@@ -1,3 +1,4 @@
+// src/app/middleware.ts
 import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 
@@ -5,31 +6,18 @@ const publicRoutes = [
   '/',
   '/login',
   '/register',
-  '/forgot-password',
-  '/reset-password',
-  '/verify-email',
-  '/terms',
-  '/privacy',
-  '/pricing',
-  '/features',
-  '/blog',
   '/api/auth',
-  '/api/public',
 ]
 
 const authRoutes = [
   '/login',
   '/register',
-  '/forgot-password',
-  '/reset-password',
 ]
 
 const protectedRoutes = [
   '/dashboard',
   '/projects',
   '/settings',
-  '/billing',
-  '/team',
   '/api/protected',
 ]
 
@@ -93,7 +81,6 @@ export async function middleware(request: NextRequest) {
     if (isProtectedRoute) {
       const loginUrl = new URL('/login', request.url)
       loginUrl.searchParams.set('redirectTo', pathname)
-      loginUrl.searchParams.set('error', 'Session expired. Please log in again.')
       return NextResponse.redirect(loginUrl)
     }
 

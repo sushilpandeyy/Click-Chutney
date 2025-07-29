@@ -4,12 +4,10 @@
 import { createAuthClient } from "better-auth/react"
 import type { Session, User } from "./auth"
 
-// Create the auth client for client-side operations
 export const authClient = createAuthClient({
   baseURL: process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000",
 })
 
-// Export commonly used hooks and functions
 export const {
   signIn,
   signUp,
@@ -18,7 +16,6 @@ export const {
   getSession,
 } = authClient
 
-// Custom hooks for ClickChutney
 export const useAuth = () => {
   const session = useSession()
   
@@ -31,7 +28,6 @@ export const useAuth = () => {
   }
 }
 
-// Authentication actions with ClickChutney-specific error handling
 export const authActions = {
   async signIn(email: string, password: string) {
     try {
@@ -99,7 +95,6 @@ export const authActions = {
   },
 }
 
-// Spicy error messages for ClickChutney theme
 function getSpicyErrorMessage(error: string): string {
   const errorMessages: Record<string, string> = {
     "Invalid credentials": "Wrong combo! Like putting ketchup on samosas 🍅",
@@ -110,60 +105,8 @@ function getSpicyErrorMessage(error: string): string {
     "Too many attempts": "Slow down, chef! Too many attempts. Take a chai break ☕",
     "Session expired": "Your session has gone stale! Time to log in again 🍞",
     "Network error": "Connection is as slow as street traffic! Try again 🚗",
+    "Server error": "Our kitchen is having issues! Chef is fixing it 👨‍🍳",
   }
 
-  // Find matching error or return a default spicy message
-  const matchedError = Object.keys(errorMessages).find(key => 
-    error.toLowerCase().includes(key.toLowerCase())
-  )
-
-  return matchedError ? errorMessages[matchedError] : 
-    "Something's not right in the kitchen! Please try again 🍳"
-}
-
-// Utility function to check if user is authenticated on client
-export const checkAuth = async () => {
-  const sessionResult = await getSession()
-  // sessionResult may be an error or a data object
-  if ('data' in sessionResult && sessionResult.data) {
-    return {
-      isAuthenticated: !!sessionResult.data.user,
-      user: sessionResult.data.user ?? null,
-    }
-  }
-  return {
-    isAuthenticated: false,
-    user: null,
-  }
-}
-
-// Types for better TypeScript support
-export type AuthUser = User
-export type AuthSession = Session
-export type AuthResult<T = any> = {
-  success: boolean
-  data?: T
-  error?: string
-}
-
-// Local storage helpers for remember me functionality
-export const authStorage = {
-  setRememberMe: (remember: boolean) => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('clickchutney-remember', remember.toString())
-    }
-  },
-  
-  getRememberMe: (): boolean => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('clickchutney-remember') === 'true'
-    }
-    return false
-  },
-  
-  clearRememberMe: () => {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('clickchutney-remember')
-    }
-  },
+  return errorMessages[error] || `Something's not right in the kitchen! ${error} 🤔`
 }

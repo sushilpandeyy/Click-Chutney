@@ -1,4 +1,3 @@
-// src/components/auth/LoginForm.tsx
 "use client"
 
 import { useState } from "react"
@@ -7,7 +6,8 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { authActions, authStorage } from "@/lib/auth-client"
+import { authActions } from "@/lib/auth-client"
+import { authStorage } from "@/lib/auth-storage"
 import { Eye, EyeOff, Loader2, Mail, Lock, Coffee } from "lucide-react"
 import { toast } from "sonner"
 
@@ -26,7 +26,6 @@ export function LoginForm({ redirectTo = "/dashboard" }: LoginFormProps) {
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
 
-  // Form validation
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
 
@@ -58,14 +57,12 @@ export function LoginForm({ redirectTo = "/dashboard" }: LoginFormProps) {
       const result = await authActions.signIn(formData.email, formData.password)
       
       if (result.success) {
-        // Handle remember me preference
         authStorage.setRememberMe(rememberMe)
         
         toast.success("Welcome back! The kitchen is ready for you 🍳", {
           description: "Redirecting to your spicy dashboard...",
         })
         
-        // Small delay for toast visibility
         setTimeout(() => {
           router.push(redirectTo)
           router.refresh()
@@ -90,7 +87,6 @@ export function LoginForm({ redirectTo = "/dashboard" }: LoginFormProps) {
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
     setFormData(prev => ({ ...prev, [field]: e.target.value }))
-    // Clear error when user starts typing
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: "" }))
     }
@@ -98,7 +94,6 @@ export function LoginForm({ redirectTo = "/dashboard" }: LoginFormProps) {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 via-yellow-50 to-red-50 p-4">
-      {/* Floating spice elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-8 h-8 text-2xl animate-bounce">🌶️</div>
         <div className="absolute top-40 right-20 w-8 h-8 text-2xl animate-bounce delay-300">🥭</div>
@@ -108,7 +103,6 @@ export function LoginForm({ redirectTo = "/dashboard" }: LoginFormProps) {
 
       <Card className="w-full max-w-md border-0 shadow-2xl bg-white/95 backdrop-blur-sm">
         <CardHeader className="text-center space-y-4">
-          {/* Logo */}
           <div className="flex justify-center">
             <div className="w-20 h-20 bg-gradient-to-br from-yellow-400 via-orange-500 to-red-500 rounded-2xl flex items-center justify-center shadow-lg">
               <span className="text-3xl">🥭</span>
@@ -126,14 +120,12 @@ export function LoginForm({ redirectTo = "/dashboard" }: LoginFormProps) {
 
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* General Error */}
             {errors.general && (
               <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
                 <p className="text-red-600 text-sm">{errors.general}</p>
               </div>
             )}
 
-            {/* Email Field */}
             <div className="space-y-2">
               <label htmlFor="email" className="text-sm font-medium text-gray-700">
                 Email Address
@@ -155,7 +147,6 @@ export function LoginForm({ redirectTo = "/dashboard" }: LoginFormProps) {
               )}
             </div>
 
-            {/* Password Field */}
             <div className="space-y-2">
               <label htmlFor="password" className="text-sm font-medium text-gray-700">
                 Password
@@ -189,7 +180,6 @@ export function LoginForm({ redirectTo = "/dashboard" }: LoginFormProps) {
               )}
             </div>
 
-            {/* Remember Me & Forgot Password */}
             <div className="flex items-center justify-between">
               <label className="flex items-center space-x-2 cursor-pointer">
                 <input
@@ -210,7 +200,6 @@ export function LoginForm({ redirectTo = "/dashboard" }: LoginFormProps) {
               </Link>
             </div>
 
-            {/* Submit Button */}
             <Button
               type="submit"
               disabled={isLoading}
@@ -229,7 +218,6 @@ export function LoginForm({ redirectTo = "/dashboard" }: LoginFormProps) {
               )}
             </Button>
 
-            {/* Register Link */}
             <div className="text-center pt-4 border-t border-gray-200">
               <p className="text-gray-600">
                 New to the kitchen?{" "}

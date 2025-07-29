@@ -1,6 +1,6 @@
-import { pgTable, text, timestamp, uuid, boolean, integer } from "drizzle-orm/pg-core"
+// src/db/schema.ts
+import { pgTable, text, timestamp, uuid, boolean } from "drizzle-orm/pg-core"
 import { createInsertSchema, createSelectSchema } from "drizzle-zod"
-import { z } from "zod"
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -8,7 +8,6 @@ export const user = pgTable("user", {
   email: text("email").notNull().unique(),
   emailVerified: boolean("emailVerified").notNull().default(false),
   image: text("image"),
-  avatar: text("avatar"),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
   updatedAt: timestamp("updatedAt").notNull().defaultNow(),
 })
@@ -42,15 +41,6 @@ export const account = pgTable("account", {
   password: text("password"),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
   updatedAt: timestamp("updatedAt").notNull().defaultNow(),
-})
-
-export const verification = pgTable("verification", {
-  id: text("id").primaryKey(),
-  identifier: text("identifier").notNull(),
-  value: text("value").notNull(),
-  expiresAt: timestamp("expiresAt").notNull(),
-  createdAt: timestamp("createdAt").defaultNow(),
-  updatedAt: timestamp("updatedAt").defaultNow(),
 })
 
 export const project = pgTable("project", {
@@ -88,21 +78,6 @@ export const analyticsEvent = pgTable("analytics_event", {
   timestamp: timestamp("timestamp").defaultNow(),
 })
 
-export const teamMember = pgTable("team_member", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  projectId: uuid("projectId")
-    .notNull()
-    .references(() => project.id, { onDelete: "cascade" }),
-  userId: text("userId")
-    .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
-  role: text("role").notNull().default("viewer"),
-  invitedAt: timestamp("invitedAt").defaultNow(),
-  joinedAt: timestamp("joinedAt"),
-  invitedBy: text("invitedBy")
-    .references(() => user.id),
-})
-
 export const insertUserSchema = createInsertSchema(user).omit({
   id: true,
   createdAt: true,
@@ -111,20 +86,16 @@ export const insertUserSchema = createInsertSchema(user).omit({
 })
 
 export const selectUserSchema = createSelectSchema(user)
-
 export const insertProjectSchema = createInsertSchema(project).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
 })
-
 export const selectProjectSchema = createSelectSchema(project)
-
 export const insertAnalyticsEventSchema = createInsertSchema(analyticsEvent).omit({
   id: true,
   timestamp: true,
 })
-
 export const selectAnalyticsEventSchema = createSelectSchema(analyticsEvent)
 
 export type User = typeof user.$inferSelect
@@ -133,21 +104,15 @@ export type Session = typeof session.$inferSelect
 export type NewSession = typeof session.$inferInsert
 export type Account = typeof account.$inferSelect
 export type NewAccount = typeof account.$inferInsert
-export type Verification = typeof verification.$inferSelect
-export type NewVerification = typeof verification.$inferInsert
 export type Project = typeof project.$inferSelect
 export type NewProject = typeof project.$inferInsert
 export type AnalyticsEvent = typeof analyticsEvent.$inferSelect
 export type NewAnalyticsEvent = typeof analyticsEvent.$inferInsert
-export type TeamMember = typeof teamMember.$inferSelect
-export type NewTeamMember = typeof teamMember.$inferInsert
 
 export const tables = {
   user,
   session,
   account,
-  verification,
   project,
   analyticsEvent,
-  teamMember,
 }
