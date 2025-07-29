@@ -10,6 +10,7 @@ import { authActions } from "@/lib/auth-client"
 import { authStorage } from "@/lib/auth-storage"
 import { Eye, EyeOff, Loader2, Mail, Lock, Coffee } from "lucide-react"
 import { toast } from "sonner"
+import { GitHubButton } from "./GitHubButton"
 
 interface LoginFormProps {
   redirectTo?: string
@@ -118,7 +119,28 @@ export function LoginForm({ redirectTo = "/dashboard" }: LoginFormProps) {
           </CardDescription>
         </CardHeader>
 
-        <CardContent>
+        <CardContent className="space-y-6">
+          {/* GitHub OAuth Section - Outside of form */}
+          <div className="space-y-4">
+            <GitHubButton 
+              mode="signin" 
+              redirectTo={redirectTo}
+            />
+            
+            {/* Divider */}
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-gray-300" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-white px-2 text-gray-500">
+                  Or continue with email
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Email/Password Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
             {errors.general && (
               <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
@@ -217,19 +239,20 @@ export function LoginForm({ redirectTo = "/dashboard" }: LoginFormProps) {
                 </>
               )}
             </Button>
-
-            <div className="text-center pt-4 border-t border-gray-200">
-              <p className="text-gray-600">
-                New to the kitchen?{" "}
-                <Link
-                  href="/register"
-                  className="text-orange-600 hover:text-orange-700 font-semibold transition-colors"
-                >
-                  Join our spicy community! 🌶️
-                </Link>
-              </p>
-            </div>
           </form>
+
+          {/* Sign up link */}
+          <div className="text-center pt-4 border-t border-gray-200">
+            <p className="text-gray-600">
+              New to the kitchen?{" "}
+              <Link
+                href="/register"
+                className="text-orange-600 hover:text-orange-700 font-semibold transition-colors"
+              >
+                Join our spicy community! 🌶️
+              </Link>
+            </p>
+          </div>
         </CardContent>
       </Card>
     </div>

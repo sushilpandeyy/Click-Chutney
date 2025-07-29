@@ -1,4 +1,3 @@
-// src/lib/auth.ts
 import { betterAuth } from "better-auth"
 import { drizzleAdapter } from "better-auth/adapters/drizzle"
 import { db } from "@/db/db"
@@ -17,8 +16,18 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: false,
-    minPasswordLength: 6, // Changed from 8 to match your requirement
+    minPasswordLength: 8,
     maxPasswordLength: 128,
+  },
+
+  // 🌶️ NEW: Add GitHub OAuth
+  socialProviders: {
+    github: {
+      clientId: process.env.GITHUB_CLIENT_ID!,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+      // Optional: Request specific scopes
+      scope: ["user:email", "read:user"],
+    },
   },
   
   session: {
@@ -83,6 +92,21 @@ export const auth = betterAuth({
     level: process.env.NODE_ENV === "production" ? "error" : "debug",
     disabled: false,
   },
+
+  // 🌶️ Optional: Add custom callbacks for GitHub login
+  callbacks: {
+    after: [
+      {
+        matcher(context: { path: string }) {
+          return context.path === "/sign-up/social"
+        },
+        handler: async (ctx: { user?: { email?: string } }) => {
+          console.log("🎉 New chef joined via GitHub!", ctx.user?.email)
+          // You can add custom logic here (e.g., send welcome email, analytics)
+        }
+      }
+    ]
+  }
 })
 
 export default auth.handler
