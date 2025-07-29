@@ -1,82 +1,63 @@
 // src/app/(auth)/login/page.tsx
-import { Suspense } from "react"
-import { Metadata } from "next"
-import { LoginForm } from "@/components/auth/LoginForm"
-import { Loader2 } from "lucide-react"
+import { Suspense } from 'react'
+import LoginForm from '@/components/LoginForm'
 
-export const metadata: Metadata = {
-  title: "Login | ClickChutney - Spicy Analytics",
-  description: "Log in to your ClickChutney dashboard and spice up your analytics journey!",
-  keywords: ["login", "signin", "authentication", "analytics", "dashboard"],
+interface LoginPageProps {
+  searchParams: Promise<{
+    redirectTo?: string
+    error?: string
+  }>
 }
 
-// Loading component for Suspense
-function LoginLoading() {
+// Separate component to handle the async searchParams
+async function LoginContent({ searchParams }: LoginPageProps) {
+  const params = await searchParams
+  const redirectTo = params.redirectTo || "/dashboard"
+  const error = params.error
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 via-yellow-50 to-red-50">
-      <div className="text-center">
-        <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 via-orange-500 to-red-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-          <span className="text-2xl">🥭</span>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8">
+        <div>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            Sign in to your account
+          </h2>
+          <p className="mt-2 text-center text-sm text-gray-600">
+            Or{' '}
+            <a
+              href="/register"
+              className="font-medium text-indigo-600 hover:text-indigo-500"
+            >
+              create a new account
+            </a>
+          </p>
         </div>
-        <Loader2 className="w-8 h-8 animate-spin text-orange-500 mx-auto mb-4" />
-        <p className="text-gray-600 text-lg">Heating up the kitchen... 🔥</p>
+
+        {error && (
+          <div className="rounded-md bg-red-50 p-4">
+            <div className="text-sm text-red-700">
+              {error === 'CredentialsSignin' 
+                ? 'Invalid email or password. Please try again.'
+                : 'An error occurred during sign in. Please try again.'
+              }
+            </div>
+          </div>
+        )}
+
+        <LoginForm redirectTo={redirectTo} />
       </div>
     </div>
   )
 }
 
-interface LoginPageProps {
-  searchParams: {
-    redirectTo?: string
-    error?: string
-    message?: string
-  }
-}
-
-export default function LoginPage({ searchParams }: LoginPageProps) {
-  const redirectTo = searchParams.redirectTo || "/dashboard"
-  
+export default function LoginPage(props: LoginPageProps) {
   return (
-    <>
-      {/* SEO and Social Meta Tags */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "WebPage",
-            "name": "Login to ClickChutney",
-            "description": "Access your spicy analytics dashboard",
-            "url": "https://clickchutney.com/login",
-            "provider": {
-              "@type": "Organization",
-              "name": "ClickChutney",
-              "url": "https://clickchutney.com"
-            }
-          })
-        }}
-      />
-      
-      <Suspense fallback={<LoginLoading />}>
-        <LoginForm redirectTo={redirectTo} />
-      </Suspense>
-      
-      {/* Error/Success Messages from URL params */}
-      {searchParams.error && (
-        <div className="fixed top-4 right-4 z-50">
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded shadow-lg max-w-sm">
-            <p className="text-sm">{searchParams.error}</p>
-          </div>
-        </div>
-      )}
-      
-      {searchParams.message && (
-        <div className="fixed top-4 right-4 z-50">
-          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded shadow-lg max-w-sm">
-            <p className="text-sm">{searchParams.message}</p>
-          </div>
-        </div>
-      )}
-    </>
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+      </div>
+    }>
+      <LoginContent {...props} />
+    </Suspense>
   )
 }

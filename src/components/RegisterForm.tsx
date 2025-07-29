@@ -54,7 +54,7 @@ export default function RegisterForm({ redirectTo }: RegisterFormProps) {
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.message || 'Registration failed')
+        throw new Error(data.error || 'Registration failed')
       }
 
       setSuccess('Account created successfully! Redirecting...')
@@ -62,6 +62,7 @@ export default function RegisterForm({ redirectTo }: RegisterFormProps) {
       // Redirect after successful registration
       setTimeout(() => {
         router.push(redirectTo)
+        router.refresh()
       }, 1500)
 
     } catch (err) {
