@@ -41,7 +41,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-yellow-50">
-      {/* Navigation */}
       <nav
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           scrolled ? "bg-white/95 backdrop-blur-md shadow-lg border-b border-orange-100" : "bg-transparent"
@@ -49,7 +48,6 @@ export default function Home() {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            {/* Logo */}
             <div className="flex items-center space-x-3 group cursor-pointer">
               <div className="w-10 h-10 bg-gradient-to-br from-yellow-400 via-orange-500 to-red-500 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
                 <span className="text-white font-bold text-lg">🥭</span>
@@ -59,7 +57,6 @@ export default function Home() {
               </span>
             </div>
 
-            {/* Desktop Menu */}
             <div className="hidden md:flex items-center space-x-8">
               <Link
                 href="#features"
@@ -94,7 +91,6 @@ export default function Home() {
               </Button>
             </div>
 
-            {/* Mobile Menu Button */}
             <button
               className="md:hidden p-2 rounded-lg hover:bg-orange-100 transition-colors"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -103,7 +99,6 @@ export default function Home() {
             </button>
           </div>
 
-          {/* Mobile Menu */}
           {mobileMenuOpen && (
             <div className="md:hidden py-4 border-t border-orange-100 bg-white/95 backdrop-blur-md">
               <div className="flex flex-col space-y-4">
@@ -126,11 +121,9 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* Hero Section */}
       <section className="relative overflow-hidden pt-24 pb-20 lg:pt-32 lg:pb-32">
         <FloatingElements />
 
-        {/* Background Pattern */}
         <div className="absolute inset-0 opacity-5">
           <div
             className="absolute inset-0"
@@ -178,7 +171,6 @@ export default function Home() {
                 </Button>
               </div>
 
-              {/* Trust Indicators */}
               <div className="flex flex-wrap items-center justify-center lg:justify-start gap-8 text-sm text-gray-500">
                 <div className="flex items-center space-x-2">
                   <CheckCircle className="w-5 h-5 text-green-600" />
@@ -206,19 +198,15 @@ export default function Home() {
                 />
               </div>
 
-              {/* Glow Effect */}
               <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 rounded-2xl blur-3xl opacity-20 -z-10 animate-pulse"></div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Stats Section */}
       <StatsSection />
 
-      {/* Features Section */}
       <section id="features" className="py-24 bg-white relative overflow-hidden">
-        {/* Background decoration */}
         <div className="absolute top-0 left-0 w-full h-full opacity-5">
           <div className="absolute top-20 left-10 w-32 h-32 bg-yellow-400 rounded-full blur-3xl"></div>
           <div className="absolute bottom-20 right-10 w-40 h-40 bg-red-400 rounded-full blur-3xl"></div>
@@ -293,7 +281,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* How It Works Section */}
       <section className="py-24 bg-gradient-to-br from-yellow-50 via-orange-50 to-red-50 relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-yellow-400 rounded-full blur-3xl animate-pulse"></div>
@@ -367,7 +354,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Enhanced Testimonials */}
       <section className="py-24 bg-white relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-20">
@@ -459,7 +445,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Enhanced FAQ Section */}
       <section className="py-24 bg-gradient-to-br from-orange-50 to-yellow-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-20">
@@ -545,7 +530,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Enhanced CTA Section */}
       <section className="py-24 bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 relative overflow-hidden">
         <div className="absolute inset-0">
           <div className="absolute top-10 left-10 w-32 h-32 bg-white/10 rounded-full blur-2xl animate-pulse"></div>
@@ -594,7 +578,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Enhanced Footer */}
       <footer className="bg-gradient-to-br from-orange-50 to-yellow-50 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-4 gap-12">

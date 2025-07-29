@@ -143,7 +143,6 @@ export default function Dashboard() {
         <AppSidebar />
 
         <main className="flex-1 p-6 overflow-auto">
-          {/* Header */}
           <div className="mb-8">
             <div className="flex items-center gap-4 mb-4">
               <SidebarTrigger className="md:hidden" />
@@ -158,7 +157,6 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Primary CTA */}
             <Button
               size="lg"
               className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-full px-8 py-6 text-lg font-semibold shadow-lg hover:shadow-xl transition-all"
@@ -171,7 +169,6 @@ export default function Dashboard() {
 
           {hasProjects ? (
             <>
-              {/* Stats Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 {statCards.map((stat, index) => (
                   <Card key={index} className="rounded-2xl shadow-md hover:shadow-lg transition-shadow border-0">
@@ -194,7 +191,6 @@ export default function Dashboard() {
                 ))}
               </div>
 
-              {/* Chart */}
               <Card className="rounded-2xl shadow-md border-0 mb-8">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-xl">
@@ -260,7 +256,6 @@ export default function Dashboard() {
             </Card>
           )}
 
-          {/* Footer */}
           <footer className="mt-12 py-6 border-t border-orange-100">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
               <p className="text-gray-600 flex items-center gap-2">
