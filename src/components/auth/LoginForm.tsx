@@ -4,6 +4,7 @@ import Link from "next/link"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChefHat } from "lucide-react"
 import { GitHubButton } from "./GitHubButton"
+import { TwitterButton } from "./TwitterButton"
 
 interface LoginFormProps {
   redirectTo?: string
@@ -22,12 +23,25 @@ export function LoginForm({ redirectTo = "/dashboard" }: LoginFormProps) {
           Welcome to the Kitchen! 👨‍🍳
         </CardTitle>
         <CardDescription className="text-[#8B4513]">
-          Sign in with GitHub to start cooking with spicy analytics
+          Sign in to start cooking with spicy analytics
         </CardDescription>
       </CardHeader>
       
       <CardContent className="space-y-6">
-        <GitHubButton disabled={false} redirectTo={redirectTo} />
+        <div className="space-y-3">
+          <GitHubButton disabled={false} redirectTo={redirectTo} />
+          
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-[#8B4513]/20" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-white px-2 text-[#8B4513]/60">or</span>
+            </div>
+          </div>
+          
+          <TwitterButton disabled={false} redirectTo={redirectTo} />
+        </div>
 
         <div className="text-center">
           <p className="text-sm text-[#8B4513]/80">
