@@ -1,6 +1,6 @@
 // src/app/(auth)/login/page.tsx
 import { Suspense } from 'react'
-import LoginForm from '@/components/LoginForm'
+import { LoginForm } from '@/components/auth/LoginForm'
 
 interface LoginPageProps {
   searchParams: Promise<{
@@ -16,34 +16,18 @@ async function LoginContent({ searchParams }: LoginPageProps) {
   const error = params.error
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Sign in to your account
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Or{' '}
-            <a
-              href="/register"
-              className="font-medium text-indigo-600 hover:text-indigo-500"
-            >
-              create a new account
-            </a>
-          </p>
-        </div>
-
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#FEF7E0] via-[#FFFFFF] to-[#10B981]/10 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md">
         {error && (
-          <div className="rounded-md bg-red-50 p-4">
-            <div className="text-sm text-red-700">
+          <div className="mb-6 p-4 rounded-lg bg-[#FF4444]/10 border border-[#FF4444]/20">
+            <p className="text-sm text-[#FF4444] font-medium text-center">
               {error === 'CredentialsSignin' 
-                ? 'Invalid email or password. Please try again.'
-                : 'An error occurred during sign in. Please try again.'
-              }
-            </div>
+                ? 'Invalid credentials! Check your recipe again 🔍' 
+                : 'Authentication failed. Please try again.'}
+            </p>
           </div>
         )}
-
+        
         <LoginForm redirectTo={redirectTo} />
       </div>
     </div>
@@ -53,8 +37,10 @@ async function LoginContent({ searchParams }: LoginPageProps) {
 export default function LoginPage(props: LoginPageProps) {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#FEF7E0] via-[#FFFFFF] to-[#10B981]/10">
+        <div className="w-16 h-16 bg-gradient-to-br from-[#FFB800] to-[#FF4444] rounded-full flex items-center justify-center animate-pulse">
+          <div className="w-8 h-8 bg-white rounded-full animate-spin"></div>
+        </div>
       </div>
     }>
       <LoginContent {...props} />

@@ -4,44 +4,41 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Github, Loader2 } from "lucide-react"
 import { authActions } from "@/lib/auth-client"
-import { useRouter } from "next/navigation"
 import { toast } from "sonner"
+import { useRouter } from "next/navigation"
 
 interface GitHubButtonProps {
-  mode?: "signin" | "signup"
+  disabled?: boolean
   redirectTo?: string
-  className?: string
 }
 
-export function GitHubButton({ 
-  mode = "signin", 
-  redirectTo = "/dashboard",
-  className 
-}: GitHubButtonProps) {
+export function GitHubButton({ disabled = false, redirectTo = "/dashboard" }: GitHubButtonProps) {
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
-  const handleGitHubAuth = async () => {
+  const handleGitHubSignIn = async () => {
+    setIsLoading(true)
+    
     try {
-      setIsLoading(true)
-      
       const result = await authActions.signInWithGitHub()
       
       if (result.success) {
-        toast.success("🎉 Welcome to the kitchen, chef!", {
-          description: "You've successfully signed in with GitHub!"
+        toast.success("GitHub sign-in successful! 🎉", {
+          description: "Welcome to the kitchen!",
         })
         
-        // Redirect after successful authentication
-        router.push(redirectTo)
+        setTimeout(() => {
+          router.push(redirectTo)
+          router.refresh()
+        }, 1000)
       } else {
-        toast.error("GitHub Sign-in Failed", {
-          description: result.error
+        toast.error("GitHub sign-in failed", {
+          description: result.error || "Something went wrong",
         })
       }
     } catch (error) {
-      toast.error("Connection Error", {
-        description: "Failed to connect with GitHub. Try again!"
+      toast.error("Connection failed!", {
+        description: "Unable to connect with GitHub. Please try again.",
       })
     } finally {
       setIsLoading(false)
@@ -52,27 +49,19 @@ export function GitHubButton({
     <Button
       type="button"
       variant="outline"
-      onClick={handleGitHubAuth}
-      disabled={isLoading}
-      className={`
-        w-full border-gray-300 hover:border-gray-400 
-        bg-white hover:bg-gray-50 text-gray-900
-        dark:bg-gray-800 dark:hover:bg-gray-700 
-        dark:text-white dark:border-gray-600
-        transition-all duration-200 ease-in-out
-        hover:shadow-md active:scale-[0.98]
-        ${className}
-      `}
+      onClick={handleGitHubSignIn}
+      disabled={disabled || isLoading}
+      className="w-full h-12 border-2 border-[#8B4513]/20 hover:border-[#8B4513]/40 hover:bg-[#8B4513]/5 transition-all duration-200"
     >
       {isLoading ? (
         <>
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          Connecting to GitHub...
+          <Loader2 className="w-5 h-5 animate-spin mr-2" />
+          Connecting...
         </>
       ) : (
         <>
-          <Github className="mr-2 h-4 w-4" />
-          {mode === "signin" ? "Sign in" : "Sign up"} with GitHub
+          <Github className="w-5 h-5 mr-2" />
+          Continue with GitHub
         </>
       )}
     </Button>

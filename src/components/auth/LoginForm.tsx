@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { authActions } from "@/lib/auth-client"
 import { authStorage } from "@/lib/auth-storage"
-import { Eye, EyeOff, Loader2, Mail, Lock, Coffee } from "lucide-react"
+import { Eye, EyeOff, Loader2, Mail, Lock, Coffee, ChefHat } from "lucide-react"
 import { toast } from "sonner"
 import { GitHubButton } from "./GitHubButton"
 
@@ -46,6 +46,15 @@ export function LoginForm({ redirectTo = "/dashboard" }: LoginFormProps) {
     return Object.keys(newErrors).length === 0
   }
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    setFormData(prev => ({ ...prev, [name]: value }))
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: "" }))
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
@@ -75,186 +84,166 @@ export function LoginForm({ redirectTo = "/dashboard" }: LoginFormProps) {
         setErrors({ general: result.error || "Login failed" })
       }
     } catch (error) {
-      toast.error("Oops! Something burned in the kitchen 🔥", {
-        description: "Please try again in a moment",
+      toast.error("Oops! Kitchen's having a moment 🔥", {
+        description: "Something went wrong. Try again!",
       })
-      setErrors({ general: "An unexpected error occurred" })
+      setErrors({ general: "Login failed. Please try again." })
     } finally {
       setIsLoading(false)
     }
   }
 
-  const handleInputChange = (field: keyof typeof formData) => (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setFormData(prev => ({ ...prev, [field]: e.target.value }))
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: "" }))
-    }
-  }
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 via-yellow-50 to-red-50 p-4">
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-8 h-8 text-2xl animate-bounce">🌶️</div>
-        <div className="absolute top-40 right-20 w-8 h-8 text-2xl animate-bounce delay-300">🥭</div>
-        <div className="absolute bottom-32 left-20 w-8 h-8 text-2xl animate-bounce delay-700">☕</div>
-        <div className="absolute bottom-20 right-10 w-8 h-8 text-2xl animate-bounce delay-500">🧄</div>
-      </div>
-
-      <Card className="w-full max-w-md border-0 shadow-2xl bg-white/95 backdrop-blur-sm">
-        <CardHeader className="text-center space-y-4">
-          <div className="flex justify-center">
-            <div className="w-20 h-20 bg-gradient-to-br from-yellow-400 via-orange-500 to-red-500 rounded-2xl flex items-center justify-center shadow-lg">
-              <span className="text-3xl">🥭</span>
-            </div>
+    <Card className="w-full max-w-md mx-auto shadow-xl border-0 bg-white/95 backdrop-blur">
+      <CardHeader className="text-center pb-2">
+        <div className="flex justify-center mb-4">
+          <div className="w-16 h-16 bg-gradient-to-br from-[#FFB800] to-[#FF4444] rounded-full flex items-center justify-center">
+            <ChefHat className="w-8 h-8 text-white" />
           </div>
-          
-          <CardTitle className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-            Welcome Back!
-          </CardTitle>
-          
-          <CardDescription className="text-lg text-gray-600">
-            Time to spice up your analytics! Log in to continue your flavor journey 🌶️
-          </CardDescription>
-        </CardHeader>
+        </div>
+        <CardTitle className="text-2xl font-bold text-[#1F2937]">
+          Welcome back, Chef! 👨‍🍳
+        </CardTitle>
+        <CardDescription className="text-[#8B4513]">
+          Ready to cook up some spicy analytics?
+        </CardDescription>
+      </CardHeader>
+      
+      <CardContent className="space-y-6">
+        {errors.general && (
+          <div className="p-3 rounded-lg bg-[#FF4444]/10 border border-[#FF4444]/20">
+            <p className="text-sm text-[#FF4444] font-medium">{errors.general}</p>
+          </div>
+        )}
 
-        <CardContent className="space-y-6">
-          {/* GitHub OAuth Section - Outside of form */}
-          <div className="space-y-4">
-            <GitHubButton 
-              mode="signin" 
-              redirectTo={redirectTo}
-            />
-            
-            {/* Divider */}
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <label className="text-sm font-semibold text-[#8B4513]">
+              Email Address
+            </label>
             <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-gray-300" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-white px-2 text-gray-500">
-                  Or continue with email
-                </span>
-              </div>
+              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#8B4513]/60 w-5 h-5" />
+              <Input
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                placeholder="your.email@example.com"
+                className={`pl-10 h-12 border-2 transition-all duration-200 bg-white/80 ${
+                  errors.email 
+                    ? "border-[#FF4444] focus:border-[#FF4444]" 
+                    : "border-[#8B4513]/20 focus:border-[#FFB800] hover:border-[#FFB800]/60"
+                }`}
+                disabled={isLoading}
+              />
             </div>
-          </div>
-
-          {/* Email/Password Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {errors.general && (
-              <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-red-600 text-sm">{errors.general}</p>
-              </div>
+            {errors.email && (
+              <p className="text-xs text-[#FF4444] font-medium mt-1">{errors.email}</p>
             )}
-
-            <div className="space-y-2">
-              <label htmlFor="email" className="text-sm font-medium text-gray-700">
-                Email Address
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="chef@clickchutney.com"
-                  value={formData.email}
-                  onChange={handleInputChange("email")}
-                  className={`pl-10 h-12 ${errors.email ? 'border-red-500 focus-visible:ring-red-500' : 'focus-visible:ring-orange-500'}`}
-                  disabled={isLoading}
-                />
-              </div>
-              {errors.email && (
-                <p className="text-red-500 text-sm mt-1">{errors.email}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <label htmlFor="password" className="text-sm font-medium text-gray-700">
-                Password
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Your secret spice blend..."
-                  value={formData.password}
-                  onChange={handleInputChange("password")}
-                  className={`pl-10 pr-12 h-12 ${errors.password ? 'border-red-500 focus-visible:ring-red-500' : 'focus-visible:ring-orange-500'}`}
-                  disabled={isLoading}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-                  disabled={isLoading}
-                >
-                  {showPassword ? (
-                    <EyeOff className="w-5 h-5" />
-                  ) : (
-                    <Eye className="w-5 h-5" />
-                  )}
-                </button>
-              </div>
-              {errors.password && (
-                <p className="text-red-500 text-sm mt-1">{errors.password}</p>
-              )}
-            </div>
-
-            <div className="flex items-center justify-between">
-              <label className="flex items-center space-x-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                  className="w-4 h-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500"
-                  disabled={isLoading}
-                />
-                <span className="text-sm text-gray-600">Remember this spice level</span>
-              </label>
-              
-              <Link
-                href="/forgot-password"
-                className="text-sm text-orange-600 hover:text-orange-700 font-medium transition-colors"
-              >
-                Forgot recipe?
-              </Link>
-            </div>
-
-            <Button
-              type="submit"
-              disabled={isLoading}
-              className="w-full h-12 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                  Cooking up your session...
-                </>
-              ) : (
-                <>
-                  <Coffee className="w-5 h-5 mr-2" />
-                  Let's Get Cooking! 
-                </>
-              )}
-            </Button>
-          </form>
-
-          {/* Sign up link */}
-          <div className="text-center pt-4 border-t border-gray-200">
-            <p className="text-gray-600">
-              New to the kitchen?{" "}
-              <Link
-                href="/register"
-                className="text-orange-600 hover:text-orange-700 font-semibold transition-colors"
-              >
-                Join our spicy community! 🌶️
-              </Link>
-            </p>
           </div>
-        </CardContent>
-      </Card>
-    </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-semibold text-[#8B4513]">
+              Password
+            </label>
+            <div className="relative">
+              <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#8B4513]/60 w-5 h-5" />
+              <Input
+                name="password"
+                type={showPassword ? "text" : "password"}
+                value={formData.password}
+                onChange={handleInputChange}
+                placeholder="Enter your secret recipe"
+                className={`pl-10 pr-12 h-12 border-2 transition-all duration-200 bg-white/80 ${
+                  errors.password 
+                    ? "border-[#FF4444] focus:border-[#FF4444]" 
+                    : "border-[#8B4513]/20 focus:border-[#FFB800] hover:border-[#FFB800]/60"
+                }`}
+                disabled={isLoading}
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0 hover:bg-[#FFB800]/20"
+                onClick={() => setShowPassword(!showPassword)}
+                disabled={isLoading}
+              >
+                {showPassword ? (
+                  <EyeOff className="w-4 h-4 text-[#8B4513]/60" />
+                ) : (
+                  <Eye className="w-4 h-4 text-[#8B4513]/60" />
+                )}
+              </Button>
+            </div>
+            {errors.password && (
+              <p className="text-xs text-[#FF4444] font-medium mt-1">{errors.password}</p>
+            )}
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <label className="flex items-center space-x-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+              className="w-4 h-4 text-[#FFB800] border-2 border-[#8B4513]/20 rounded focus:ring-[#FFB800] focus:ring-2"
+              disabled={isLoading}
+            />
+            <span className="text-sm text-[#8B4513] font-medium">Remember me</span>
+          </label>
+          <Link 
+            href="/forgot-password" 
+            className="text-sm text-[#FFB800] hover:text-[#FF4444] font-semibold transition-colors"
+          >
+            Forgot recipe? 🤔
+          </Link>
+        </div>
+
+        <Button
+          onClick={handleSubmit}
+          disabled={isLoading}
+          className="w-full h-12 bg-gradient-to-r from-[#FFB800] to-[#FF4444] hover:from-[#FF4444] hover:to-[#FFB800] text-white font-bold text-base rounded-lg transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-xl"
+        >
+          {isLoading ? (
+            <>
+              <Loader2 className="w-5 h-5 animate-spin mr-2" />
+              Cooking up access... 🍳
+            </>
+          ) : (
+            <>
+              <Coffee className="w-5 h-5 mr-2" />
+              Enter the Kitchen! 🔥
+            </>
+          )}
+        </Button>
+
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-[#8B4513]/20"></div>
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="px-3 bg-white text-[#8B4513]/60 font-medium">
+              Or spice it up with
+            </span>
+          </div>
+        </div>
+
+        <GitHubButton disabled={isLoading} />
+
+        <div className="text-center">
+          <p className="text-sm text-[#8B4513]/80">
+            New to the kitchen?{" "}
+            <Link 
+              href="/register" 
+              className="font-bold text-[#FFB800] hover:text-[#FF4444] transition-colors"
+            >
+              Join the crew! 👥
+            </Link>
+          </p>
+        </div>
+      </CardContent>
+    </Card>
   )
 }
