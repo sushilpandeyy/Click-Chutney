@@ -10,6 +10,10 @@
 !.yarn/releases
 !.yarn/versions
 
+# Plugin dependencies
+plugin/npm/*/node_modules/
+plugin/lambda/*/node_modules/
+
 # testing
 /coverage
 
@@ -19,6 +23,16 @@
 
 # production
 /build
+/dist
+
+# Plugin build outputs
+plugin/npm/*/dist/
+plugin/npm/*/build/
+plugin/lambda/*/dist/
+
+# Lambda deployment packages
+*.zip
+plugin/lambda/*/*.zip
 
 # misc
 .DS_Store
@@ -40,5 +54,21 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-claude.md
-/src/generated/prisma
+# Plugin lock files (keep package.json but not lock files)
+plugin/npm/*/package-lock.json
+plugin/lambda/*/package-lock.json
+
+# Development files
+ANALYTICS_PACKAGE_PLAN.md
+PLUGIN_INTEGRATION_GUIDE.md
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+
+CLAUDE.md
+ANALYTICS_PACKAGE_PLAN.md
+DEPLOYMENT_GUIDE.md

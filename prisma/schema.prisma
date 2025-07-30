@@ -84,6 +84,8 @@ model Project {
   favicon     String?
   trackingId  String   @unique
   isActive    Boolean  @default(true)
+  isVerified  Boolean  @default(false)
+  verifiedAt  DateTime?
   userId      String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
