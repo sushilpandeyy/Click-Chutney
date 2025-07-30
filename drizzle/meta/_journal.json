@@ -5,8 +5,15 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1753857146759,
-      "tag": "0000_cultured_swarm",
+      "when": 1753860878110,
+      "tag": "0000_initial",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1753861200000,
+      "tag": "0001_fix_verification_schema",
       "breakpoints": true
     }
   ]

@@ -10,13 +10,9 @@ export const auth = betterAuth({
       users,
       sessions,
       accounts,
-      verificationTokens,
+      verification: verificationTokens,
     },
   }),
-  emailAndPassword: {
-    enabled: true,
-    requireEmailVerification: false, // Set to true for production
-  },
   socialProviders: {
     github: {
       clientId: process.env.GITHUB_CLIENT_ID!,
@@ -35,11 +31,13 @@ export const auth = betterAuth({
     crossSubDomainCookies: {
       enabled: false,
     },
-    generateId: () => {
-      return crypto.randomUUID()
+    database: {
+      generateId: () => {
+        return crypto.randomUUID()
+      },
     },
   },
-  trustedOrigins: ["<http://localhost:3000>"],
+  trustedOrigins: ["http://localhost:3000"],
 })
 
 export type Session = typeof auth.$Infer.Session
