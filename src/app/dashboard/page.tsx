@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import {
   BarChart3,
   Clock,
@@ -166,9 +167,12 @@ export default function Dashboard() {
             <Button
               size="lg"
               className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-full px-6 py-3 font-semibold shadow-lg hover:shadow-xl transition-all"
+              asChild
             >
-              <Plus className="w-5 h-5 mr-2" />
-              Add Project
+              <a href="/dashboard/new-project">
+                <Plus className="w-5 h-5 mr-2" />
+                Add Project
+              </a>
             </Button>
           </div>
 
@@ -250,9 +254,12 @@ export default function Dashboard() {
                   <Button
                     size="default"
                     className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-full px-6 py-2 font-semibold"
+                    asChild
                   >
-                    <Zap className="w-4 h-4 mr-2" />
-                    Get Started
+                    <a href="/dashboard/new-project">
+                      <Zap className="w-4 h-4 mr-2" />
+                      Get Started
+                    </a>
                   </Button>
                 </div>
               </CardContent>
