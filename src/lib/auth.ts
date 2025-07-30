@@ -1,17 +1,11 @@
 import { betterAuth } from "better-auth"
-import { drizzleAdapter } from "better-auth/adapters/drizzle"
-import { db } from "@/db/db"
-import { users, sessions, accounts, verificationTokens } from "@/db/schema"
+import { prismaAdapter } from "better-auth/adapters/prisma"
+import { prisma } from "@/lib/prisma"
 
 export const auth = betterAuth({
-  database: drizzleAdapter(db, {
-    provider: "pg",
-    schema: {
-      users,
-      sessions,
-      accounts,
-      verification: verificationTokens,
-    },
+  baseURL: process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000",
+  database: prismaAdapter(prisma, {
+    provider: "mongodb",
   }),
   socialProviders: {
     github: {
@@ -33,7 +27,8 @@ export const auth = betterAuth({
     },
     database: {
       generateId: () => {
-        return crypto.randomUUID()
+        // Generate a MongoDB-compatible string ID
+        return Date.now().toString(36) + Math.random().toString(36).substr(2);
       },
     },
   },
