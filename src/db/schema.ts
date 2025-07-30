@@ -1,4 +1,3 @@
-// src/db/schema.ts
 import { pgTable, text, timestamp, uuid, boolean } from "drizzle-orm/pg-core"
 import { createInsertSchema, createSelectSchema } from "drizzle-zod"
 
@@ -6,7 +5,7 @@ export const user = pgTable("user", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
-  password: text("password"), // Add password field
+  password: text("password"),
   emailVerified: boolean("emailVerified").notNull().default(false),
   image: text("image"),
   createdAt: timestamp("createdAt").notNull().defaultNow(),

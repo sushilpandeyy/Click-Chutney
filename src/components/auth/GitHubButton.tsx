@@ -2,66 +2,67 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Github, Loader2 } from "lucide-react"
-import { authActions } from "@/lib/auth-client"
+import { Github, Loader2, Sparkles } from "lucide-react"
+import { signIn } from "@/lib/auth-client"
 import { toast } from "sonner"
-import { useRouter } from "next/navigation"
 
 interface GitHubButtonProps {
   disabled?: boolean
   redirectTo?: string
+  mode?: "signin" | "signup"
 }
 
-export function GitHubButton({ disabled = false, redirectTo = "/dashboard" }: GitHubButtonProps) {
+export function GitHubButton({ 
+  disabled = false, 
+  redirectTo = "/dashboard",
+  mode = "signin" 
+}: GitHubButtonProps) {
   const [isLoading, setIsLoading] = useState(false)
-  const router = useRouter()
 
   const handleGitHubSignIn = async () => {
+    if (disabled || isLoading) return
+    
     setIsLoading(true)
     
     try {
-      const result = await authActions.signInWithGitHub()
+      await signIn.social({
+        provider: "github",
+        callbackURL: redirectTo,
+      })
       
-      if (result.success) {
-        toast.success("GitHub sign-in successful! 🎉", {
-          description: "Welcome to the kitchen!",
-        })
-        
-        setTimeout(() => {
-          router.push(redirectTo)
-          router.refresh()
-        }, 1000)
-      } else {
-        toast.error("GitHub sign-in failed", {
-          description: result.error || "Something went wrong",
-        })
-      }
+      toast.success("🎉 Redirecting to GitHub!", {
+        description: "Sign in with your GitHub account to continue",
+      })
     } catch (error) {
-      toast.error("Connection failed!", {
+      console.error('GitHub auth error:', error)
+      toast.error("Connection Failed!", {
         description: "Unable to connect with GitHub. Please try again.",
       })
-    } finally {
       setIsLoading(false)
     }
   }
 
+  const buttonText = mode === "signin" ? "Sign in with GitHub" : "Sign up with GitHub"
+  const loadingText = "Connecting to GitHub..."
+
   return (
     <Button
       type="button"
-      variant="outline"
       onClick={handleGitHubSignIn}
       disabled={disabled || isLoading}
-      className="w-full h-12 border-2 border-[#8B4513]/20 hover:border-[#8B4513]/40 hover:bg-[#8B4513]/5 transition-all duration-200"
+      size="lg"
+      className="w-full h-14 bg-[#24292e] hover:bg-[#1a1e22] text-white font-semibold text-base rounded-lg transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-xl border-0"
     >
       {isLoading ? (
         <>
-          <Loader2 className="w-5 h-5 animate-spin mr-2" />
-          Connecting...
+          <Loader2 className="w-5 h-5 animate-spin mr-3" />
+          {loadingText}
         </>
       ) : (
         <>
-          <Github className="w-5 h-5 mr-2" />
-          Continue with GitHub
+          <Github className="w-5 h-5 mr-3" />
+          {buttonText}
+          <Sparkles className="w-4 h-4 ml-2 opacity-70" />
         </>
       )}
     </Button>

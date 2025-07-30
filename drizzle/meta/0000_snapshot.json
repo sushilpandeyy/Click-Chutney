@@ -1,5 +1,5 @@
 {
-  "id": "bfedd146-0cc6-4c88-a675-67ca92a0407b",
+  "id": "4d67ff7a-ade9-48a6-896f-6f12dc78b6dc",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -427,6 +427,12 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "password": {
+          "name": "password",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         },
         "emailVerified": {
           "name": "emailVerified",
