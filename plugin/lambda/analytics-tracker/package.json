@@ -7,13 +7,15 @@
   "scripts": {
     "build": "esbuild src/index.ts --bundle --platform=node --target=node18 --format=esm --outfile=dist/index.js",
     "package": "npm run build && zip -r analytics-tracker.zip dist/ package.json",
+    "zip": "zip -r analytics-tracker.zip . -x '*.zip' '.git/*' 'README.md' 'deploy.sh'",
     "deploy": "aws lambda update-function-code --function-name clickchutney-analytics --zip-file fileb://analytics-tracker.zip",
     "test": "jest",
     "dev": "nodemon --exec node --loader ts-node/esm src/index.ts"
   },
   "dependencies": {
-    "mongodb": "^6.3.0",
-    "aws-lambda": "^1.0.7"
+    "aws-lambda": "^1.0.7",
+    "dotenv": "^17.2.1",
+    "mongodb": "^6.3.0"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.131",

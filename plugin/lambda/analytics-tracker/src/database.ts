@@ -1,5 +1,8 @@
 import { MongoClient, Db, Collection } from 'mongodb'
 import { Project, EventDocument } from './types.js'
+import { config } from 'dotenv'
+
+config() 
 
 let cachedClient: MongoClient | null = null
 let cachedDb: Db | null = null

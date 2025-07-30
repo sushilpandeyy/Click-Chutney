@@ -5,9 +5,10 @@ import terser from '@rollup/plugin-terser';
 const production = !process.env.ROLLUP_WATCH;
 
 export default [
-  // ES Module build
+  // ES Module build with React support
   {
     input: 'src/index.ts',
+    external: ['react', 'react-dom', 'next/navigation'],
     output: {
       file: 'dist/index.esm.js',
       format: 'es',
@@ -23,9 +24,10 @@ export default [
       production && terser()
     ]
   },
-  // CommonJS build
+  // CommonJS build with React support
   {
     input: 'src/index.ts',
+    external: ['react', 'react-dom', 'next/navigation'],
     output: {
       file: 'dist/index.js',
       format: 'cjs',
@@ -38,9 +40,9 @@ export default [
       production && terser()
     ]
   },
-  // UMD build for CDN
+  // UMD build for CDN (vanilla JS only - no React)
   {
-    input: 'src/index.ts',
+    input: 'src/tracker.ts',
     output: {
       file: 'dist/clickchutney.min.js',
       format: 'umd',

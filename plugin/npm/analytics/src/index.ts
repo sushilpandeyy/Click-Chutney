@@ -137,6 +137,11 @@ export default ClickChutney;
 export { ClickChutneyTracker };
 export * from './types';
 
+// Next.js / React exports (import from ./nextjs for Next.js usage)
+// export { ClickChutneyProvider, useClickChutney } from './nextjs/provider';
+// export { RouterTracking, withClickChutney } from './nextjs/router-tracking';  
+// export { TrackingButton, TrackingLink, TrackingForm } from './nextjs/components';
+
 // CommonJS export
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = ClickChutney;
