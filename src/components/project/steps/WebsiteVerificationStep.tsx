@@ -18,18 +18,19 @@ interface WebsiteVerificationStepProps {
 export function WebsiteVerificationStep({ data, updateData, onNext, onPrev }: WebsiteVerificationStepProps) {
   const [copiedScript, setCopiedScript] = useState(false)
   const [activeTab, setActiveTab] = useState('nextjs')
+  const [isCreating, setIsCreating] = useState(false)
 
-  // Generate trackingId only once or use existing one
-  const trackingId = data.trackingId || `cc_${Math.random().toString(36).substr(2, 16)}`
-  const scriptTag = `<script src="https://unpkg.com/@click-chutney/analytics@1.2.2/dist/clickchutney.min.js"></script>
-<script>cc('init', '${trackingId}');</script>`
-
-  // Save trackingId to data when component mounts if it doesn't exist
+  // Generate trackingId only once and save it immediately
   useEffect(() => {
     if (!data.trackingId) {
-      updateData({ trackingId })
+      const newTrackingId = `cc_${Date.now()}_${Math.random().toString(36).substr(2, 12)}`
+      updateData({ trackingId: newTrackingId })
     }
-  }, [data.trackingId, trackingId, updateData])
+  }, [data.trackingId, updateData])
+
+  const trackingId = data.trackingId || 'cc_loading...'
+  const scriptTag = `<script src="https://unpkg.com/@click-chutney/analytics@1.2.2/dist/clickchutney.min.js"></script>
+<script>cc('init', '${trackingId}');</script>`
 
   const copyToClipboard = async (text: string) => {
     await navigator.clipboard.writeText(text)
@@ -37,9 +38,40 @@ export function WebsiteVerificationStep({ data, updateData, onNext, onPrev }: We
     setTimeout(() => setCopiedScript(false), 2000)
   }
 
-  const handleContinue = () => {
-    updateData({ trackingId })
-    onNext()
+  const handleContinue = async () => {
+    // Create the project immediately when user clicks continue from verification
+    setIsCreating(true)
+    try {
+      const projectPayload = {
+        name: data.name,
+        url: data.url,
+        domain: data.domain,
+        description: data.description || null,
+        trackingId: data.trackingId
+      }
+
+      const response = await fetch('/api/projects', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(projectPayload),
+      })
+      
+      if (response.ok) {
+        const project = await response.json()
+        updateData({ projectId: project.id })
+        onNext()
+      } else {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to create project')
+      }
+    } catch (error) {
+      console.error('Error creating project:', error)
+      alert(`Failed to create project: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    } finally {
+      setIsCreating(false)
+    }
   }
 
   return (
@@ -187,9 +219,18 @@ ClickChutney.track('button_click', {
           Back
         </Button>
         
-        <Button onClick={handleContinue}>
-          Continue
-          <ArrowRight className="w-4 h-4 ml-2" />
+        <Button onClick={handleContinue} disabled={isCreating || !data.trackingId}>
+          {isCreating ? (
+            <>
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+              Creating Project...
+            </>
+          ) : (
+            <>
+              Continue
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </>
+          )}
         </Button>
       </div>
     </div>

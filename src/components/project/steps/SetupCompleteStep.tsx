@@ -51,29 +51,12 @@ ClickChutney.track('button_click', { button: 'signup' });`
     setTimeout(() => setCopiedReact(false), 2000)
   }
 
-  const handleCreateProject = async () => {
-    setIsCreating(true)
-    
-    try {
-      const response = await fetch('/api/projects', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      })
-      
-      if (response.ok) {
-        const project = await response.json()
-        window.location.href = `/dashboard`
-      } else {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to create project')
-      }
-    } catch (error) {
-      console.error('Error creating project:', error)
-      alert(`Failed to create project: ${error instanceof Error ? error.message : 'Unknown error'}`)
-      setIsCreating(false)
+  const handleGoToDashboard = () => {
+    // Project is already created, just navigate to it
+    if (data.projectId) {
+      window.location.href = `/project/${data.projectId}`
+    } else {
+      window.location.href = `/dashboard`
     }
   }
 
@@ -206,21 +189,11 @@ ClickChutney.track('button_click', { button: 'signup' });`
         </Button>
         
         <Button 
-          onClick={handleCreateProject}
-          disabled={isCreating}
+          onClick={handleGoToDashboard}
           className="px-8"
         >
-          {isCreating ? (
-            <>
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-              Creating Project...
-            </>
-          ) : (
-            <>
-              <Rocket className="w-4 h-4 mr-2" />
-              Create Project & Go to Dashboard
-            </>
-          )}
+          <Rocket className="w-4 h-4 mr-2" />
+          Go to Project Dashboard
         </Button>
       </div>
     </div>

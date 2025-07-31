@@ -18,6 +18,7 @@ export interface ProjectData {
   favicon?: string
   color: string
   trackingId?: string
+  projectId?: string
 }
 
 const steps = [
