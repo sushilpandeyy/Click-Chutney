@@ -182,12 +182,13 @@ exports.handler = async (event, context) => {
     const clientIP = getClientIP(event);
     const geoData = clientIP ? await getGeoLocation(clientIP) : {};
 
-    // Extract domain from event URL for verification purposes
+    // Extract and normalize domain from event URL for verification purposes
     function extractDomain(url) {
       if (!url) return null;
       try {
         const urlObj = new URL(url);
-        return urlObj.hostname.replace('www.', '').toLowerCase();
+        // Always normalize to non-www version for consistent storage
+        return urlObj.hostname.replace(/^www\./, '').toLowerCase();
       } catch {
         return null;
       }

@@ -33,8 +33,8 @@ export function WebsiteVerificationStep({ data, updateData, onNext, onPrev }: We
   }, [data.trackingId, updateData])
 
   const trackingId = data.trackingId || 'cc_loading...'
-  const scriptTag = `<script src="https://unpkg.com/@click-chutney/analytics@1.2.3/dist/clickchutney.min.js"></script>
-<script>cc('init', '${trackingId}');</script>`
+  const scriptTag = `<script src="https://unpkg.com/@click-chutney/analytics@2.0.0/dist/clickchutney.min.js"></script>
+<script>ClickChutney.init('${trackingId}');</script>`
 
   const copyToClipboard = async (text: string) => {
     await navigator.clipboard.writeText(text)
@@ -181,29 +181,27 @@ export function WebsiteVerificationStep({ data, updateData, onNext, onPrev }: We
                   </div>
 
                   <div>
-                    <h4 className="font-medium text-sm mb-2">2. Initialize in your app</h4>
+                    <h4 className="font-medium text-sm mb-2">2. Add environment variable</h4>
+                    <div className="bg-muted rounded-lg p-4 relative">
+                      <code className="text-sm font-mono">NEXT_PUBLIC_CLICKCHUTNEY_ID=${trackingId}</code>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="absolute top-2 right-2"
+                        onClick={() => copyToClipboard(`NEXT_PUBLIC_CLICKCHUTNEY_ID=${trackingId}`)}
+                      >
+                        {copiedScript ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">Add this to your .env.local file</p>
+                  </div>
+
+                  <div>
+                    <h4 className="font-medium text-sm mb-2">3. Add Analytics component</h4>
                     <div className="bg-muted rounded-lg p-4">
                       <pre className="text-xs font-mono text-wrap">
-{`// Step 1: Install the package
-npm install @click-chutney/analytics
-
-// Step 2: Create a simple client component
-// components/Analytics.tsx
-'use client'
-import { useEffect } from 'react'
-import ClickChutney from '@click-chutney/analytics'
-
-export default function Analytics() {
-  useEffect(() => {
-    ClickChutney.init('${trackingId}')
-    ClickChutney.page()
-  }, [])
-  return null
-}
-
-// Step 3: Add to your layout
-// app/layout.tsx
-import Analytics from './components/Analytics'
+{`// app/layout.tsx (Next.js 13+)
+import { Analytics } from '@click-chutney/analytics/react'
 
 export default function RootLayout({ children }) {
   return (
@@ -217,12 +215,10 @@ export default function RootLayout({ children }) {
 }`}
                       </pre>
                     </div>
-                    <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-                      <p className="text-xs text-blue-800 dark:text-blue-200">
-                        <strong>💡 Pro Tip:</strong> For security, store your tracking ID in environment variables:
+                    <div className="mt-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                      <p className="text-xs text-green-800 dark:text-green-200">
+                        <strong>✨ Zero Config:</strong> Analytics component auto-detects your tracking ID from environment variables and handles everything automatically!
                       </p>
-                      <code className="text-xs block mt-1">.env.local: NEXT_PUBLIC_CLICKCHUTNEY_TRACKING_ID=${trackingId}</code>
-                      <code className="text-xs block">Then use: process.env.NEXT_PUBLIC_CLICKCHUTNEY_TRACKING_ID</code>
                     </div>
                   </div>
 

@@ -1,11 +1,24 @@
 {
   "name": "@click-chutney/analytics",
-  "version": "1.2.3",
+  "version": "2.0.0",
   "type": "module",
-  "description": "Lightweight analytics tracking library for ClickChutney",
+  "description": "Zero-config analytics tracking library for React, Next.js and vanilla JavaScript",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.esm.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./react": {
+      "import": "./dist/react.esm.js",
+      "require": "./dist/react.js",
+      "types": "./dist/react.d.ts"
+    },
+    "./dist/clickchutney.min.js": "./dist/clickchutney.min.js"
+  },
   "files": [
     "dist"
   ],

@@ -5,10 +5,9 @@ import terser from '@rollup/plugin-terser';
 const production = !process.env.ROLLUP_WATCH;
 
 export default [
-  // ES Module build with React support
+  // Main library - ES Module build
   {
     input: 'src/index.ts',
-    external: ['react', 'react-dom', 'next/navigation'],
     output: {
       file: 'dist/index.esm.js',
       format: 'es',
@@ -24,10 +23,9 @@ export default [
       production && terser()
     ]
   },
-  // CommonJS build with React support
+  // Main library - CommonJS build
   {
     input: 'src/index.ts',
-    external: ['react', 'react-dom', 'next/navigation'],
     output: {
       file: 'dist/index.js',
       format: 'cjs',
@@ -40,9 +38,44 @@ export default [
       production && terser()
     ]
   },
+  // React components - ES Module build
+  {
+    input: 'src/react.tsx',
+    external: ['react', 'react-dom', 'next/navigation'],
+    output: {
+      file: 'dist/react.esm.js',
+      format: 'es',
+      sourcemap: true
+    },
+    plugins: [
+      nodeResolve(),
+      typescript({
+        declaration: true,
+        declarationDir: 'dist',
+        rootDir: 'src'
+      }),
+      production && terser()
+    ]
+  },
+  // React components - CommonJS build
+  {
+    input: 'src/react.tsx',
+    external: ['react', 'react-dom', 'next/navigation'],
+    output: {
+      file: 'dist/react.js',
+      format: 'cjs',
+      sourcemap: true,
+      exports: 'named'
+    },
+    plugins: [
+      nodeResolve(),
+      typescript(),
+      production && terser()
+    ]
+  },
   // UMD build for CDN (vanilla JS only - no React)
   {
-    input: 'src/tracker.ts',
+    input: 'src/index.ts',
     output: {
       file: 'dist/clickchutney.min.js',
       format: 'umd',

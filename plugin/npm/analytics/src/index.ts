@@ -8,13 +8,23 @@ let globalTracker: ClickChutneyTracker | null = null;
 class ClickChutneyAPI {
   private tracker: ClickChutneyTracker | null = null;
 
-  init(trackingId: string, config?: Partial<ClickChutneyConfig>): void {
-    if (!trackingId) {
-      throw new Error('ClickChutney: trackingId is required');
+  init(trackingId?: string, config?: Partial<ClickChutneyConfig>): void {
+    // Auto-detect tracking ID if not provided
+    const autoTrackingId = trackingId || 
+      (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_CLICKCHUTNEY_ID) ||
+      (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_CLICKCHUTNEY_TRACKING_ID) ||
+      (typeof process !== 'undefined' && process.env?.CLICKCHUTNEY_TRACKING_ID);
+
+    if (!autoTrackingId) {
+      throw new Error('ClickChutney: trackingId is required. Provide it as a parameter or set NEXT_PUBLIC_CLICKCHUTNEY_ID environment variable.');
     }
 
+    // Auto-detect environment
+    const isDev = typeof process !== 'undefined' && process.env?.NODE_ENV === 'development';
+    
     this.tracker = new ClickChutneyTracker({
-      trackingId,
+      trackingId: autoTrackingId,
+      debug: isDev,
       ...config
     });
 

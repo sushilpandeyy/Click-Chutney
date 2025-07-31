@@ -50,14 +50,22 @@ export async function POST(
 
     // Simple event-based verification: check if events came from the project's domain
     try {
-      // Extract domain from project URL for comparison
+      // Extract and normalize domain from project URL for comparison
       const projectDomain = new URL(project.url).hostname.replace('www.', '').toLowerCase()
       
-      // Check if we have any events from the project's domain
+      // Create domain variants to check (both www and non-www)
+      const domainVariants = [
+        projectDomain,           // example.com
+        `www.${projectDomain}`   // www.example.com (in case events came with www)
+      ]
+      
+      // Check if we have any events from any of the domain variants
       const recentEvents = await prisma.event.findFirst({
         where: {
           projectId: project.id,
-          domain: projectDomain,
+          domain: {
+            in: domainVariants // Check for events from any domain variant
+          },
           createdAt: {
             gte: new Date(Date.now() - 24 * 60 * 60 * 1000) // Last 24 hours
           }
