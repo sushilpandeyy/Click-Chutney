@@ -36,22 +36,16 @@ interface ProjectStatusProps {
 
 export function ProjectStatus({ project, onVerificationUpdate }: ProjectStatusProps) {
   const [isVerifying, setIsVerifying] = useState(false)
-  const [copiedTag, setCopiedTag] = useState(false)
   const [copiedScript, setCopiedScript] = useState(false)
   const [error, setError] = useState<string>('')
 
-  const metaTag = `<meta name="clickchutney-verification" content="${project.trackingId}" />`
-  const scriptTag = `<script src="https://cdn.clickchutney.com/v1/analytics.js" data-site-id="${project.trackingId}" async></script>`
+  const scriptTag = `<script src="https://unpkg.com/@click-chutney/analytics@1.2.2/dist/clickchutney.min.js"></script>
+<script>cc('init', '${project.trackingId}');</script>`
 
-  const copyToClipboard = async (text: string, type: 'tag' | 'script') => {
+  const copyToClipboard = async (text: string) => {
     await navigator.clipboard.writeText(text)
-    if (type === 'tag') {
-      setCopiedTag(true)
-      setTimeout(() => setCopiedTag(false), 2000)
-    } else {
-      setCopiedScript(true)
-      setTimeout(() => setCopiedScript(false), 2000)
-    }
+    setCopiedScript(true)
+    setTimeout(() => setCopiedScript(false), 2000)
   }
 
   const verifyDomain = async () => {
@@ -59,13 +53,9 @@ export function ProjectStatus({ project, onVerificationUpdate }: ProjectStatusPr
     setError('')
 
     try {
-      const response = await fetch('/api/verify', {
+      const response = await fetch(`/api/projects/${project.id}/verify`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          trackingId: project.trackingId,
-          domain: project.domain
-        })
+        headers: { 'Content-Type': 'application/json' }
       })
 
       const result = await response.json()
@@ -159,50 +149,53 @@ export function ProjectStatus({ project, onVerificationUpdate }: ProjectStatusPr
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-amber-700 dark:text-amber-300">
-              Add one of the following to your website to verify domain ownership:
+              Install ClickChutney analytics to verify domain ownership and start tracking. Choose either method:
             </p>
 
-            {/* Meta Tag Option */}
+            {/* NPM Package Method */}
             <div className="space-y-3">
               <h4 className="font-medium text-sm flex items-center gap-2">
                 <Code className="w-4 h-4" />
-                Option 1: Verification Meta Tag
+                Method 1: NPM Package (Recommended for React/Next.js)
               </h4>
-              <div className="bg-muted rounded-lg p-3 relative">
-                <code className="text-xs font-mono break-all">{metaTag}</code>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="absolute top-1 right-1"
-                  onClick={() => copyToClipboard(metaTag, 'tag')}
-                >
-                  {copiedTag ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
-                </Button>
+              <div className="bg-muted rounded-lg p-3">
+                <pre className="text-xs font-mono break-all whitespace-pre-wrap">{`npm install @click-chutney/analytics
+
+// In your app
+import ClickChutney from '@click-chutney/analytics';
+ClickChutney.init('${project.trackingId}');
+ClickChutney.page();`}</pre>
               </div>
               <p className="text-xs text-muted-foreground">
-                Add this to the &lt;head&gt; section of your homepage
+                Install via npm and initialize in your React/Next.js application.
               </p>
             </div>
 
-            {/* Script Tag Option */}
+            {/* Script Tag Method */}
             <div className="space-y-3">
               <h4 className="font-medium text-sm flex items-center gap-2">
                 <Globe className="w-4 h-4" />
-                Option 2: Analytics Script (Recommended)
+                Method 2: Script Tags (For HTML/WordPress)
               </h4>
               <div className="bg-muted rounded-lg p-3 relative">
-                <code className="text-xs font-mono break-all">{scriptTag}</code>
+                <pre className="text-xs font-mono break-all whitespace-pre-wrap">{scriptTag}</pre>
                 <Button
                   size="sm"
                   variant="ghost"
                   className="absolute top-1 right-1"
-                  onClick={() => copyToClipboard(scriptTag, 'script')}
+                  onClick={() => copyToClipboard(scriptTag)}
                 >
                   {copiedScript ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
                 </Button>
               </div>
               <p className="text-xs text-muted-foreground">
-                Add this before &lt;/body&gt; to start tracking immediately
+                Add these script tags to the &lt;head&gt; section of your website.
+              </p>
+            </div>
+
+            <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+              <p className="text-xs text-blue-800 dark:text-blue-200">
+                <strong>Note:</strong> Use either method, not both. The verification will detect whichever method you choose.
               </p>
             </div>
 

@@ -150,23 +150,16 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Auto-verify domain on first analytics hit
-    if (!project.isVerified && body.domain) {
-      try {
-        await projects.updateOne(
-          { trackingId: body.trackingId },
-          {
-            $set: {
-              isVerified: true,
-              verifiedAt: new Date(),
-              updatedAt: new Date()
-            }
-          }
-        );
-        console.log(`Auto-verified domain: ${body.domain}`);
-      } catch (error) {
-        console.warn('Auto-verification failed:', error);
-      }
+    // Only verified projects can track events
+    if (!project.isVerified) {
+      return {
+        statusCode: 403,
+        headers: corsHeaders,
+        body: JSON.stringify({ 
+          success: false, 
+          error: 'Project not verified. Please verify your domain to start tracking events.' 
+        })
+      };
     }
 
     // Process events
@@ -178,7 +171,7 @@ exports.handler = async (event, context) => {
         body: JSON.stringify({ 
           success: true, 
           eventIds: [],
-          verified: project.isVerified || body.domain ? true : false
+          verified: project.isVerified
         })
       };
     }
@@ -218,7 +211,7 @@ exports.handler = async (event, context) => {
       body: JSON.stringify({
         success: true,
         eventIds,
-        verified: project.isVerified || body.domain ? true : false
+        verified: project.isVerified
       })
     };
 
