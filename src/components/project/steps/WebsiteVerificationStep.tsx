@@ -33,7 +33,7 @@ export function WebsiteVerificationStep({ data, updateData, onNext, onPrev }: We
   }, [data.trackingId, updateData])
 
   const trackingId = data.trackingId || 'cc_loading...'
-  const scriptTag = `<script src="https://unpkg.com/@click-chutney/analytics@1.2.2/dist/clickchutney.min.js"></script>
+  const scriptTag = `<script src="https://unpkg.com/@click-chutney/analytics@1.2.3/dist/clickchutney.min.js"></script>
 <script>cc('init', '${trackingId}');</script>`
 
   const copyToClipboard = async (text: string) => {
@@ -132,9 +132,9 @@ export function WebsiteVerificationStep({ data, updateData, onNext, onPrev }: We
         <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
           <Shield className="w-8 h-8 text-blue-600" />
         </div>
-        <h2 className="text-2xl font-bold text-foreground mb-2">Install ClickChutney</h2>
+        <h2 className="text-2xl font-bold text-foreground mb-2">Install & Verify</h2>
         <p className="text-muted-foreground max-w-md mx-auto">
-          Add ClickChutney to <strong>{data.domain}</strong> and start tracking visitors automatically
+          Install ClickChutney on <strong>{data.domain}</strong>, then verify by checking for real events
         </p>
       </div>
 
@@ -184,25 +184,45 @@ export function WebsiteVerificationStep({ data, updateData, onNext, onPrev }: We
                     <h4 className="font-medium text-sm mb-2">2. Initialize in your app</h4>
                     <div className="bg-muted rounded-lg p-4">
                       <pre className="text-xs font-mono text-wrap">
-{`// app/layout.tsx or _app.tsx
-import ClickChutney from '@click-chutney/analytics';
+{`// Step 1: Install the package
+npm install @click-chutney/analytics
 
-// Initialize with your tracking ID
-ClickChutney.init('${trackingId}');
+// Step 2: Create a simple client component
+// components/Analytics.tsx
+'use client'
+import { useEffect } from 'react'
+import ClickChutney from '@click-chutney/analytics'
 
-// Track page views (automatic in many frameworks)
-ClickChutney.page();
+export default function Analytics() {
+  useEffect(() => {
+    ClickChutney.init('${trackingId}')
+    ClickChutney.page()
+  }, [])
+  return null
+}
 
-// Track custom events
-ClickChutney.track('button_click', { 
-  button: 'signup' 
-});`}
+// Step 3: Add to your layout
+// app/layout.tsx
+import Analytics from './components/Analytics'
+
+export default function RootLayout({ children }) {
+  return (
+    <html>
+      <body>
+        {children}
+        <Analytics />
+      </body>
+    </html>
+  )
+}`}
                       </pre>
                     </div>
                     <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
                       <p className="text-xs text-blue-800 dark:text-blue-200">
-                        <strong>Note:</strong> If you use the npm package and call <code>ClickChutney.init()</code>, you don't need the script tags below. Either method works for verification.
+                        <strong>💡 Pro Tip:</strong> For security, store your tracking ID in environment variables:
                       </p>
+                      <code className="text-xs block mt-1">.env.local: NEXT_PUBLIC_CLICKCHUTNEY_TRACKING_ID=${trackingId}</code>
+                      <code className="text-xs block">Then use: process.env.NEXT_PUBLIC_CLICKCHUTNEY_TRACKING_ID</code>
                     </div>
                   </div>
 
@@ -262,9 +282,9 @@ ClickChutney.track('button_click', {
         <Card className="border-blue-200 bg-blue-50 dark:bg-blue-900/20">
           <CardContent className="p-6 space-y-4">
             <div className="text-center">
-              <h3 className="font-medium text-blue-800 dark:text-blue-200 mb-2">Verification Required</h3>
+              <h3 className="font-medium text-blue-800 dark:text-blue-200 mb-2">Simple Event-Based Verification</h3>
               <p className="text-sm text-blue-700 dark:text-blue-300">
-                Follow these steps to verify your website and start tracking analytics:
+                Install analytics, visit your site, then verify. We'll check for real events from your domain:
               </p>
             </div>
             
@@ -294,8 +314,8 @@ ClickChutney.track('button_click', {
               <div className="flex items-center gap-3 p-3 bg-white dark:bg-blue-950/50 rounded-lg">
                 <div className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold">2</div>
                 <div className="flex-1">
-                  <p className="text-sm font-medium">Install Tracking Code</p>
-                  <p className="text-xs text-muted-foreground">Add the code above to your website</p>
+                  <p className="text-sm font-medium">Install & Visit Your Site</p>
+                  <p className="text-xs text-muted-foreground">Add the code above to {data.domain}, then visit it to generate events</p>
                 </div>
                 <div className="text-xs text-muted-foreground">Manual Step</div>
               </div>
@@ -303,8 +323,8 @@ ClickChutney.track('button_click', {
               <div className="flex items-center gap-3 p-3 bg-white dark:bg-blue-950/50 rounded-lg">
                 <div className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold">3</div>
                 <div className="flex-1">
-                  <p className="text-sm font-medium">Verify Installation</p>
-                  <p className="text-xs text-muted-foreground">Check if tracking code is properly installed</p>
+                  <p className="text-sm font-medium">Verify Events</p>
+                  <p className="text-xs text-muted-foreground">We'll check if events came from {data.domain} in the last 24h</p>
                 </div>
                 <Button 
                   size="sm" 

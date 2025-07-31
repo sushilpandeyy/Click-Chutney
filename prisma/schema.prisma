@@ -130,6 +130,7 @@ model Event {
   ipAddress String?
   country   String?
   city      String?
+  domain    String?  // Domain extracted from event URL for verification
   createdAt DateTime @default(now())
 
   // Relations

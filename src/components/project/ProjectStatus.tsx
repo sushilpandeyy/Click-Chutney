@@ -39,7 +39,7 @@ export function ProjectStatus({ project, onVerificationUpdate }: ProjectStatusPr
   const [copiedScript, setCopiedScript] = useState(false)
   const [error, setError] = useState<string>('')
 
-  const scriptTag = `<script src="https://unpkg.com/@click-chutney/analytics@1.2.2/dist/clickchutney.min.js"></script>
+  const scriptTag = `<script src="https://unpkg.com/@click-chutney/analytics@1.2.3/dist/clickchutney.min.js"></script>
 <script>cc('init', '${project.trackingId}');</script>`
 
   const copyToClipboard = async (text: string) => {

@@ -20,31 +20,44 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create project and add creator as owner in a transaction
-    const result = await prisma.$transaction(async (tx) => {
-      const project = await tx.project.create({
-        data: {
-          id: `proj_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-          name,
-          url,
-          domain,
-          description: description || null,
-          trackingId,
-        },
-      })
-
-      // Add creator as project owner
-      await tx.projectMember.create({
-        data: {
-          id: `member_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-          userId: session.user.id,
-          projectId: project.id,
-          role: 'OWNER'
-        }
-      })
-
-      return project
+    // Check if domain is already registered to prevent duplicate projects
+    const existingProject = await prisma.project.findFirst({
+      where: {
+        domain: domain.toLowerCase(),
+        isActive: true
+      }
     })
+
+    if (existingProject) {
+      return NextResponse.json(
+        { error: `Domain "${domain}" is already registered with another project. Each domain can only have one active project.` },
+        { status: 409 }
+      )
+    }
+
+    // Create project first
+    const project = await prisma.project.create({
+      data: {
+        id: `proj_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        name,
+        url,
+        domain: domain.toLowerCase(),
+        description: description || null,
+        trackingId,
+      },
+    })
+
+    // Add creator as project owner
+    await prisma.projectMember.create({
+      data: {
+        id: `member_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        userId: session.user.id,
+        projectId: project.id,
+        role: 'OWNER'
+      }
+    })
+
+    const result = project
 
     return NextResponse.json(result)
   } catch (error) {

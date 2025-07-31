@@ -150,14 +150,17 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Only verified projects can track events
-    if (!project.isVerified) {
+    // Allow unverified projects to track events for verification purposes
+    // but mark them appropriately in the response
+    const allowTracking = project.isVerified || true; // Always allow for verification
+    
+    if (!allowTracking) {
       return {
         statusCode: 403,
         headers: corsHeaders,
         body: JSON.stringify({ 
           success: false, 
-          error: 'Project not verified. Please verify your domain to start tracking events.' 
+          error: 'Project not found or inactive.' 
         })
       };
     }
@@ -179,24 +182,40 @@ exports.handler = async (event, context) => {
     const clientIP = getClientIP(event);
     const geoData = clientIP ? await getGeoLocation(clientIP) : {};
 
+    // Extract domain from event URL for verification purposes
+    function extractDomain(url) {
+      if (!url) return null;
+      try {
+        const urlObj = new URL(url);
+        return urlObj.hostname.replace('www.', '').toLowerCase();
+      } catch {
+        return null;
+      }
+    }
+
     // Prepare event documents
-    const eventDocuments = events.map(analyticsEvent => ({
-      projectId: project._id,
-      type: analyticsEvent.event,
-      data: {
-        ...analyticsEvent.data,
-        sessionId: analyticsEvent.sessionId,
-        userId: analyticsEvent.userId,
-        url: analyticsEvent.url,
-        referrer: analyticsEvent.referrer,
-        timestamp: analyticsEvent.timestamp
-      },
-      userAgent: analyticsEvent.userAgent,
-      ipAddress: clientIP,
-      country: geoData.country,
-      city: geoData.city,
-      createdAt: new Date()
-    }));
+    const eventDocuments = events.map(analyticsEvent => {
+      const eventDomain = extractDomain(analyticsEvent.url);
+      
+      return {
+        projectId: project._id,
+        type: analyticsEvent.event,
+        data: {
+          ...analyticsEvent.data,
+          sessionId: analyticsEvent.sessionId,
+          userId: analyticsEvent.userId,
+          url: analyticsEvent.url,
+          referrer: analyticsEvent.referrer,
+          timestamp: analyticsEvent.timestamp
+        },
+        userAgent: analyticsEvent.userAgent,
+        ipAddress: clientIP,
+        country: geoData.country,
+        city: geoData.city,
+        domain: eventDomain, // Store the domain for verification
+        createdAt: new Date()
+      };
+    });
 
     // Insert events
     const eventsCollection = db.collection('events');

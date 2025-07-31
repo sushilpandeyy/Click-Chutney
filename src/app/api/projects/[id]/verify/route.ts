@@ -48,39 +48,39 @@ export async function POST(
       })
     }
 
-    // Attempt to verify by checking if the tracking code is installed
+    // Simple event-based verification: check if events came from the project's domain
     try {
-      const response = await fetch(project.url, {
-        headers: {
-          'User-Agent': 'ClickChutney-Verification/1.0'
+      // Extract domain from project URL for comparison
+      const projectDomain = new URL(project.url).hostname.replace('www.', '').toLowerCase()
+      
+      // Check if we have any events from the project's domain
+      const recentEvents = await prisma.event.findFirst({
+        where: {
+          projectId: project.id,
+          domain: projectDomain,
+          createdAt: {
+            gte: new Date(Date.now() - 24 * 60 * 60 * 1000) // Last 24 hours
+          }
         },
-        timeout: 10000
+        orderBy: {
+          createdAt: 'desc'
+        }
       })
-      
-      if (!response.ok) {
+
+      if (!recentEvents) {
         return NextResponse.json({
           success: false,
-          error: `Could not access website: ${response.status} ${response.statusText}`,
-          verified: false
-        })
-      }
-
-      const html = await response.text()
-      
-      // Check if tracking code is present - supports both npm package and script tag
-      const hasTrackingId = html.includes(project.trackingId)
-      const hasPluginCode = html.includes('click-chutney/analytics') || 
-                           html.includes('clickchutney.min.js') ||
-                           html.includes('ClickChutney.init') ||
-                           html.includes('cc(') // for cc('init', 'trackingId')
-      
-      const hasTrackingCode = hasTrackingId && hasPluginCode
-
-      if (!hasTrackingCode) {
-        return NextResponse.json({
-          success: false,
-          error: "Tracking code not found on website. Please install the ClickChutney tracking code and try again.",
-          verified: false
+          error: `No analytics events detected from ${projectDomain} in the last 24 hours. Please ensure:\n\n` +
+                 `1. You've installed the ClickChutney analytics code on ${projectDomain}\n` +
+                 `2. The tracking ID "${project.trackingId}" is correct\n` +
+                 `3. Someone has visited your website to generate events\n\n` +
+                 `Events are being accepted from all domains (including localhost), but verification requires events from your registered domain: ${projectDomain}`,
+          verified: false,
+          debug: {
+            projectDomain,
+            trackingId: project.trackingId,
+            checkedTimeframe: '24 hours'
+          }
         })
       }
 
@@ -96,15 +96,20 @@ export async function POST(
 
       return NextResponse.json({
         success: true,
-        message: "Project verified successfully! Analytics tracking is now active.",
+        message: `Project verified successfully! We detected ${recentEvents.type} events from ${projectDomain}. Analytics tracking is now active.`,
         verified: true,
-        verifiedAt: updatedProject.verifiedAt
+        verifiedAt: updatedProject.verifiedAt,
+        debug: {
+          projectDomain,
+          lastEventType: recentEvents.type,
+          lastEventTime: recentEvents.createdAt
+        }
       })
 
-    } catch (fetchError) {
+    } catch (verificationError) {
       return NextResponse.json({
         success: false,
-        error: `Could not verify website: ${fetchError instanceof Error ? fetchError.message : 'Network error'}`,
+        error: `Verification failed: ${verificationError instanceof Error ? verificationError.message : 'Unknown error'}`,
         verified: false
       })
     }
