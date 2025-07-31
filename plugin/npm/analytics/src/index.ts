@@ -59,6 +59,11 @@ class ClickChutneyAPI {
     }
   }
 
+  forceFlush(): Promise<void> {
+    this.ensureInitialized();
+    return this.tracker!.forceFlush();
+  }
+
   private ensureInitialized(): void {
     if (!this.tracker) {
       throw new Error('ClickChutney: Must call init() before using other methods');
@@ -123,6 +128,13 @@ if (typeof window !== 'undefined') {
         break;
       case 'set':
         ClickChutney.set(args[0]);
+        break;
+      case 'flush':
+        try {
+          ClickChutney.forceFlush();
+        } catch (e) {
+          console.warn('ClickChutney: Cannot flush - not initialized');
+        }
         break;
       default:
         console.warn(`ClickChutney: Unknown command "${command}"`);

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -11,9 +12,29 @@ import {
   CheckCircle2,
   Clock,
   AlertCircle,
-  ArrowLeft
+  ArrowLeft,
+  BarChart3,
+  Eye,
+  Flame,
+  Home,
+  LogOut,
+  Settings,
+  Users,
 } from "lucide-react"
 import Link from "next/link"
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar"
+import { ThemeToggle } from "@/components/theme-toggle"
+import { authActions } from "@/lib/auth-client"
 
 interface Project {
   id: string
@@ -24,6 +45,81 @@ interface Project {
   isVerified: boolean
   verifiedAt?: string
   createdAt: string
+}
+
+function AppSidebar({ currentPage = "projects" }: { currentPage?: string }) {
+  const router = useRouter()
+  
+  const menuItems = [
+    { title: "Dashboard", icon: Home, href: "/dashboard", key: "dashboard" },
+    { title: "Projects", icon: BarChart3, href: "/dashboard/projects", key: "projects" },
+    { title: "Team", icon: Users, href: "#", key: "team" },
+    { title: "Settings", icon: Settings, href: "/dashboard/settings", key: "settings" },
+  ]
+
+  const handleLogout = async () => {
+    const result = await authActions.signOut()
+    if (result.success) {
+      router.push("/login")
+    }
+  }
+
+  const handleMenuClick = (href: string) => {
+    if (href !== "#") {
+      router.push(href)
+    }
+  }
+
+  return (
+    <Sidebar>
+      <SidebarHeader>
+        <div className="flex items-center gap-3 p-4">
+          <div className="w-10 h-10 bg-sidebar-primary rounded-full flex items-center justify-center text-sidebar-primary-foreground font-bold text-lg">
+            🥭
+          </div>
+          <div>
+            <h1 className="font-bold text-lg text-sidebar-foreground">ClickChutney</h1>
+            <p className="text-xs opacity-80 text-sidebar-foreground">Analytics</p>
+          </div>
+        </div>
+      </SidebarHeader>
+
+      <SidebarContent>
+        <div className="p-4">
+          <SidebarMenu>
+            {menuItems.map((item) => (
+              <SidebarMenuItem key={item.title}>
+                <SidebarMenuButton
+                  asChild
+                  className={`w-full justify-start gap-3 rounded-xl transition-all ${
+                    currentPage === item.key
+                      ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-md" 
+                      : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+                  }`}
+                >
+                  <button onClick={() => handleMenuClick(item.href)}>
+                    <item.icon className="w-5 h-5" />
+                    <span className="font-medium">{item.title}</span>
+                  </button>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </div>
+      </SidebarContent>
+
+      <SidebarFooter className="p-4">
+        <Button
+          variant="ghost"
+          className="w-full justify-start gap-3 text-sidebar-foreground hover:bg-sidebar-accent/50 rounded-xl"
+          onClick={handleLogout}
+        >
+          <LogOut className="w-5 h-5" />
+          <span className="font-medium">Logout</span>
+        </Button>
+      </SidebarFooter>
+    </Sidebar>
+  )
 }
 
 export default function ProjectsPage() {
@@ -60,77 +156,96 @@ export default function ProjectsPage() {
 
   if (selectedProject) {
     return (
-      <div className="min-h-screen bg-background p-6">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex items-center gap-4 mb-8">
-            <Button 
-              variant="outline" 
-              onClick={() => setSelectedProject(null)}
-              className="flex items-center gap-2"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Back to Projects
-            </Button>
-            <h1 className="text-3xl font-bold">Project Details</h1>
-          </div>
-          
-          <ProjectStatus 
-            project={selectedProject} 
-            onVerificationUpdate={handleVerificationUpdate}
-          />
+      <SidebarProvider>
+        <div className="min-h-screen flex w-full bg-background">
+          <AppSidebar currentPage="projects" />
+          <main className="flex-1 p-6 overflow-auto">
+            <div className="max-w-4xl mx-auto">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-4">
+                  <SidebarTrigger className="md:hidden" />
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setSelectedProject(null)}
+                    className="flex items-center gap-2"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                    Back to Projects
+                  </Button>
+                  <h1 className="text-3xl font-bold">Project Details</h1>
+                </div>
+                <ThemeToggle />
+              </div>
+              
+              <ProjectStatus 
+                project={selectedProject} 
+                onVerificationUpdate={handleVerificationUpdate}
+              />
+            </div>
+          </main>
         </div>
-      </div>
+      </SidebarProvider>
     )
   }
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background p-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex items-center gap-4 mb-8">
-            <h1 className="text-3xl font-bold">Projects</h1>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3].map((i) => (
-              <Card key={i} className="animate-pulse">
-                <CardHeader>
-                  <div className="h-6 bg-muted rounded w-3/4"></div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div className="h-4 bg-muted rounded w-full"></div>
-                    <div className="h-4 bg-muted rounded w-2/3"></div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+      <SidebarProvider>
+        <div className="min-h-screen flex w-full bg-background">
+          <AppSidebar currentPage="projects" />
+          <main className="flex-1 p-6 overflow-auto">
+            <div className="max-w-6xl mx-auto">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-4">
+                  <SidebarTrigger className="md:hidden" />
+                  <h1 className="text-3xl font-bold">Projects</h1>
+                </div>
+                <ThemeToggle />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[1, 2, 3].map((i) => (
+                  <Card key={i} className="animate-pulse">
+                    <CardHeader>
+                      <div className="h-6 bg-muted rounded w-3/4"></div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        <div className="h-4 bg-muted rounded w-full"></div>
+                        <div className="h-4 bg-muted rounded w-2/3"></div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          </main>
         </div>
-      </div>
+      </SidebarProvider>
     )
   }
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
-            <Link href="/dashboard">
-              <Button variant="outline" className="flex items-center gap-2">
-                <ArrowLeft className="w-4 h-4" />
-                Back to Dashboard
-              </Button>
-            </Link>
-            <h1 className="text-3xl font-bold">Projects</h1>
-          </div>
-          
-          <Link href="/dashboard/new-project">
-            <Button className="flex items-center gap-2">
-              <Plus className="w-4 h-4" />
-              Add Project
-            </Button>
-          </Link>
-        </div>
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full bg-background">
+        <AppSidebar currentPage="projects" />
+        <main className="flex-1 p-6 overflow-auto">
+          <div className="max-w-6xl mx-auto">
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-4">
+                <SidebarTrigger className="md:hidden" />
+                <h1 className="text-3xl font-bold">Projects</h1>
+              </div>
+              
+              <div className="flex items-center gap-4">
+                <ThemeToggle />
+                <Link href="/dashboard/new-project">
+                  <Button className="flex items-center gap-2">
+                    <Plus className="w-4 h-4" />
+                    Add Project
+                  </Button>
+                </Link>
+              </div>
+            </div>
 
         {projects.length === 0 ? (
           <Card className="text-center py-12">
@@ -218,14 +333,16 @@ export default function ProjectsPage() {
           </div>
         )}
 
-        {projects.length > 0 && (
-          <div className="mt-8 text-center">
-            <p className="text-sm text-muted-foreground">
-              {projects.filter(p => p.isVerified).length} of {projects.length} projects verified
-            </p>
+            {projects.length > 0 && (
+              <div className="mt-8 text-center">
+                <p className="text-sm text-muted-foreground">
+                  {projects.filter(p => p.isVerified).length} of {projects.length} projects verified
+                </p>
+              </div>
+            )}
           </div>
-        )}
+        </main>
       </div>
-    </div>
+    </SidebarProvider>
   )
 }

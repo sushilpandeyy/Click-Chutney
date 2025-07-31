@@ -22,11 +22,11 @@ export async function POST(request: NextRequest) {
 
     const project = await prisma.project.create({
       data: {
-        id: Date.now().toString(36) + Math.random().toString(36).substr(2),
+        id: `proj_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         name,
         url,
         domain,
-        description: description || "",
+        description: description || null,
         trackingId,
         userId: session.user.id,
       },

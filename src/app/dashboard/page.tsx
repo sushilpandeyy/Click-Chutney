@@ -1,7 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import { useSession } from "@/lib/auth-client"
+import { authActions } from "@/lib/auth-client"
 import {
   BarChart3,
   Clock,
@@ -16,6 +18,8 @@ import {
   TrendingUp,
   Coffee,
   Cookie,
+  CheckCircle2,
+  Globe,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -44,12 +48,14 @@ const chartData = [
   { name: "Sun", visits: 290 },
 ]
 
-const menuItems = [
-  { title: "Dashboard", icon: Home, active: true },
-  { title: "Projects", icon: BarChart3, active: false },
-  { title: "Team", icon: Users, active: false },
-  { title: "Settings", icon: Settings, active: false },
-]
+interface Project {
+  id: string
+  name: string
+  domain: string
+  trackingId: string
+  isVerified: boolean
+  createdAt: string
+}
 
 const statCards = [
   {
@@ -86,7 +92,29 @@ const statCards = [
   },
 ]
 
-function AppSidebar() {
+function AppSidebar({ currentPage = "dashboard" }: { currentPage?: string }) {
+  const router = useRouter()
+  
+  const menuItems = [
+    { title: "Dashboard", icon: Home, href: "/dashboard", key: "dashboard" },
+    { title: "Projects", icon: BarChart3, href: "/dashboard/projects", key: "projects" },
+    { title: "Team", icon: Users, href: "#", key: "team" },
+    { title: "Settings", icon: Settings, href: "/dashboard/settings", key: "settings" },
+  ]
+
+  const handleLogout = async () => {
+    const result = await authActions.signOut()
+    if (result.success) {
+      router.push("/login")
+    }
+  }
+
+  const handleMenuClick = (href: string) => {
+    if (href !== "#") {
+      router.push(href)
+    }
+  }
+
   return (
     <Sidebar>
       <SidebarHeader>
@@ -109,12 +137,12 @@ function AppSidebar() {
                 <SidebarMenuButton
                   asChild
                   className={`w-full justify-start gap-3 rounded-xl transition-all ${
-                    item.active 
+                    currentPage === item.key
                       ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-md" 
                       : "text-sidebar-foreground hover:bg-sidebar-accent/50"
                   }`}
                 >
-                  <button>
+                  <button onClick={() => handleMenuClick(item.href)}>
                     <item.icon className="w-5 h-5" />
                     <span className="font-medium">{item.title}</span>
                   </button>
@@ -129,6 +157,7 @@ function AppSidebar() {
         <Button
           variant="ghost"
           className="w-full justify-start gap-3 text-sidebar-foreground hover:bg-sidebar-accent/50 rounded-xl"
+          onClick={handleLogout}
         >
           <LogOut className="w-5 h-5" />
           <span className="font-medium">Logout</span>
@@ -139,12 +168,34 @@ function AppSidebar() {
 }
 
 export default function Dashboard() {
-  const [hasProjects] = useState(false)
+  const [projects, setProjects] = useState<Project[]>([])
+  const [loading, setLoading] = useState(true)
+  const { data: session } = useSession()
+
+  useEffect(() => {
+    fetchProjects()
+  }, [])
+
+  const fetchProjects = async () => {
+    try {
+      const response = await fetch('/api/projects')
+      if (response.ok) {
+        const data = await response.json()
+        setProjects(data)
+      }
+    } catch (error) {
+      console.error('Error fetching projects:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const hasProjects = projects.length > 0
 
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background">
-        <AppSidebar />
+        <AppSidebar currentPage="dashboard" />
 
         <main className="flex-1 p-6 overflow-auto">
           <div className="mb-8">
@@ -176,11 +227,69 @@ export default function Dashboard() {
             </Button>
           </div>
 
-          {hasProjects ? (
+          {loading ? (
+            /* Loading State */
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+              {[1, 2, 3, 4].map((i) => (
+                <Card key={i} className="rounded-xl shadow-sm animate-pulse">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="w-10 h-10 bg-muted rounded-lg"></div>
+                      <div className="w-12 h-4 bg-muted rounded"></div>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="w-16 h-3 bg-muted rounded"></div>
+                      <div className="w-20 h-6 bg-muted rounded"></div>
+                      <div className="w-24 h-3 bg-muted rounded"></div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : hasProjects ? (
             <>
+              {/* Projects Overview */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                {statCards.map((stat, index) => (
-                  <Card key={index} className="rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                <Card className="rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20">
+                        <BarChart3 className="w-5 h-5 text-blue-600" />
+                      </div>
+                      <Badge variant="secondary" className="text-xs">
+                        Total
+                      </Badge>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-xs font-medium text-muted-foreground">Projects</p>
+                      <p className="text-xl font-bold text-foreground">{projects.length}</p>
+                      <p className="text-xs text-muted-foreground">Active tracking</p>
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                <Card className="rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="p-2 rounded-lg bg-green-50 dark:bg-green-900/20">
+                        <CheckCircle2 className="w-5 h-5 text-green-600" />
+                      </div>
+                      <Badge variant="secondary" className="text-xs">
+                        Status
+                      </Badge>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-xs font-medium text-muted-foreground">Verified</p>
+                      <p className="text-xl font-bold text-foreground">
+                        {projects.filter(p => p.isVerified).length}
+                      </p>
+                      <p className="text-xs text-muted-foreground">Ready to track</p>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {statCards.slice(2).map((stat, index) => (
+                  <Card key={index + 2} className="rounded-xl shadow-sm hover:shadow-md transition-shadow">
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between mb-3">
                         <div className={`p-2 rounded-lg ${stat.bgColor}`}>
@@ -199,6 +308,46 @@ export default function Dashboard() {
                   </Card>
                 ))}
               </div>
+
+              {/* Recent Projects */}
+              <Card className="rounded-xl shadow-sm mb-8">
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="flex items-center gap-2 text-lg text-foreground">
+                      <BarChart3 className="w-5 h-5 text-blue-600" />
+                      Recent Projects
+                    </CardTitle>
+                    <Button variant="outline" size="sm" onClick={() => window.location.href = '/dashboard/projects'}>
+                      View All
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {projects.slice(0, 3).map((project) => (
+                      <div key={project.id} className="flex items-center justify-between p-3 rounded-lg border">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                            <Globe className="w-4 h-4 text-primary" />
+                          </div>
+                          <div>
+                            <p className="font-medium">{project.name}</p>
+                            <p className="text-sm text-muted-foreground">{project.domain}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge variant={project.isVerified ? "default" : "secondary"}>
+                            {project.isVerified ? "Verified" : "Pending"}
+                          </Badge>
+                          <Button size="sm" variant="ghost" onClick={() => window.location.href = '/dashboard/projects'}>
+                            View
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
 
               <Card className="rounded-xl shadow-sm mb-8">
                 <CardHeader className="pb-3">

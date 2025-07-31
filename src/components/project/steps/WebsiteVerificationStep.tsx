@@ -19,9 +19,17 @@ export function WebsiteVerificationStep({ data, updateData, onNext, onPrev }: We
   const [copiedScript, setCopiedScript] = useState(false)
   const [activeTab, setActiveTab] = useState('nextjs')
 
-  const trackingId = `cc_${Math.random().toString(36).substr(2, 16)}`
-  const scriptTag = `<script src="https://unpkg.com/@click-chutney/analytics@1.2.1/dist/clickchutney.min.js"></script>
+  // Generate trackingId only once or use existing one
+  const trackingId = data.trackingId || `cc_${Math.random().toString(36).substr(2, 16)}`
+  const scriptTag = `<script src="https://unpkg.com/@click-chutney/analytics@1.2.2/dist/clickchutney.min.js"></script>
 <script>cc('init', '${trackingId}');</script>`
+
+  // Save trackingId to data when component mounts if it doesn't exist
+  useEffect(() => {
+    if (!data.trackingId) {
+      updateData({ trackingId })
+    }
+  }, [data.trackingId, trackingId, updateData])
 
   const copyToClipboard = async (text: string) => {
     await navigator.clipboard.writeText(text)

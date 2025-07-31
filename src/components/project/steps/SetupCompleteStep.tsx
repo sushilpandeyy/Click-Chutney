@@ -18,7 +18,7 @@ export function SetupCompleteStep({ data, onPrev }: SetupCompleteStepProps) {
   const [isCreating, setIsCreating] = useState(false)
 
   const trackingScript = `<!-- ClickChutney Analytics -->
-<script src="https://unpkg.com/@click-chutney/analytics@1.2.1/dist/clickchutney.min.js"></script>
+<script src="https://unpkg.com/@click-chutney/analytics@1.2.2/dist/clickchutney.min.js"></script>
 <script>
   cc('init', '${data.trackingId}');
   cc('page'); // Track initial page view
@@ -62,15 +62,17 @@ ClickChutney.track('button_click', { button: 'signup' });`
         },
         body: JSON.stringify(data),
       })
-
+      
       if (response.ok) {
         const project = await response.json()
         window.location.href = `/dashboard`
       } else {
-        throw new Error('Failed to create project')
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to create project')
       }
     } catch (error) {
       console.error('Error creating project:', error)
+      alert(`Failed to create project: ${error instanceof Error ? error.message : 'Unknown error'}`)
       setIsCreating(false)
     }
   }

@@ -59,10 +59,10 @@ export class ClickChutneyTracker {
     // Set up performance tracking
     this.setupPerformanceTracking();
 
-    // Set up periodic flush
+    // Set up periodic flush (more frequent for better UX)
     this.flushTimer = setInterval(() => {
       this.flush();
-    }, 10000); // Flush every 10 seconds
+    }, 3000); // Flush every 3 seconds
 
     // Flush on page unload
     window.addEventListener('beforeunload', () => {
@@ -220,9 +220,10 @@ export class ClickChutneyTracker {
     this.eventQueue.push(payload);
     this.log('Event enqueued', payload);
 
-    // Auto-flush if queue is getting large
-    if (this.eventQueue.length >= 10) {
-      this.flush();
+    // Auto-flush if queue is getting large or for important events
+    if (this.eventQueue.length >= 5 || eventName === 'pageview') {
+      // Flush immediately for page views and when queue has 5+ events
+      setTimeout(() => this.flush(), 100);
     }
   }
 
@@ -294,6 +295,11 @@ export class ClickChutneyTracker {
     }
     this.flush(true);
     this.log('Tracker destroyed');
+  }
+
+  // Public method to manually flush events (useful for testing)
+  forceFlush(): Promise<void> {
+    return this.flush();
   }
 
   private log(message: string, data?: any): void {
