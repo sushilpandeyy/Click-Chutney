@@ -20,6 +20,10 @@ import {
   Cookie,
   CheckCircle2,
   Globe,
+  ArrowRight,
+  Crown,
+  Shield,
+  User
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -38,6 +42,26 @@ import { Badge } from "@/components/ui/badge"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 import { ThemeToggle } from "@/components/theme-toggle"
 
+interface Project {
+  id: string
+  name: string
+  domain: string
+  url: string
+  description?: string
+  trackingId: string
+  isActive: boolean
+  isVerified: boolean
+  verifiedAt?: string
+  createdAt: string
+  updatedAt: string
+  userRole: 'OWNER' | 'ADMIN' | 'MEMBER' | 'VIEWER'
+  userJoinedAt: string
+  _count: {
+    events: number
+    members: number
+  }
+}
+
 const chartData = [
   { name: "Mon", visits: 120 },
   { name: "Tue", visits: 190 },
@@ -47,15 +71,6 @@ const chartData = [
   { name: "Sat", visits: 380 },
   { name: "Sun", visits: 290 },
 ]
-
-interface Project {
-  id: string
-  name: string
-  domain: string
-  trackingId: string
-  isVerified: boolean
-  createdAt: string
-}
 
 const statCards = [
   {
@@ -324,27 +339,59 @@ export default function Dashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {projects.slice(0, 3).map((project) => (
-                      <div key={project.id} className="flex items-center justify-between p-3 rounded-lg border">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                            <Globe className="w-4 h-4 text-primary" />
+                    {projects.slice(0, 3).map((project) => {
+                      const getRoleIcon = (role: string) => {
+                        switch (role) {
+                          case 'OWNER': return <Crown className="w-3 h-3 text-yellow-600" />
+                          case 'ADMIN': return <Shield className="w-3 h-3 text-blue-600" />
+                          case 'MEMBER': return <User className="w-3 h-3 text-green-600" />
+                          default: return <Eye className="w-3 h-3 text-gray-500" />
+                        }
+                      }
+
+                      const getRoleBadgeColor = (role: string) => {
+                        switch (role) {
+                          case 'OWNER': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
+                          case 'ADMIN': return 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400'
+                          case 'MEMBER': return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
+                          default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'
+                        }
+                      }
+
+                      return (
+                        <div key={project.id} className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted/50 transition-colors cursor-pointer" onClick={() => window.location.href = `/project/${project.id}`}>
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                              <Globe className="w-4 h-4 text-primary" />
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <p className="font-medium">{project.name}</p>
+                                <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${getRoleBadgeColor(project.userRole)}`}>
+                                  {getRoleIcon(project.userRole)}
+                                  {project.userRole}
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <p className="text-sm text-muted-foreground">{project.domain}</p>
+                                <span className="text-xs text-muted-foreground">•</span>
+                                <p className="text-xs text-muted-foreground">{project._count.events} events</p>
+                                <span className="text-xs text-muted-foreground">•</span>
+                                <p className="text-xs text-muted-foreground">{project._count.members} member{project._count.members !== 1 ? 's' : ''}</p>
+                              </div>
+                            </div>
                           </div>
-                          <div>
-                            <p className="font-medium">{project.name}</p>
-                            <p className="text-sm text-muted-foreground">{project.domain}</p>
+                          <div className="flex items-center gap-2">
+                            <Badge variant={project.isVerified ? "default" : "secondary"}>
+                              {project.isVerified ? "Verified" : "Pending"}
+                            </Badge>
+                            <Button size="sm" variant="ghost">
+                              <ArrowRight className="w-4 h-4" />
+                            </Button>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <Badge variant={project.isVerified ? "default" : "secondary"}>
-                            {project.isVerified ? "Verified" : "Pending"}
-                          </Badge>
-                          <Button size="sm" variant="ghost" onClick={() => window.location.href = '/dashboard/projects'}>
-                            View
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
+                      )
+                    })}
                   </div>
                 </CardContent>
               </Card>
