@@ -17,6 +17,8 @@ import {
   MapPin,
   Clock
 } from "lucide-react"
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
+import { ProjectSidebar } from "@/components/project/ProjectSidebar"
 
 interface Project {
   id: string
@@ -143,10 +145,28 @@ export default function ProjectDashboard() {
   const canManage = ['OWNER', 'ADMIN'].includes(userRole)
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto p-6 space-y-6">
-        {/* Project Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <SidebarProvider>
+      <div className="min-h-screen w-full flex">
+        <ProjectSidebar 
+          currentPage="overview"
+          projectName={project.name}
+          projectDomain={project.domain}
+        />
+        
+        <main className="flex-1 flex flex-col">
+          <div className="border-b bg-background">
+            <div className="flex h-16 items-center px-6">
+              <SidebarTrigger />
+              <div className="ml-4">
+                <h1 className="font-semibold">Project Overview</h1>
+                <p className="text-sm text-muted-foreground">Analytics dashboard for {project.name}</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="flex-1 p-6 space-y-6">
+            {/* Project Header */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <div className="flex items-center gap-3 mb-2">
               <h1 className="text-2xl font-bold">{project.name}</h1>
@@ -349,7 +369,9 @@ export default function ProjectDashboard() {
             </TabsContent>
           )}
         </Tabs>
+          </div>
+        </main>
       </div>
-    </div>
+    </SidebarProvider>
   )
 }

@@ -40,7 +40,7 @@ export default function RootLayout({ children }) {
 
 **Add to your HTML:**
 ```html
-<script src="https://unpkg.com/@click-chutney/analytics@2.0.0/dist/clickchutney.min.js"></script>
+<script src="https://unpkg.com/@click-chutney/analytics@2.0.1/dist/clickchutney.min.js"></script>
 <script>
   ClickChutney.init('your_tracking_id_here');
 </script>
@@ -181,13 +181,73 @@ The system automatically handles:
 
 ## 🆘 Troubleshooting
 
-**Analytics not working?**
+### Analytics not working?
 1. Check that your tracking ID is set in environment variables
 2. Verify the Analytics component is rendered
 3. Check browser dev tools for debug messages (enabled in development)
 4. Ensure your domain is verified in the ClickChutney dashboard
 
-**TypeScript support:**
+### Next.js Deployment Issues
+
+If you encounter errors like `TypeError: (0, n.useRef) is not a function` during Vercel or other deployments:
+
+**Solution 1: Use Dynamic Import (Safest)**
+```tsx
+import { DynamicAnalytics } from '@click-chutney/analytics/dynamic';
+
+export default function RootLayout({ children }) {
+  return (
+    <html>
+      <body>
+        {children}
+        <DynamicAnalytics />
+      </body>
+    </html>
+  );
+}
+```
+
+**Solution 2: Next.js Dynamic Import**
+```tsx
+import dynamic from 'next/dynamic';
+
+const Analytics = dynamic(() => 
+  import('@click-chutney/analytics/react').then(mod => ({ default: mod.Analytics })), 
+  { ssr: false }
+);
+
+export default function RootLayout({ children }) {
+  return (
+    <html>
+      <body>
+        {children}
+        <Analytics />
+      </body>
+    </html>
+  );
+}
+```
+
+**Solution 3: Client Component Wrapper**
+```tsx
+'use client';
+import { Analytics } from '@click-chutney/analytics/react';
+import { useEffect, useState } from 'react';
+
+export function ClientAnalytics() {
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  
+  if (!mounted) return null;
+  
+  return <Analytics />;
+}
+```
+
+### TypeScript Support
 Full TypeScript support included with detailed type definitions.
 
 ## 📝 License
