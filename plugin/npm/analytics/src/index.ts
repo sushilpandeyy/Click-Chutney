@@ -101,7 +101,7 @@ if (typeof window !== 'undefined') {
 declare global {
   interface Window {
     cc: (command: string, ...args: any[]) => void;
-    ClickChutney: typeof ClickChutney;
+    ClickChutney: ClickChutneyAPI;
   }
 }
 

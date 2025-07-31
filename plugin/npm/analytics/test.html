@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClickChutney Plugin Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .container { max-width: 600px; margin: 0 auto; }
+        button { padding: 10px 20px; margin: 10px; cursor: pointer; }
+        .log { background: #f5f5f5; padding: 20px; border-radius: 5px; margin-top: 20px; }
+        pre { white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ClickChutney Analytics Test</h1>
+        
+        <h2>Test Controls</h2>
+        <button onclick="testPageView()">Track Page View</button>
+        <button onclick="testCustomEvent()">Track Custom Event</button>
+        <button onclick="testIdentify()">Identify User</button>
+        <button onclick="flushEvents()">Flush Events</button>
+        
+        <div class="log" id="log">
+            <h3>Console Log:</h3>
+            <pre id="logContent"></pre>
+        </div>
+    </div>
+
+    <!-- Load the plugin -->
+    <script src="./dist/clickchutney.min.js"></script>
+    
+    <script>
+        // Override console.log to display in the page
+        const originalLog = console.log;
+        const logElement = document.getElementById('logContent');
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            logElement.textContent += args.map(arg => 
+                typeof arg === 'object' ? JSON.stringify(arg, null, 2) : arg
+            ).join(' ') + '\n';
+            logElement.scrollTop = logElement.scrollHeight;
+        };
+
+        // Initialize ClickChutney with debug enabled
+        window.cc('init', 'test-tracking-id-123', { 
+            debug: true,
+            apiUrl: 'https://qpbibuv2t3.execute-api.ap-south-1.amazonaws.com/v1/tracker'
+        });
+
+        console.log('ClickChutney initialized with tracking ID: test-tracking-id-123');
+
+        // Test functions
+        function testPageView() {
+            console.log('Testing page view...');
+            window.cc('page', '/test-page', 'Test Page Title');
+        }
+
+        function testCustomEvent() {
+            console.log('Testing custom event...');
+            window.cc('track', 'button_click', { 
+                button_name: 'test_button',
+                page: 'test_page'
+            });
+        }
+
+        function testIdentify() {
+            console.log('Testing user identification...');
+            window.cc('identify', 'user-123', {
+                name: 'Test User',
+                email: 'test@example.com'
+            });
+        }
+
+        function flushEvents() {
+            console.log('Flushing events manually...');
+            if (window.ClickChutney) {
+                window.ClickChutney.flush().then(() => {
+                    console.log('Events flushed successfully');
+                }).catch(err => {
+                    console.error('Error flushing events:', err);
+                });
+            }
+        }
+    </script>
+</body>
+</html>

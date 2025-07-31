@@ -42,11 +42,13 @@ export async function POST(request: NextRequest) {
     // Get client information
     const userAgent = request.headers.get('user-agent') || undefined
     const forwardedFor = request.headers.get('x-forwarded-for')
-    const ipAddress = forwardedFor ? forwardedFor.split(',')[0] : request.ip || undefined
+    const realIp = request.headers.get('x-real-ip')
+    const ipAddress = forwardedFor ? forwardedFor.split(',')[0].trim() : realIp || undefined
 
     // Create the event
     const newEvent = await prisma.event.create({
       data: {
+        id: `evt_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         projectId: project.id,
         type: event || 'pageview',
         data: {

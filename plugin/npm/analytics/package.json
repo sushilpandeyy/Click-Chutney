@@ -1,6 +1,6 @@
 {
   "name": "@click-chutney/analytics",
-  "version": "1.1.0",
+  "version": "1.2.1",
   "type": "module",
   "description": "Lightweight analytics tracking library for ClickChutney",
   "main": "dist/index.js",

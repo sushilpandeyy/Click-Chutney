@@ -2,6 +2,7 @@ import { SessionData, UserData } from './types';
 
 export class Storage {
   private static isLocalStorageAvailable(): boolean {
+    if (typeof window === 'undefined' || typeof localStorage === 'undefined') return false;
     try {
       const test = '__cc_test__';
       localStorage.setItem(test, test);
@@ -45,26 +46,32 @@ export function generateId(): string {
 }
 
 export function getCurrentUrl(): string {
+  if (typeof window === 'undefined') return '';
   return window.location.href;
 }
 
 export function getCurrentDomain(): string {
+  if (typeof window === 'undefined') return '';
   return window.location.hostname;
 }
 
 export function getCurrentPath(): string {
+  if (typeof window === 'undefined') return '';
   return window.location.pathname;
 }
 
 export function getPageTitle(): string {
+  if (typeof document === 'undefined') return '';
   return document.title;
 }
 
 export function getReferrer(): string {
+  if (typeof document === 'undefined') return '';
   return document.referrer;
 }
 
 export function getUserAgent(): string {
+  if (typeof navigator === 'undefined') return '';
   return navigator.userAgent;
 }
 
@@ -186,7 +193,7 @@ export class UserManager {
 }
 
 export function getPerformanceMetrics() {
-  if (!window.performance) return {};
+  if (typeof window === 'undefined' || !window.performance) return {};
 
   const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
   const paint = performance.getEntriesByType('paint');

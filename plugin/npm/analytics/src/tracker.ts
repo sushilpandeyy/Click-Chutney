@@ -28,10 +28,10 @@ export class ClickChutneyTracker {
 
   constructor(config: ClickChutneyConfig) {
     this.config = {
-      apiUrl: 'https://your-lambda-api-gateway-url.execute-api.region.amazonaws.com/prod',
       debug: false,
       autoTrack: true,
       sessionTimeout: 30 * 60 * 1000, // 30 minutes
+      apiUrl: 'https://qpbibuv2t3.execute-api.ap-south-1.amazonaws.com/v1/tracker',
       ...config
     };
 
@@ -41,6 +41,12 @@ export class ClickChutneyTracker {
 
   private initialize(): void {
     if (this.isInitialized) return;
+
+    // Only initialize in browser environment
+    if (typeof window === 'undefined' || typeof document === 'undefined') {
+      this.log('Skipping initialization - not in browser environment');
+      return;
+    }
 
     // Ensure we have a session
     SessionManager.getSession() || SessionManager.createSession();
@@ -73,6 +79,8 @@ export class ClickChutneyTracker {
   }
 
   private setupAutoTracking(): void {
+    if (typeof document === 'undefined') return;
+
     // Track page visibility changes
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) {
@@ -107,6 +115,8 @@ export class ClickChutneyTracker {
   }
 
   private setupPerformanceTracking(): void {
+    if (typeof document === 'undefined' || typeof window === 'undefined') return;
+
     // Track performance metrics after page load
     if (document.readyState === 'complete') {
       this.trackPerformance();
@@ -125,6 +135,11 @@ export class ClickChutneyTracker {
   }
 
   page(url?: string, title?: string): void {
+    if (typeof window === 'undefined') {
+      this.log('Skipping page tracking - not in browser environment');
+      return;
+    }
+
     const pageEvent: PageViewEvent = {
       type: 'pageview',
       url: url || getCurrentUrl(),
@@ -143,6 +158,11 @@ export class ClickChutneyTracker {
   }
 
   track(event: string, properties?: Record<string, any>): void {
+    if (typeof window === 'undefined') {
+      this.log('Skipping event tracking - not in browser environment');
+      return;
+    }
+
     const customEvent: CustomEvent = {
       type: 'event',
       name: event,
@@ -207,7 +227,7 @@ export class ClickChutneyTracker {
   }
 
   flush(synchronous = false): Promise<void> {
-    if (this.eventQueue.length === 0) {
+    if (typeof window === 'undefined' || this.eventQueue.length === 0) {
       return Promise.resolve();
     }
 
@@ -218,7 +238,7 @@ export class ClickChutneyTracker {
 
     const sendEvents = async () => {
       try {
-        const response = await fetch(`${this.config.apiUrl}/api/analytics`, {
+        const response = await fetch(this.config.apiUrl!, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -245,14 +265,16 @@ export class ClickChutneyTracker {
 
     if (synchronous) {
       // For beforeunload, we need to use sendBeacon or synchronous request
-      navigator.sendBeacon?.(
-        `${this.config.apiUrl}/api/analytics`,
-        JSON.stringify({
-          events,
-          trackingId: this.config.trackingId,
-          domain: getCurrentDomain()
-        })
-      );
+      if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
+        navigator.sendBeacon(
+          this.config.apiUrl!,
+          JSON.stringify({
+            events,
+            trackingId: this.config.trackingId,
+            domain: getCurrentDomain()
+          })
+        );
+      }
       return Promise.resolve();
     } else {
       return sendEvents();

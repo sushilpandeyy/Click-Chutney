@@ -30,12 +30,17 @@ export async function POST(request: NextRequest) {
 
     try {
       // Fetch the website's HTML to check for meta tag
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 10000)
+      
       const response = await fetch(`https://${domain}`, {
         headers: {
           'User-Agent': 'ClickChutney-Verifier/1.0'
         },
-        timeout: 10000
+        signal: controller.signal
       })
+      
+      clearTimeout(timeoutId)
 
       if (!response.ok) {
         return NextResponse.json(

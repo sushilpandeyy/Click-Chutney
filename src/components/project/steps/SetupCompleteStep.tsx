@@ -14,24 +14,41 @@ interface SetupCompleteStepProps {
 
 export function SetupCompleteStep({ data, onPrev }: SetupCompleteStepProps) {
   const [copiedScript, setCopiedScript] = useState(false)
+  const [copiedReact, setCopiedReact] = useState(false)
   const [isCreating, setIsCreating] = useState(false)
 
   const trackingScript = `<!-- ClickChutney Analytics -->
+<script src="https://unpkg.com/@click-chutney/analytics@1.2.1/dist/clickchutney.min.js"></script>
 <script>
-  (function(c,h,u,t,n,e,y){
-    c[n]=c[n]||function(){(c[n].q=c[n].q||[]).push(arguments)};
-    c[n].config={id:'${data.trackingId}'};
-    e=h.createElement(u);e.async=1;e.src='https://analytics.clickchutney.com/script.js';
-    y=h.getElementsByTagName(u)[0];y.parentNode.insertBefore(e,y);
-  })(window,document,'script','cc','chutney');
-  
-  chutney('init', '${data.trackingId}');
+  cc('init', '${data.trackingId}');
+  cc('page'); // Track initial page view
 </script>`
+
+  const reactInstallScript = `# Install the package
+npm install @click-chutney/analytics
+
+# For React/Next.js applications
+import ClickChutney from '@click-chutney/analytics';
+
+// Initialize in your app
+ClickChutney.init('${data.trackingId}');
+
+// Track page views
+ClickChutney.page();
+
+// Track custom events
+ClickChutney.track('button_click', { button: 'signup' });`
 
   const copyScript = async () => {
     await navigator.clipboard.writeText(trackingScript)
     setCopiedScript(true)
     setTimeout(() => setCopiedScript(false), 2000)
+  }
+
+  const copyReactScript = async () => {
+    await navigator.clipboard.writeText(reactInstallScript)
+    setCopiedReact(true)
+    setTimeout(() => setCopiedReact(false), 2000)
   }
 
   const handleCreateProject = async () => {
@@ -96,12 +113,38 @@ export function SetupCompleteStep({ data, onPrev }: SetupCompleteStepProps) {
           </CardContent>
         </Card>
 
+        {/* React/Next.js Installation */}
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center gap-2 mb-4">
               <Code className="w-5 h-5 text-primary" />
-              <h3 className="font-medium">Installation Script</h3>
-              <Badge variant="secondary">Required</Badge>
+              <h3 className="font-medium">React/Next.js Installation</h3>
+              <Badge variant="default">Recommended</Badge>
+            </div>
+            <p className="text-sm text-muted-foreground mb-4">
+              For React and Next.js applications, install via npm:
+            </p>
+            <div className="bg-muted rounded-lg p-4 relative">
+              <pre className="text-xs font-mono text-wrap overflow-x-auto">{reactInstallScript}</pre>
+              <Button
+                size="sm"
+                variant="ghost"
+                className="absolute top-2 right-2"
+                onClick={copyReactScript}
+              >
+                {copiedReact ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Vanilla JS/HTML Installation */}
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <Code className="w-5 h-5 text-primary" />
+              <h3 className="font-medium">HTML/Vanilla JS Installation</h3>
+              <Badge variant="secondary">Alternative</Badge>
             </div>
             <p className="text-sm text-muted-foreground mb-4">
               Add this script to the &lt;head&gt; section of every page you want to track:
@@ -126,29 +169,29 @@ export function SetupCompleteStep({ data, onPrev }: SetupCompleteStepProps) {
         </Card>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Card className="border-dashed">
+          <Card className="border-dashed border-orange-200 bg-orange-50 dark:bg-orange-900/20">
             <CardContent className="p-6 text-center">
-              <Download className="w-8 h-8 text-muted-foreground mx-auto mb-3" />
-              <h3 className="font-medium mb-2">WordPress Plugin</h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                Install our WordPress plugin for easy setup
+              <Download className="w-8 h-8 text-orange-600 mx-auto mb-3" />
+              <h3 className="font-medium mb-2 text-orange-800 dark:text-orange-200">WordPress Plugin</h3>
+              <p className="text-sm text-orange-700 dark:text-orange-300 mb-4">
+                WordPress plugin with easy setup
               </p>
-              <Button variant="outline" size="sm" disabled>
+              <Badge variant="outline" className="border-orange-300 text-orange-700">
                 Coming Soon
-              </Button>
+              </Badge>
             </CardContent>
           </Card>
 
-          <Card className="border-dashed">
+          <Card className="border-dashed border-purple-200 bg-purple-50 dark:bg-purple-900/20">
             <CardContent className="p-6 text-center">
-              <ExternalLink className="w-8 h-8 text-muted-foreground mx-auto mb-3" />
-              <h3 className="font-medium mb-2">Framework Guides</h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                Integration guides for React, Vue, and more
+              <ExternalLink className="w-8 h-8 text-purple-600 mx-auto mb-3" />
+              <h3 className="font-medium mb-2 text-purple-800 dark:text-purple-200">More Integrations</h3>
+              <p className="text-sm text-purple-700 dark:text-purple-300 mb-4">
+                Vue, Angular, Svelte & more frameworks
               </p>
-              <Button variant="outline" size="sm" disabled>
-                View Docs
-              </Button>
+              <Badge variant="outline" className="border-purple-300 text-purple-700">
+                Coming Soon
+              </Badge>
             </CardContent>
           </Card>
         </div>
