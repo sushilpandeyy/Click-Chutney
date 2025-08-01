@@ -69,6 +69,62 @@ function isPrivateIP(ip) {
   return privateRanges.some(range => range.test(ip));
 }
 
+// Auto-verification logic
+async function checkAutoVerification(project, eventDocuments, db) {
+  try {
+    // Get the project's registered domain
+    const projectDomain = normalizeWwwDomain(project.domain);
+    
+    // Check if any event's domain matches the project domain
+    const hasMatchingDomain = eventDocuments.some(event => {
+      if (!event.domain) return false;
+      const eventDomain = normalizeWwwDomain(event.domain);
+      return eventDomain === projectDomain;
+    });
+    
+    if (!hasMatchingDomain) {
+      console.log(`No matching domain found for project ${project._id}. Expected: ${projectDomain}`);
+      return false;
+    }
+    
+    // Additional verification: Check if we have sufficient page view events from the correct domain
+    const eventsCollection = db.collection('events');
+    const recentMatchingEvents = await eventsCollection.find({
+      projectId: project._id,
+      domain: projectDomain,
+      type: 'pageview',
+      createdAt: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) } // Last 24 hours
+    }).limit(3).toArray();
+    
+    // Require at least 1 page view from the correct domain
+    const hasPageViews = recentMatchingEvents.length >= 1;
+    
+    if (!hasPageViews) {
+      console.log(`Insufficient page views for auto-verification. Found: ${recentMatchingEvents.length}`);
+      return false;
+    }
+    
+    console.log(`Auto-verification criteria met for project ${project._id}:`, {
+      projectDomain,
+      matchingEvents: recentMatchingEvents.length,
+      hasMatchingDomain,
+      hasPageViews
+    });
+    
+    return true;
+    
+  } catch (error) {
+    console.error('Error in auto-verification check:', error);
+    return false;
+  }
+}
+
+// Normalize domain to handle www subdomain consistently
+function normalizeWwwDomain(domain) {
+  if (!domain) return null;
+  return domain.replace(/^www\./, '').toLowerCase();
+}
+
 function getClientIP(event) {
   const headers = event.headers || {};
   return (
@@ -151,19 +207,7 @@ exports.handler = async (event, context) => {
     }
 
     // Allow unverified projects to track events for verification purposes
-    // but mark them appropriately in the response
-    const allowTracking = project.isVerified || true; // Always allow for verification
-    
-    if (!allowTracking) {
-      return {
-        statusCode: 403,
-        headers: corsHeaders,
-        body: JSON.stringify({ 
-          success: false, 
-          error: 'Project not found or inactive.' 
-        })
-      };
-    }
+    const allowTracking = true; // Always allow for verification
 
     // Process events
     const events = body.events || [];
@@ -188,7 +232,7 @@ exports.handler = async (event, context) => {
       try {
         const urlObj = new URL(url);
         // Always normalize to non-www version for consistent storage
-        return urlObj.hostname.replace(/^www\./, '').toLowerCase();
+        return normalizeWwwDomain(urlObj.hostname);
       } catch {
         return null;
       }
@@ -224,6 +268,25 @@ exports.handler = async (event, context) => {
     const eventIds = Object.values(result.insertedIds).map(id => id.toString());
 
     console.log(`Processed ${eventDocuments.length} events for project ${project._id}`);
+
+    // Auto-verification logic: Check if project should be auto-verified
+    if (!project.isVerified) {
+      const shouldAutoVerify = await checkAutoVerification(project, eventDocuments, db);
+      if (shouldAutoVerify) {
+        await projects.updateOne(
+          { _id: project._id },
+          { 
+            $set: { 
+              isVerified: true, 
+              verifiedAt: new Date(),
+              autoVerified: true
+            } 
+          }
+        );
+        project.isVerified = true; // Update local copy for response
+        console.log(`Auto-verified project ${project._id} based on domain match`);
+      }
+    }
 
     return {
       statusCode: 200,

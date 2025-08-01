@@ -46,16 +46,22 @@ export function ProjectSidebar({
       key: "overview"
     },
     { 
-      title: "Data & Events", 
-      icon: Database, 
-      href: `/project/${projectId}/data`, 
-      key: "data"
+      title: "View", 
+      icon: LineChart, 
+      href: `/project/${projectId}/view`, 
+      key: "view"
     },
     { 
       title: "Real-time", 
       icon: Activity, 
       href: `/project/${projectId}/realtime`, 
       key: "realtime"
+    },
+    { 
+      title: "Data & Events", 
+      icon: Database, 
+      href: `/project/${projectId}/data`, 
+      key: "data"
     },
     { 
       title: "Team", 
