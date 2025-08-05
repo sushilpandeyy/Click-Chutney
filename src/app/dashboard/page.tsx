@@ -63,59 +63,36 @@ interface Project {
   }
 }
 
-const chartData = [
-  { name: "Mon", visits: 120 },
-  { name: "Tue", visits: 190 },
-  { name: "Wed", visits: 300 },
-  { name: "Thu", visits: 250 },
-  { name: "Fri", visits: 420 },
-  { name: "Sat", visits: 380 },
-  { name: "Sun", visits: 290 },
-]
-
-const statCards = [
-  {
-    title: "Visits",
-    value: "2,847",
-    subtitle: "Today",
-    icon: Eye,
-    color: "text-orange-600",
-    bgColor: "bg-orange-50 dark:bg-orange-900/20",
-  },
-  {
-    title: "Top Page",
-    value: "/pricing",
-    subtitle: "Most visited",
-    icon: TrendingUp,
-    color: "text-green-600",
-    bgColor: "bg-green-50 dark:bg-green-900/20",
-  },
-  {
-    title: "Avg Time",
-    value: "3m 24s",
-    subtitle: "Session length",
-    icon: Clock,
-    color: "text-amber-600",
-    bgColor: "bg-amber-50 dark:bg-amber-900/20",
-  },
-  {
-    title: "Peak Hour",
-    value: "2-3 PM",
-    subtitle: "Busiest time",
-    icon: Flame,
-    color: "text-red-600",
-    bgColor: "bg-red-50 dark:bg-red-900/20",
-  },
-]
+interface AnalyticsData {
+  stats: {
+    totalViews: number
+    uniqueVisitors: number
+    totalEvents: number
+    avgSessionTime: number
+    topPage: string | null
+    peakHour: string | null
+  }
+  dailyTraffic: Array<{
+    name: string
+    visits: number
+    date: string
+  }>
+  countries: Array<{
+    country: string
+    visitors: number
+  }>
+}
 
 
 export default function Dashboard() {
   const [projects, setProjects] = useState<Project[]>([])
+  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null)
   const [loading, setLoading] = useState(true)
   const { data: session } = useSession()
 
   useEffect(() => {
     fetchProjects()
+    fetchAnalytics()
   }, [])
 
   const fetchProjects = async () => {
@@ -127,9 +104,28 @@ export default function Dashboard() {
       }
     } catch (error) {
       console.error('Error fetching projects:', error)
+    }
+  }
+
+  const fetchAnalytics = async () => {
+    try {
+      const response = await fetch('/api/dashboard/analytics')
+      if (response.ok) {
+        const data = await response.json()
+        setAnalytics(data)
+      }
+    } catch (error) {
+      console.error('Error fetching analytics:', error)
     } finally {
       setLoading(false)
     }
+  }
+
+  const formatSessionTime = (seconds: number) => {
+    if (seconds < 60) return `${seconds}s`
+    const minutes = Math.floor(seconds / 60)
+    const remainingSeconds = seconds % 60
+    return `${minutes}m ${remainingSeconds}s`
   }
 
   const hasProjects = projects.length > 0
@@ -229,25 +225,45 @@ export default function Dashboard() {
                   </CardContent>
                 </Card>
 
-                {statCards.slice(2).map((stat, index) => (
-                  <Card key={index + 2} className="rounded-xl shadow-sm hover:shadow-md transition-shadow">
-                    <CardContent className="p-4">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className={`p-2 rounded-lg ${stat.bgColor}`}>
-                          <stat.icon className={`w-5 h-5 ${stat.color}`} />
-                        </div>
-                        <Badge variant="secondary" className="text-xs">
-                          Live
-                        </Badge>
+                <Card className="rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="p-2 rounded-lg bg-amber-50 dark:bg-amber-900/20">
+                        <Clock className="w-5 h-5 text-amber-600" />
                       </div>
-                      <div className="space-y-1">
-                        <p className="text-xs font-medium text-muted-foreground">{stat.title}</p>
-                        <p className="text-xl font-bold text-foreground">{stat.value}</p>
-                        <p className="text-xs text-muted-foreground">{stat.subtitle}</p>
+                      <Badge variant="secondary" className="text-xs">
+                        Live
+                      </Badge>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-xs font-medium text-muted-foreground">Avg Time</p>
+                      <p className="text-xl font-bold text-foreground">
+                        {analytics ? formatSessionTime(analytics.stats.avgSessionTime) : '0s'}
+                      </p>
+                      <p className="text-xs text-muted-foreground">Session length</p>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="p-2 rounded-lg bg-red-50 dark:bg-red-900/20">
+                        <Flame className="w-5 h-5 text-red-600" />
                       </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                      <Badge variant="secondary" className="text-xs">
+                        Live
+                      </Badge>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-xs font-medium text-muted-foreground">Peak Hour</p>
+                      <p className="text-xl font-bold text-foreground">
+                        {analytics?.stats.peakHour || 'N/A'}
+                      </p>
+                      <p className="text-xs text-muted-foreground">Busiest time</p>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
 
               {/* Recent Projects */}
@@ -332,7 +348,7 @@ export default function Dashboard() {
                 <CardContent>
                   <div className="h-64">
                     <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={chartData}>
+                      <LineChart data={analytics?.dailyTraffic || []}>
                         <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="opacity-20" />
                         <XAxis dataKey="name" stroke="currentColor" className="opacity-60" fontSize={12} />
                         <YAxis stroke="currentColor" className="opacity-60" fontSize={12} />

@@ -28,21 +28,6 @@ export const authActions = {
     }
   },
 
-  async signInWithTwitter(redirectTo?: string) {
-    try {
-      const result = await signIn.social({
-        provider: "twitter",
-        callbackURL: redirectTo || "/dashboard",
-      })
-      return { success: true, data: result }
-    } catch (error) {
-      console.error("Twitter sign-in failed:", error)
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : "Twitter sign-in failed"
-      }
-    }
-  },
 
   async signOut() {
     try {

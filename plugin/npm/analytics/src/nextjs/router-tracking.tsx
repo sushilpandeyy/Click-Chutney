@@ -10,9 +10,14 @@ export function RouterTracking() {
   const { page } = useClickChutney()
 
   useEffect(() => {
-    // Track route changes
-    const url = pathname + (searchParams.toString() ? `?${searchParams.toString()}` : '')
-    page(url)
+    // Track route changes with small delay to ensure DOM is ready
+    const timeoutId = setTimeout(() => {
+      const url = pathname + (searchParams.toString() ? `?${searchParams.toString()}` : '')
+      const title = typeof document !== 'undefined' ? document.title : undefined
+      page(url, title)
+    }, 100)
+
+    return () => clearTimeout(timeoutId)
   }, [pathname, searchParams, page])
 
   return null

@@ -31,10 +31,21 @@ export class ClickChutneyTracker {
       debug: false,
       autoTrack: true,
       sessionTimeout: 30 * 60 * 1000, // 30 minutes
-      apiUrl: 'https://qpbibuv2t3.execute-api.ap-south-1.amazonaws.com/v1/tracker',
+      apiUrl: config.apiUrl || (typeof window !== 'undefined' && window.location.origin) 
+        ? `${window.location.origin}/api/analytics` 
+        : 'https://qpbibuv2t3.execute-api.ap-south-1.amazonaws.com/v1/tracker',
       ...config
     };
 
+    if (this.config.debug) {
+      console.log(
+        '🚀 ClickChutney Analytics Initialized\n' +
+        `• Tracking ID: ${this.config.trackingId}\n` +
+        `• API URL: ${this.config.apiUrl}\n` +
+        `• Auto-tracking: ${this.config.autoTrack ? 'enabled' : 'disabled'}\n` +
+        '• Ready to track events!'
+      );
+    }
     this.log('Initializing ClickChutney tracker', this.config);
     this.initialize();
   }
@@ -65,8 +76,17 @@ export class ClickChutneyTracker {
     }, 3000); // Flush every 3 seconds
 
     // Flush on page unload
-    window.addEventListener('beforeunload', () => {
+    const handleBeforeUnload = () => {
       this.flush(true);
+    };
+    
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    
+    // Also handle visibility change for better mobile support
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') {
+        this.flush(true);
+      }
     });
 
     // Track initial page view
@@ -119,11 +139,13 @@ export class ClickChutneyTracker {
 
     // Track performance metrics after page load
     if (document.readyState === 'complete') {
-      this.trackPerformance();
+      setTimeout(() => this.trackPerformance(), 1000);
     } else {
-      window.addEventListener('load', () => {
+      const handleLoad = () => {
         setTimeout(() => this.trackPerformance(), 1000);
-      });
+        window.removeEventListener('load', handleLoad);
+      };
+      window.addEventListener('load', handleLoad);
     }
   }
 
@@ -257,8 +279,15 @@ export class ClickChutneyTracker {
         }
 
         this.log('Events sent successfully');
+        if (this.config.debug) {
+          console.log('✅ ClickChutney: Successfully sent', events.length, 'events to', this.config.apiUrl);
+        }
       } catch (error) {
         this.log('Error sending events', error);
+        if (this.config.debug) {
+          console.error('❌ ClickChutney: Failed to send events:', error);
+          console.log('Retrying events:', events);
+        }
         // Re-queue events on failure
         this.eventQueue.unshift(...events);
       }

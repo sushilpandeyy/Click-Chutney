@@ -42,7 +42,7 @@ export class Storage {
 }
 
 export function generateId(): string {
-  return `cc_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  return `cc_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
 }
 
 export function getCurrentUrl(): string {
@@ -195,16 +195,40 @@ export class UserManager {
 export function getPerformanceMetrics() {
   if (typeof window === 'undefined' || !window.performance) return {};
 
-  const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
-  const paint = performance.getEntriesByType('paint');
+  try {
+    const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+    const paint = performance.getEntriesByType('paint');
 
-  const fcp = paint.find(entry => entry.name === 'first-contentful-paint');
-  const lcp = performance.getEntriesByType('largest-contentful-paint')[0];
+    const fcp = paint.find(entry => entry.name === 'first-contentful-paint');
+    
+    // Try to get LCP, but handle cases where it might not be available
+    let lcp;
+    try {
+      lcp = performance.getEntriesByType('largest-contentful-paint')[0];
+    } catch {
+      lcp = null;
+    }
 
-  return {
-    loadTime: navigation ? Math.round(navigation.loadEventEnd - navigation.fetchStart) : undefined,
-    fcp: fcp ? Math.round(fcp.startTime) : undefined,
-    lcp: lcp ? Math.round(lcp.startTime) : undefined,
-    // CLS and FID would need additional implementation
-  };
+    const metrics: Record<string, number | undefined> = {};
+
+    if (navigation && navigation.loadEventEnd && navigation.fetchStart) {
+      const loadTime = navigation.loadEventEnd - navigation.fetchStart;
+      if (loadTime > 0 && loadTime < 60000) { // Sanity check: less than 60 seconds
+        metrics.loadTime = Math.round(loadTime);
+      }
+    }
+
+    if (fcp && fcp.startTime > 0) {
+      metrics.fcp = Math.round(fcp.startTime);
+    }
+
+    if (lcp && lcp.startTime > 0) {
+      metrics.lcp = Math.round(lcp.startTime);
+    }
+
+    return metrics;
+  } catch (error) {
+    // Performance API might not be fully supported or accessible
+    return {};
+  }
 }

@@ -171,16 +171,41 @@ export async function DELETE(
       )
     }
 
-    // Delete project (cascade will handle members and events)
+    // Get project details for logging
+    const project = await prisma.project.findUnique({
+      where: { id: projectId },
+      include: {
+        _count: {
+          select: {
+            members: true,
+            events: true
+          }
+        }
+      }
+    })
+
+    if (!project) {
+      return NextResponse.json(
+        { error: "Project not found" }, 
+        { status: 404 }
+      )
+    }
+
+    // Delete project (cascade will handle members and events automatically)
     await prisma.project.delete({
       where: { id: projectId }
     })
 
-    return NextResponse.json({ success: true })
+    console.log(`Project deleted: ${project.name} (${projectId}) - ${project._count.events} events and ${project._count.members} members removed`)
+
+    return NextResponse.json({ 
+      success: true,
+      message: `Project "${project.name}" has been successfully deleted along with all associated data.`
+    })
   } catch (error) {
     console.error("Error deleting project:", error)
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Failed to delete project. Please try again." },
       { status: 500 }
     )
   }

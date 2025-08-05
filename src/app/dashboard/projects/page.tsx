@@ -20,13 +20,23 @@ import {
   LogOut,
   Settings,
   Users,
+  MoreVertical,
+  Trash2,
+  Edit,
 } from "lucide-react"
 import Link from "next/link"
 import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { AppSidebar } from "@/components/dashboard/AppSidebar"
+import { DeleteProjectDialog } from "@/components/project/DeleteProjectDialog"
 
 interface Project {
   id: string
@@ -37,6 +47,7 @@ interface Project {
   isVerified: boolean
   verifiedAt?: string
   createdAt: string
+  userRole?: string
 }
 
 
@@ -185,31 +196,68 @@ export default function ProjectsPage() {
             {projects.map((project) => (
               <Card 
                 key={project.id} 
-                className="hover:shadow-md transition-shadow cursor-pointer"
-                onClick={() => setSelectedProject(project)}
+                className="hover:shadow-md transition-shadow"
               >
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <CardTitle className="flex items-center gap-2 text-lg">
+                    <CardTitle 
+                      className="flex items-center gap-2 text-lg cursor-pointer"
+                      onClick={() => setSelectedProject(project)}
+                    >
                       <Globe className="w-5 h-5" />
                       {project.name}
                     </CardTitle>
-                    <Badge variant={project.isVerified ? "default" : "secondary"}>
-                      {project.isVerified ? (
-                        <>
-                          <CheckCircle2 className="w-3 h-3 mr-1" />
-                          Verified
-                        </>
-                      ) : (
-                        <>
-                          <Clock className="w-3 h-3 mr-1" />
-                          Pending
-                        </>
-                      )}
-                    </Badge>
+                    <div className="flex items-center gap-2">
+                      <Badge variant={project.isVerified ? "default" : "secondary"}>
+                        {project.isVerified ? (
+                          <>
+                            <CheckCircle2 className="w-3 h-3 mr-1" />
+                            Verified
+                          </>
+                        ) : (
+                          <>
+                            <Clock className="w-3 h-3 mr-1" />
+                            Pending
+                          </>
+                        )}
+                      </Badge>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => setSelectedProject(project)}>
+                            <Eye className="mr-2 h-4 w-4" />
+                            View Details
+                          </DropdownMenuItem>
+                          {project.userRole === 'OWNER' && (
+                            <DeleteProjectDialog
+                              project={project}
+                              onProjectDeleted={fetchProjects}
+                              trigger={
+                                <DropdownMenuItem
+                                  className="text-destructive focus:text-destructive"
+                                  asChild
+                                >
+                                  <button className="w-full text-left flex items-center">
+                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    Delete Project
+                                  </button>
+                                </DropdownMenuItem>
+                              }
+                            />
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-3">
+                <CardContent 
+                  className="space-y-3 cursor-pointer"
+                  onClick={() => setSelectedProject(project)}
+                >
                   <div>
                     <p className="text-sm text-muted-foreground">Domain</p>
                     <p className="font-medium">{project.domain}</p>

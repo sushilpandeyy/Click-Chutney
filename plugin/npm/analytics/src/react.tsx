@@ -69,6 +69,17 @@ export function Analytics(props: AnalyticsProps = {}) {
     process.env.NEXT_PUBLIC_CLICKCHUTNEY_TRACKING_ID;
 
   if (!autoTrackingId) {
+    console.warn(
+      '⚠️ ClickChutney Warning: No tracking ID found\n' +
+      '\n' +
+      'Analytics will not track events because no tracking ID was provided.\n' +
+      '\n' +
+      'Solutions:\n' +
+      '• Add NEXT_PUBLIC_CLICKCHUTNEY_ID to your .env.local file\n' +
+      '• Or pass trackingId prop: <Analytics trackingId="your-id" />\n' +
+      '\n' +
+      'Get your tracking ID from: https://clickchutney.com/dashboard'
+    );
     return null;
   }
 
@@ -85,7 +96,7 @@ export function Analytics(props: AnalyticsProps = {}) {
   if (typeof window !== 'undefined' && !window.__ccAnalyticsInitialized) {
     window.__ccAnalyticsInitialized = true;
     
-    // Use setTimeout to avoid blocking the main thread
+    // Use setTimeout to avoid blocking the main thread and ensure DOM is ready
     setTimeout(() => {
       try {
         ClickChutney.init(autoTrackingId, {
@@ -94,14 +105,18 @@ export function Analytics(props: AnalyticsProps = {}) {
           ...config
         });
 
-        // Track initial page view
-        ClickChutney.page();
+        // Track initial page view with a small delay to ensure page is fully loaded
+        setTimeout(() => {
+          ClickChutney.page();
+        }, 100);
         
         if (shouldDebug) {
           console.log('ClickChutney: Initialized successfully with ID:', autoTrackingId);
         }
       } catch (error) {
         console.error('ClickChutney: Failed to initialize:', error);
+        // Reset flag on error so initialization can be retried
+        window.__ccAnalyticsInitialized = false;
       }
     }, 0);
   }

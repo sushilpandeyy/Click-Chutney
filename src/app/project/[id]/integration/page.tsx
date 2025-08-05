@@ -96,8 +96,8 @@ export default function ProjectIntegrationPage() {
   }
 
   const trackingId = project.trackingId
-  const scriptTag = `<script src="https://unpkg.com/@click-chutney/analytics@2.0.0/dist/clickchutney.min.js"></script>
-<script>ClickChutney.init('${trackingId}');</script>`
+  const scriptTag = `<script src="https://unpkg.com/@click-chutney/analytics@2.0.4/dist/clickchutney.min.js"></script>
+<script>cc('init', '${trackingId}');</script>`
 
   const envVariable = `NEXT_PUBLIC_CLICKCHUTNEY_ID=${trackingId}`
 

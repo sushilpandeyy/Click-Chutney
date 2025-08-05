@@ -16,6 +16,18 @@ class ClickChutneyAPI {
       (typeof process !== 'undefined' && process.env?.CLICKCHUTNEY_TRACKING_ID);
 
     if (!autoTrackingId) {
+      console.error(
+        '🚨 ClickChutney Error: Missing Tracking ID\n' +
+        '\n' +
+        'Your ClickChutney analytics is not properly configured!\n' +
+        '\n' +
+        'Solutions:\n' +
+        '• For React/Next.js: Set NEXT_PUBLIC_CLICKCHUTNEY_ID in your .env.local file\n' +
+        '• For script tags: Use cc(\'init\', \'your-tracking-id\')\n' +
+        '• Or pass it directly: ClickChutney.init(\'your-tracking-id\')\n' +
+        '\n' +
+        'Get your tracking ID from: https://clickchutney.com/dashboard'
+      );
       throw new Error('ClickChutney: trackingId is required. Provide it as a parameter or set NEXT_PUBLIC_CLICKCHUTNEY_ID environment variable.');
     }
 

@@ -54,7 +54,7 @@ export default function SettingsPage() {
                   </div>
                 </div>
               </div>
-              <ThemeToggle />
+              {/* Theme toggle placeholder */}
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -232,7 +232,7 @@ export default function SettingsPage() {
                         Choose your preferred theme
                       </p>
                       <div className="flex items-center gap-2">
-                        <ThemeToggle />
+                        {/* Theme toggle will be added later */}
                         <span className="text-sm">Toggle theme</span>
                       </div>
                     </div>

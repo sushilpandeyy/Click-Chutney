@@ -33,8 +33,8 @@ export function WebsiteVerificationStep({ data, updateData, onNext, onPrev }: We
   }, [data.trackingId, updateData])
 
   const trackingId = data.trackingId || 'cc_loading...'
-  const scriptTag = `<script src="https://unpkg.com/@click-chutney/analytics@2.0.0/dist/clickchutney.min.js"></script>
-<script>ClickChutney.init('${trackingId}');</script>`
+  const scriptTag = `<script src="https://unpkg.com/@click-chutney/analytics@2.0.4/dist/clickchutney.min.js"></script>
+<script>cc('init', '${trackingId}');</script>`
 
   const copyToClipboard = async (text: string) => {
     await navigator.clipboard.writeText(text)
@@ -294,7 +294,7 @@ export default function RootLayout({ children }) {
                 <Button 
                   size="sm" 
                   onClick={handleCreateProject} 
-                  disabled={isCreating || projectId || data.projectId}
+                  disabled={isCreating || !!projectId || !!data.projectId}
                   variant={projectId || data.projectId ? "outline" : "default"}
                 >
                   {isCreating ? (
