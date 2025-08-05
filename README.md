@@ -27,6 +27,16 @@ ClickChutney is a privacy-focused, real-time analytics platform that helps you u
 - **Geolocation Insights** - IP-based location analytics without storing personal data
 - **Session Management** - Comprehensive visitor session tracking
 
+## 📸 Screenshots
+
+### Dashboard Overview
+![ClickChutney Dashboard](./public/dashboard-screenshot.png)
+*Main dashboard showing project analytics, visitor statistics, and real-time data*
+
+### Project Management
+![Project Management](./public/projects-screenshot.png)
+*Project creation wizard and management interface*
+
 ## 🛠 Tech Stack
 
 ### Frontend
