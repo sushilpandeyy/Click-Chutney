@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ArrowRight, ArrowLeft, Shield, Copy, Check, Code, Globe, CheckCircle2 } from "lucide-react"
+import { ArrowRight, ArrowLeft, Shield, Copy, Check, Code, Globe, CheckCircle2, AlertTriangle } from "lucide-react"
 import type { ProjectData } from "../ProjectWizard"
 
 interface WebsiteVerificationStepProps {
@@ -23,18 +23,28 @@ export function WebsiteVerificationStep({ data, updateData, onNext, onPrev }: We
   const [verificationStatus, setVerificationStatus] = useState<'idle' | 'success' | 'error'>('idle')
   const [verificationMessage, setVerificationMessage] = useState('')
   const [projectId, setProjectId] = useState<string | null>(null)
+  const [isClient, setIsClient] = useState(false)
+  const [debugInfo, setDebugInfo] = useState<any>(null)
+  const [showDebug, setShowDebug] = useState(false)
 
-  // Generate trackingId only once and save it immediately
+  // Ensure client-side rendering for components that use dynamic values
   useEffect(() => {
-    if (!data.trackingId) {
+    setIsClient(true)
+  }, [])
+
+  // Generate trackingId only once and save it immediately - client-side only to avoid hydration issues
+  useEffect(() => {
+    if (typeof window !== 'undefined' && !data.trackingId) {
       const newTrackingId = `cc_${Date.now()}_${Math.random().toString(36).substr(2, 12)}`
       updateData({ trackingId: newTrackingId })
     }
   }, [data.trackingId, updateData])
 
   const trackingId = data.trackingId || 'cc_loading...'
-  const scriptTag = `<script src="https://unpkg.com/@click-chutney/analytics@2.0.4/dist/clickchutney.min.js"></script>
+  const scriptTag = data.trackingId 
+    ? `<script src="https://unpkg.com/@click-chutney/analytics@2.0.9/dist/clickchutney.min.js"></script>
 <script>cc('init', '${trackingId}');</script>`
+    : '<!-- Generating tracking ID... -->'
 
   const copyToClipboard = async (text: string) => {
     await navigator.clipboard.writeText(text)
@@ -280,8 +290,18 @@ export default function RootLayout({ children }) {
             <div className="text-center">
               <h3 className="font-medium text-blue-800 dark:text-blue-200 mb-2">Simple Event-Based Verification</h3>
               <p className="text-sm text-blue-700 dark:text-blue-300">
-                Install analytics, visit your site, then verify. We'll check for real events from your domain:
+                Install analytics, visit your site, then verify. We'll check for real events from <strong>{data.domain}</strong>:
               </p>
+            </div>
+            
+            <div className="p-3 bg-white dark:bg-blue-950/50 rounded-lg border border-blue-200 dark:border-blue-800">
+              <h4 className="text-xs font-medium text-blue-800 dark:text-blue-200 mb-2">Quick Debug Tips:</h4>
+              <ul className="text-xs text-blue-700 dark:text-blue-300 space-y-1">
+                <li>• Open browser dev tools (F12) to check for console messages</li>
+                <li>• Look for "✅ ClickChutney: Initialized successfully" message</li>
+                <li>• Visit multiple pages to generate more events</li>
+                <li>• Check Network tab for API calls to /api/analytics</li>
+              </ul>
             </div>
             
             <div className="space-y-3">
@@ -340,16 +360,111 @@ export default function RootLayout({ children }) {
             </div>
 
             {verificationMessage && (
-              <div className={`p-3 rounded-lg text-sm ${
-                verificationStatus === 'success' ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-200' :
-                verificationStatus === 'error' ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-200' :
-                'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-200'
+              <div className={`p-4 rounded-lg text-sm border ${
+                verificationStatus === 'success' ? 'bg-green-50 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-200 dark:border-green-800' :
+                verificationStatus === 'error' ? 'bg-red-50 text-red-800 border-red-200 dark:bg-red-900/20 dark:text-red-200 dark:border-red-800' :
+                'bg-blue-50 text-blue-800 border-blue-200 dark:bg-blue-900/20 dark:text-blue-200 dark:border-blue-800'
               }`}>
-                {verificationMessage}
+                <div className="flex items-start gap-3">
+                  {verificationStatus === 'success' ? (
+                    <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
+                  ) : verificationStatus === 'error' ? (
+                    <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" />
+                  ) : (
+                    <CheckCircle2 className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+                  )}
+                  <div className="flex-1">
+                    <div className="whitespace-pre-line">{verificationMessage}</div>
+                    {verificationStatus === 'error' && (
+                      <div className="mt-3 pt-3 border-t border-red-200 dark:border-red-800">
+                        <p className="font-medium mb-2">Troubleshooting Steps:</p>
+                        <ol className="text-xs space-y-1 list-decimal list-inside">
+                          <li>Make sure you've saved the tracking code to your website</li>
+                          <li>Clear your browser cache and visit {data.domain}</li>
+                          <li>Open browser dev tools (F12) and check for console errors</li>
+                          <li>Verify the tracking ID matches: <code className="bg-red-100 dark:bg-red-900/50 px-1 rounded">{trackingId}</code></li>
+                          <li>Wait 1-2 minutes after visiting your site, then try verifying again</li>
+                        </ol>
+                        <div className="mt-3">
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            onClick={async () => {
+                              if (!projectId && !data.projectId) return;
+                              try {
+                                const response = await fetch(`/api/projects/${projectId || data.projectId}/debug`);
+                                const debug = await response.json();
+                                setDebugInfo(debug);
+                                setShowDebug(true);
+                              } catch (error) {
+                                console.error('Debug fetch error:', error);
+                              }
+                            }}
+                            className="text-xs"
+                          >
+                            Show Debug Info
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             )}
           </CardContent>
         </Card>
+        
+        {/* Debug Information */}
+        {showDebug && debugInfo && (
+          <Card className="border-orange-200 bg-orange-50 dark:bg-orange-900/20">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="font-medium text-orange-800 dark:text-orange-200">Debug Information</h4>
+                <Button size="sm" variant="ghost" onClick={() => setShowDebug(false)}>
+                  <Check className="w-4 h-4" />
+                </Button>
+              </div>
+              <div className="space-y-3 text-xs text-orange-700 dark:text-orange-300">
+                <div>
+                  <strong>Project:</strong> {debugInfo.project?.name} ({debugInfo.project?.trackingId})
+                </div>
+                <div>
+                  <strong>Expected domains:</strong> {debugInfo.verification?.expectedDomains?.join(', ')}
+                </div>
+                <div>
+                  <strong>Total events:</strong> {debugInfo.verification?.totalEvents || 0}
+                </div>
+                <div>
+                  <strong>Recent events (24h):</strong> {debugInfo.verification?.recentEvents || 0}
+                </div>
+                {debugInfo.events?.byDomain?.length > 0 && (
+                  <div>
+                    <strong>Events by domain:</strong>
+                    <ul className="mt-1 ml-4 list-disc">
+                      {debugInfo.events.byDomain.map((item: any, idx: number) => (
+                        <li key={idx}>
+                          {item.domain || '(no domain)'}: {item._count.id} events
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {debugInfo.events?.recent?.length > 0 && (
+                  <div>
+                    <strong>Latest events:</strong>
+                    <ul className="mt-1 ml-4 list-disc max-h-32 overflow-y-auto">
+                      {debugInfo.events.recent.slice(0, 5).map((event: any, idx: number) => (
+                        <li key={idx}>
+                          {event.type} from {event.domain || '(no domain)'} at {new Date(event.createdAt).toLocaleString()}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       <div className="flex justify-between">

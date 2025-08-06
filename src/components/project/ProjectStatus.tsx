@@ -123,7 +123,7 @@ export function ProjectStatus({ project, onVerificationUpdate }: ProjectStatusPr
             </div>
             <div>
               <span className="text-muted-foreground">Created:</span>
-              <p className="font-medium">{new Date(project.createdAt).toLocaleDateString()}</p>
+              <p className="font-medium">{project.createdAt ? new Date(project.createdAt).toLocaleDateString() : 'Unknown'}</p>
             </div>
           </div>
 
@@ -131,7 +131,7 @@ export function ProjectStatus({ project, onVerificationUpdate }: ProjectStatusPr
             <Alert>
               <CheckCircle2 className="w-4 h-4" />
               <AlertDescription>
-                Domain verified on {new Date(project.verifiedAt).toLocaleString()}
+                Domain verified on {project.verifiedAt ? new Date(project.verifiedAt).toLocaleString() : 'Unknown'}
               </AlertDescription>
             </Alert>
           )}

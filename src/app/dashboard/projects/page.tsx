@@ -279,7 +279,7 @@ export default function ProjectsPage() {
 
                   <div>
                     <p className="text-sm text-muted-foreground">Created</p>
-                    <p className="text-sm">{new Date(project.createdAt).toLocaleDateString()}</p>
+                    <p className="text-sm">{project.createdAt ? new Date(project.createdAt).toLocaleDateString() : 'Unknown'}</p>
                   </div>
 
                   {!project.isVerified && (

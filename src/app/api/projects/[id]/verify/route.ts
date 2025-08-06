@@ -76,18 +76,63 @@ export async function POST(
       })
 
       if (!recentEvents) {
+        // Get some debug info about what events we do have
+        const anyEvents = await prisma.event.findFirst({
+          where: {
+            projectId: project.id,
+            createdAt: {
+              gte: new Date(Date.now() - 24 * 60 * 60 * 1000)
+            }
+          },
+          select: {
+            domain: true,
+            createdAt: true,
+            type: true
+          },
+          orderBy: {
+            createdAt: 'desc'
+          }
+        })
+        
+        const totalEvents = await prisma.event.count({
+          where: {
+            projectId: project.id
+          }
+        })
+        
+        let debugMessage = `No analytics events detected from ${projectDomain} in the last 24 hours.\n\n`
+        
+        if (anyEvents) {
+          debugMessage += `❌ Found events from other domains:\n`
+          debugMessage += `   Last event: ${anyEvents.type} from ${anyEvents.domain}\n`
+          debugMessage += `   Time: ${anyEvents.createdAt.toLocaleString()}\n\n`
+        } else if (totalEvents > 0) {
+          debugMessage += `❌ Found ${totalEvents} total events for this project, but none in the last 24 hours.\n\n`
+        } else {
+          debugMessage += `❌ No events found for this project at all.\n\n`
+        }
+        
+        debugMessage += `Please ensure:\n\n`
+        debugMessage += `1. You've installed the ClickChutney code on ${projectDomain}\n`
+        debugMessage += `2. The tracking ID "${project.trackingId}" is correct\n`
+        debugMessage += `3. You've visited ${projectDomain} to generate events\n`
+        debugMessage += `4. Wait 1-2 minutes after visiting your site\n\n`
+        debugMessage += `💡 Open browser dev tools (F12) and look for:\n`
+        debugMessage += `   "✅ ClickChutney: Initialized successfully"\n`
+        debugMessage += `   "✅ ClickChutney: Successfully sent X events"`
+        
         return NextResponse.json({
           success: false,
-          error: `No analytics events detected from ${projectDomain} in the last 24 hours. Please ensure:\n\n` +
-                 `1. You've installed the ClickChutney analytics code on ${projectDomain}\n` +
-                 `2. The tracking ID "${project.trackingId}" is correct\n` +
-                 `3. Someone has visited your website to generate events\n\n` +
-                 `Events are being accepted from all domains (including localhost), but verification requires events from your registered domain: ${projectDomain}`,
+          error: debugMessage,
           verified: false,
           debug: {
             projectDomain,
+            domainVariants,
             trackingId: project.trackingId,
-            checkedTimeframe: '24 hours'
+            checkedTimeframe: '24 hours',
+            totalEventsEver: totalEvents,
+            lastEventFrom: anyEvents?.domain || 'none',
+            lastEventTime: anyEvents?.createdAt || null
           }
         })
       }

@@ -102,6 +102,8 @@ export function throttle<T extends (...args: any[]) => void>(
 
 export class SessionManager {
   private static readonly SESSION_KEY = '__cc_session__';
+  private static sessionTimeout = 30 * 60 * 1000; // 30 minutes
+  private static currentSession: SessionData | null = null;
   private static readonly SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes
 
   static getSession(): SessionData | null {
@@ -131,7 +133,8 @@ export class SessionManager {
       startTime: Date.now(),
       lastActivity: Date.now(),
       pageViews: 0,
-      events: 0
+      events: 0,
+      isActive: true
     };
 
     this.saveSession(session);
@@ -230,5 +233,160 @@ export function getPerformanceMetrics() {
   } catch (error) {
     // Performance API might not be fully supported or accessible
     return {};
+  }
+}
+
+/**
+ * Queue management utilities
+ */
+export class QueueManager<T> {
+  private items: T[] = [];
+  private maxSize: number;
+
+  constructor(maxSize = 100) {
+    this.maxSize = maxSize;
+  }
+
+  enqueue(item: T): void {
+    this.items.push(item);
+    if (this.items.length > this.maxSize) {
+      this.items.shift(); // Remove oldest item
+    }
+  }
+
+  dequeue(): T | undefined {
+    return this.items.shift();
+  }
+
+  dequeueAll(): T[] {
+    const items = [...this.items];
+    this.items = [];
+    return items;
+  }
+
+  peek(): T | undefined {
+    return this.items[0];
+  }
+
+  size(): number {
+    return this.items.length;
+  }
+
+  isEmpty(): boolean {
+    return this.items.length === 0;
+  }
+
+  clear(): void {
+    this.items = [];
+  }
+
+  toArray(): T[] {
+    return [...this.items];
+  }
+}
+
+/**
+ * Retry utility with exponential backoff
+ */
+export async function retryWithBackoff<T>(
+  fn: () => Promise<T>,
+  maxRetries = 3,
+  baseDelay = 1000,
+  maxDelay = 10000
+): Promise<T> {
+  let lastError: Error;
+  
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error as Error;
+      
+      if (attempt === maxRetries) {
+        throw lastError;
+      }
+      
+      // Exponential backoff with jitter
+      const delay = Math.min(baseDelay * Math.pow(2, attempt) + Math.random() * 1000, maxDelay);
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+  
+  throw lastError!;
+}
+
+/**
+ * Network status detection
+ */
+export class NetworkManager {
+  private static isOnlineCache: boolean | null = null;
+  private static listeners: Array<(online: boolean) => void> = [];
+
+  static isOnline(): boolean {
+    if (typeof navigator === 'undefined') return true;
+    
+    if (this.isOnlineCache !== null) return this.isOnlineCache;
+    
+    this.isOnlineCache = navigator.onLine;
+    
+    // Set up listeners only once
+    if (typeof window !== 'undefined' && this.listeners.length === 0) {
+      window.addEventListener('online', () => {
+        this.isOnlineCache = true;
+        this.notifyListeners(true);
+      });
+      
+      window.addEventListener('offline', () => {
+        this.isOnlineCache = false;
+        this.notifyListeners(false);
+      });
+    }
+    
+    return this.isOnlineCache;
+  }
+
+  static onNetworkChange(callback: (online: boolean) => void): () => void {
+    this.listeners.push(callback);
+    return () => {
+      const index = this.listeners.indexOf(callback);
+      if (index > -1) {
+        this.listeners.splice(index, 1);
+      }
+    };
+  }
+
+  private static notifyListeners(online: boolean): void {
+    this.listeners.forEach(callback => {
+      try {
+        callback(online);
+      } catch (error) {
+        console.warn('ClickChutney: Network listener error:', error);
+      }
+    });
+  }
+}
+
+/**
+ * URL and domain utilities
+ */
+export function isValidUrl(url: string): boolean {
+  try {
+    new URL(url);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function isValidDomain(domain: string): boolean {
+  const domainRegex = /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\\.([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?))*$/;
+  return domainRegex.test(domain);
+}
+
+export function extractDomain(url: string): string {
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return '';
   }
 }

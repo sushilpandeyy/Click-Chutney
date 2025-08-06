@@ -261,7 +261,7 @@ export default function ProjectRealtimePage() {
                           <div className="flex items-center gap-2">
                             {getDeviceIcon(event.device)}
                             <span className="text-xs text-muted-foreground">
-                              {event.timestamp.toLocaleTimeString()}
+                              {event.timestamp ? event.timestamp.toLocaleTimeString() : 'Unknown'}
                             </span>
                           </div>
                         </div>

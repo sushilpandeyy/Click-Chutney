@@ -216,7 +216,7 @@ export default function ProjectTeamPage() {
                           <div className="font-medium">{member.user.name}</div>
                           <div className="text-sm text-muted-foreground">{member.user.email}</div>
                           <div className="text-xs text-muted-foreground">
-                            Joined {new Date(member.joinedAt).toLocaleDateString()}
+                            Joined {member.joinedAt ? new Date(member.joinedAt).toLocaleDateString() : 'Unknown'}
                           </div>
                         </div>
                       </div>

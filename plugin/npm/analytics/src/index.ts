@@ -171,8 +171,6 @@ export default ClickChutney;
 export { ClickChutneyTracker };
 export * from './types';
 
-// React / Next.js exports - use the simple component pattern shown in docs
-
 // CommonJS export
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = ClickChutney;

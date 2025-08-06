@@ -183,7 +183,7 @@ export default function ProjectDataPage() {
                       </div>
                       <div className="flex items-center gap-4">
                         <span className="text-sm text-muted-foreground">{item.percentage}%</span>
-                        <span className="font-medium">{item.count.toLocaleString()}</span>
+                        <span className="font-medium">{item.count?.toLocaleString() || '0'}</span>
                       </div>
                     </div>
                   ))}

@@ -1,31 +1,12 @@
 'use client';
 
-import React from 'react';
-import ClickChutney from './index';
+import React, { useEffect, useState } from 'react';
+import { ClickChutneyTracker } from './tracker';
 
 interface AnalyticsProps {
-  /**
-   * ClickChutney tracking ID. If not provided, will auto-detect from:
-   * 1. NEXT_PUBLIC_CLICKCHUTNEY_ID environment variable
-   * 2. NEXT_PUBLIC_CLICKCHUTNEY_TRACKING_ID environment variable
-   */
   trackingId?: string;
-  
-  /**
-   * Enable debug mode for development
-   * @default false in production, true in development
-   */
   debug?: boolean;
-  
-  /**
-   * Disable tracking in development mode
-   * @default true (disabled in development)
-   */
   disableInDev?: boolean;
-  
-  /**
-   * Custom configuration
-   */
   config?: {
     autoTrack?: boolean;
     sessionTimeout?: number;
@@ -33,15 +14,28 @@ interface AnalyticsProps {
   };
 }
 
+// Global flag to prevent multiple initializations
+declare global {
+  interface Window {
+    __ccAnalyticsInitialized?: boolean;
+    __ccTracker?: ClickChutneyTracker;
+    __ccReactAPI?: {
+      page: (url?: string, title?: string) => void;
+      track: (event: string, properties?: Record<string, any>) => void;
+      identify: (userId: string, traits?: Record<string, any>) => void;
+      set: (properties: Record<string, any>) => void;
+    };
+  }
+}
+
 /**
- * Zero-configuration analytics component for React/Next.js
+ * Simple Analytics component for React/Next.js
  * 
  * Usage:
  * ```tsx
- * // In your layout.tsx or _app.tsx
  * import { Analytics } from '@click-chutney/analytics/react';
  * 
- * export default function RootLayout({ children }) {
+ * export default function Layout({ children }) {
  *   return (
  *     <html>
  *       <body>
@@ -53,20 +47,23 @@ interface AnalyticsProps {
  * }
  * ```
  */
-// Global flag to prevent multiple initializations
-declare global {
-  interface Window {
-    __ccAnalyticsInitialized?: boolean;
-  }
-}
-
 export function Analytics(props: AnalyticsProps = {}) {
   const { trackingId, debug, disableInDev = true, config = {} } = props;
+  const [isClient, setIsClient] = useState(false);
   
+  // Ensure client-side rendering to avoid hydration issues
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   // Auto-detect tracking ID from environment variables
   const autoTrackingId = trackingId || 
-    process.env.NEXT_PUBLIC_CLICKCHUTNEY_ID ||
-    process.env.NEXT_PUBLIC_CLICKCHUTNEY_TRACKING_ID;
+    (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_CLICKCHUTNEY_ID) ||
+    (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_CLICKCHUTNEY_TRACKING_ID);
+
+  if (!isClient) {
+    return null;
+  }
 
   if (!autoTrackingId) {
     console.warn(
@@ -86,106 +83,121 @@ export function Analytics(props: AnalyticsProps = {}) {
   // Check if we should disable in development
   const isDev = typeof process !== 'undefined' && process.env.NODE_ENV === 'development';
   if (disableInDev && isDev) {
+    if (debug) {
+      console.log('ClickChutney: Disabled in development mode');
+    }
     return null;
   }
 
   // Auto-detect debug mode
   const shouldDebug = debug !== undefined ? debug : isDev;
 
-  // Initialize immediately on client-side, but only once
+  // Initialize on client-side only, once
   if (typeof window !== 'undefined' && !window.__ccAnalyticsInitialized) {
     window.__ccAnalyticsInitialized = true;
     
-    // Use setTimeout to avoid blocking the main thread and ensure DOM is ready
+    // Use setTimeout to avoid blocking the main thread
     setTimeout(() => {
       try {
-        ClickChutney.init(autoTrackingId, {
+        // Initialize tracker directly without circular import
+        const tracker = new ClickChutneyTracker({
+          trackingId: autoTrackingId,
           debug: shouldDebug,
           autoTrack: true,
           ...config
         });
 
-        // Track initial page view with a small delay to ensure page is fully loaded
+        // Store tracker globally
+        window.__ccTracker = tracker;
+        
+        // Create React-specific global API
+        window.__ccReactAPI = {
+          page: (url?: string, title?: string) => tracker.page(url, title),
+          track: (event: string, properties?: Record<string, any>) => tracker.track(event, properties),
+          identify: (userId: string, traits?: Record<string, any>) => tracker.identify(userId, traits),
+          set: (properties: Record<string, any>) => tracker.set(properties)
+        };
+
+        // Track initial page view
         setTimeout(() => {
-          ClickChutney.page();
+          tracker.page();
         }, 100);
         
         if (shouldDebug) {
-          console.log('ClickChutney: Initialized successfully with ID:', autoTrackingId);
+          console.log('✅ ClickChutney: Initialized successfully with ID:', autoTrackingId);
         }
       } catch (error) {
-        console.error('ClickChutney: Failed to initialize:', error);
+        console.error('❌ ClickChutney: Failed to initialize:', error);
         // Reset flag on error so initialization can be retried
         window.__ccAnalyticsInitialized = false;
       }
     }, 0);
   }
 
-  // Always return null - this component only initializes, doesn't render
+  // Component renders nothing, it just initializes analytics
   return null;
 }
 
 /**
  * Hook for manual analytics tracking
- * 
- * Usage:
- * ```tsx
- * import { useAnalytics } from '@click-chutney/analytics/react';
- * 
- * function MyComponent() {
- *   const analytics = useAnalytics();
- *   
- *   const handleClick = () => {
- *     analytics.track('button_clicked', { button: 'cta' });
- *   };
- *   
- *   return <button onClick={handleClick}>Click me</button>;
- * }
- * ```
  */
 export function useAnalytics() {
   return {
     page: (url?: string, title?: string) => {
       if (typeof window === 'undefined') return;
-      try {
-        ClickChutney.page(url, title);
-      } catch (error) {
-        console.warn('ClickChutney: Not initialized. Add <Analytics /> to your app.');
+      if (window.__ccReactAPI) {
+        try {
+          window.__ccReactAPI.page(url, title);
+        } catch (error) {
+          console.warn('ClickChutney: Not initialized. Add <Analytics /> to your app.');
+        }
+      } else {
+        console.warn('ClickChutney: Not loaded. Add <Analytics /> to your app.');
       }
     },
     
     track: (event: string, properties?: Record<string, any>) => {
       if (typeof window === 'undefined') return;
-      try {
-        ClickChutney.track(event, properties);
-      } catch (error) {
-        console.warn('ClickChutney: Not initialized. Add <Analytics /> to your app.');
+      if (window.__ccReactAPI) {
+        try {
+          window.__ccReactAPI.track(event, properties);
+        } catch (error) {
+          console.warn('ClickChutney: Not initialized. Add <Analytics /> to your app.');
+        }
+      } else {
+        console.warn('ClickChutney: Not loaded. Add <Analytics /> to your app.');
       }
     },
     
     identify: (userId: string, traits?: Record<string, any>) => {
       if (typeof window === 'undefined') return;
-      try {
-        ClickChutney.identify(userId, traits);
-      } catch (error) {
-        console.warn('ClickChutney: Not initialized. Add <Analytics /> to your app.');
+      if (window.__ccReactAPI) {
+        try {
+          window.__ccReactAPI.identify(userId, traits);
+        } catch (error) {
+          console.warn('ClickChutney: Not initialized. Add <Analytics /> to your app.');
+        }
+      } else {
+        console.warn('ClickChutney: Not loaded. Add <Analytics /> to your app.');
       }
     },
     
     set: (properties: Record<string, any>) => {
       if (typeof window === 'undefined') return;
-      try {
-        ClickChutney.set(properties);
-      } catch (error) {
-        console.warn('ClickChutney: Not initialized. Add <Analytics /> to your app.');
+      if (window.__ccReactAPI) {
+        try {
+          window.__ccReactAPI.set(properties);
+        } catch (error) {
+          console.warn('ClickChutney: Not initialized. Add <Analytics /> to your app.');
+        }
+      } else {
+        console.warn('ClickChutney: Not loaded. Add <Analytics /> to your app.');
       }
     }
   };
 }
 
-/**
- * Legacy default export for backward compatibility
- */
+// Default export for convenience
 export default Analytics;
 
 // Named exports for convenience

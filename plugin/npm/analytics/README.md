@@ -1,254 +1,149 @@
 # @click-chutney/analytics
 
-Zero-configuration analytics tracking library for React, Next.js and vanilla JavaScript applications.
+**Simple website analytics that actually works.** Track visitors on your website without the complexity.
 
-## 🚀 Quick Start
+## 🚀 Super Easy Setup
 
-### React/Next.js (Recommended)
+### For React/Next.js Apps
 
-**1. Install the package:**
+**Step 1:** Install it
 ```bash
 npm install @click-chutney/analytics
 ```
 
-**2. Add your tracking ID to environment variables:**
+**Step 2:** Add your tracking code to `.env.local`
 ```bash
-# .env.local
 NEXT_PUBLIC_CLICKCHUTNEY_ID=your_tracking_id_here
 ```
 
-**3. Add the Analytics component to your app:**
+**Step 3:** Add one line to your app
 ```tsx
-// app/layout.tsx (Next.js 13+)
+// In your main layout file
 import { Analytics } from '@click-chutney/analytics/react';
 
-export default function RootLayout({ children }) {
+export default function Layout({ children }) {
   return (
     <html>
       <body>
         {children}
-        <Analytics />
+        <Analytics />  {/* Just add this line! */}
       </body>
     </html>
   );
 }
 ```
 
-**That's it!** 🎉 Analytics will automatically start tracking page views and user interactions.
+> **Important:** Always import from `@click-chutney/analytics/react` for React components!
 
-### Vanilla JavaScript/HTML
+**That's it!** 🎉 Your website is now being tracked.
 
-**Add to your HTML:**
+### For Regular Websites (HTML/WordPress)
+
+Add these 2 lines to your `<head>` section:
 ```html
-<script src="https://unpkg.com/@click-chutney/analytics@2.0.1/dist/clickchutney.min.js"></script>
-<script>
-  ClickChutney.init('your_tracking_id_here');
-</script>
+<script src="https://unpkg.com/@click-chutney/analytics@2.0.9/dist/clickchutney.min.js"></script>
+<script>cc('init', 'your_tracking_id_here');</script>
 ```
 
-## 📖 Usage
+## ✨ What Gets Tracked Automatically
 
-### Automatic Tracking
-The Analytics component automatically tracks:
-- Page views (including route changes in SPAs)
-- Button clicks
-- Link clicks
-- Form submissions
-- Performance metrics
+- **Page views** - Every time someone visits a page
+- **Button clicks** - When people click your buttons
+- **Link clicks** - When people click your links  
+- **Form submissions** - When people fill out forms
+- **Time on site** - How long people stay
+- **Where visitors come from** - Which websites send you traffic
 
-### Manual Tracking
-Use the `useAnalytics` hook for custom events:
+## 📊 Custom Event Tracking
+
+Want to track something specific? Use the hook:
 
 ```tsx
 import { useAnalytics } from '@click-chutney/analytics/react';
 
-function MyComponent() {
+function MyButton() {
   const analytics = useAnalytics();
   
   const handleClick = () => {
-    analytics.track('button_clicked', { 
-      button: 'cta',
-      location: 'header' 
+    analytics.track('signup_clicked', { 
+      plan: 'premium',
+      source: 'homepage' 
     });
   };
   
-  return <button onClick={handleClick}>Click me</button>;
+  return <button onClick={handleClick}>Sign Up</button>;
 }
 ```
 
-### User Identification
-```tsx
-const analytics = useAnalytics();
+## 🛠 Simple Options
 
-// When user logs in
-analytics.identify('user_123', {
-  email: 'user@example.com',
-  plan: 'premium'
-});
-```
-
-## ⚙️ Configuration
-
-### Environment Variables
-The package automatically detects these environment variables:
-- `NEXT_PUBLIC_CLICKCHUTNEY_ID` (recommended for Next.js)
-- `NEXT_PUBLIC_CLICKCHUTNEY_TRACKING_ID`
-- `CLICKCHUTNEY_TRACKING_ID`
-
-### Custom Configuration
 ```tsx
 <Analytics 
-  trackingId="custom_id" 
-  debug={true}
-  disableInDev={false}
-  config={{
-    autoTrack: true,
-    sessionTimeout: 30 * 60 * 1000, // 30 minutes
-  }}
+  trackingId="your_id"           // Your tracking ID
+  debug={true}                   // See what's happening in console
+  disableInDev={false}           // Track even in development
 />
 ```
 
-### Options
-- `trackingId`: Your ClickChutney tracking ID (auto-detected from env vars)
-- `debug`: Enable debug logging (auto-enabled in development)
-- `disableInDev`: Disable tracking in development mode (default: true)
-- `config.autoTrack`: Automatically track common events (default: true)
-- `config.sessionTimeout`: Session timeout in milliseconds (default: 30 min)
+## 🆘 Not Working? Check These:
 
-## 🔧 Advanced Usage
+1. **No data showing up?**
+   - Make sure you added your tracking ID to `.env.local`
+   - Check if `<Analytics />` is in your layout file
+   - Look in browser console for error messages
 
-### Manual Initialization (Vanilla JS)
-```javascript
-import ClickChutney from '@click-chutney/analytics';
+2. **Getting errors?**
+   - Make sure your tracking ID starts with `cc_`
+   - Check that you're using the latest version: `npm update @click-chutney/analytics`
 
-// Auto-detects from environment or requires explicit ID
-ClickChutney.init(); // Uses NEXT_PUBLIC_CLICKCHUTNEY_ID
-// or
-ClickChutney.init('your_tracking_id');
+3. **Server Component errors?**
+   Our React component now includes proper `"use client"` directive. If you still have issues, try:
+   ```tsx
+   import dynamic from 'next/dynamic';
+   
+   const Analytics = dynamic(() => 
+     import('@click-chutney/analytics/react').then(mod => ({ default: mod.Analytics })), 
+     { ssr: false }
+   );
+   ```
 
-// Track events
-ClickChutney.page('/dashboard', 'Dashboard');
-ClickChutney.track('feature_used', { feature: 'search' });
-```
+## 🏷 Works With Everything
 
-### Framework Agnostic
-Works with any React-based framework:
-- Next.js 12+ (Pages & App Router)
-- Create React App
-- Vite + React
-- Remix
-- Gatsby
+- ✅ Next.js (App Router & Pages)
+- ✅ React apps (Create React App, Vite)
+- ✅ HTML websites
+- ✅ WordPress
+- ✅ Any website that can run JavaScript
 
-## 🏗️ Migration from v1.x
+## 🔒 Privacy Friendly
 
-**v1.x (Manual Setup):**
-```tsx
-// Old way - manual setup required
-import ClickChutney from '@click-chutney/analytics';
+- No cookies stored
+- Respects "Do Not Track" settings
+- GDPR compliant
+- Automatically disabled during development
 
-useEffect(() => {
-  ClickChutney.init('tracking_id');
-  ClickChutney.page();
-}, []);
-```
+## 📞 Need Help?
 
-**v2.x (Zero Config):**
-```tsx
-// New way - just add the component
-import { Analytics } from '@click-chutney/analytics/react';
+- 📖 Full documentation: [clickchutney.com/docs](https://clickchutney.com/docs)
+- 🐛 Report issues: [GitHub Issues](https://github.com/clickchutney/analytics/issues)
+- 💬 Get support: [Discord Community](https://discord.gg/clickchutney)
 
-export default function App() {
-  return (
-    <>
-      {/* Your app */}
-      <Analytics />
-    </>
-  );
-}
-```
+## 📈 Get Your Tracking ID
 
-## 🔒 Privacy & GDPR
-- Respects Do Not Track headers
-- No cookies stored by default
-- GDPR compliant data collection
-- Automatically disabled in development
+1. Go to [ClickChutney.com](https://clickchutney.com)
+2. Create a free account
+3. Add your website
+4. Copy your tracking ID (looks like `cc_abc123...`)
+5. Add it to your `.env.local` file
 
-## 📊 Domain Verification
-The system automatically handles:
-- `www.example.com` ↔ `example.com` normalization
-- Subdomain tracking
-- Development/staging environment detection
+**Free plan includes:**
+- 10,000 page views per month
+- Real-time analytics
+- Custom events
+- No time limits
 
-## 🆘 Troubleshooting
+---
 
-### Analytics not working?
-1. Check that your tracking ID is set in environment variables
-2. Verify the Analytics component is rendered
-3. Check browser dev tools for debug messages (enabled in development)
-4. Ensure your domain is verified in the ClickChutney dashboard
+Made with ❤️ by the ClickChutney team. 
 
-### Next.js Deployment Issues
-
-If you encounter errors like `TypeError: (0, n.useRef) is not a function` during Vercel or other deployments:
-
-**Solution 1: Use Dynamic Import (Safest)**
-```tsx
-import { DynamicAnalytics } from '@click-chutney/analytics/dynamic';
-
-export default function RootLayout({ children }) {
-  return (
-    <html>
-      <body>
-        {children}
-        <DynamicAnalytics />
-      </body>
-    </html>
-  );
-}
-```
-
-**Solution 2: Next.js Dynamic Import**
-```tsx
-import dynamic from 'next/dynamic';
-
-const Analytics = dynamic(() => 
-  import('@click-chutney/analytics/react').then(mod => ({ default: mod.Analytics })), 
-  { ssr: false }
-);
-
-export default function RootLayout({ children }) {
-  return (
-    <html>
-      <body>
-        {children}
-        <Analytics />
-      </body>
-    </html>
-  );
-}
-```
-
-**Solution 3: Client Component Wrapper**
-```tsx
-'use client';
-import { Analytics } from '@click-chutney/analytics/react';
-import { useEffect, useState } from 'react';
-
-export function ClientAnalytics() {
-  const [mounted, setMounted] = useState(false);
-  
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-  
-  if (!mounted) return null;
-  
-  return <Analytics />;
-}
-```
-
-### TypeScript Support
-Full TypeScript support included with detailed type definitions.
-
-## 📝 License
-MIT License - see LICENSE file for details.
+**Questions?** Just ask in our [Discord](https://discord.gg/clickchutney) - we're friendly! 😊

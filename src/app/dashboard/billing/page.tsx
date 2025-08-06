@@ -138,7 +138,7 @@ export default function BillingPage() {
               <BarChart3 className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{usage.events.toLocaleString()}</div>
+              <div className="text-2xl font-bold">{usage.events?.toLocaleString() || '0'}</div>
               <p className="text-xs text-muted-foreground">
                 {currentPlan === "Free" ? `${(usage.events / 10000 * 100).toFixed(1)}% of 10K limit` : "Unlimited"}
               </p>
@@ -174,7 +174,7 @@ export default function BillingPage() {
                   <span>Events</span>
                 </div>
                 <div className="text-right">
-                  <div className="font-medium">{usage.events.toLocaleString()}</div>
+                  <div className="font-medium">{usage.events?.toLocaleString() || '0'}</div>
                   <div className="text-xs text-muted-foreground">
                     {currentPlan === "Free" ? "of 10,000" : "Unlimited"}
                   </div>

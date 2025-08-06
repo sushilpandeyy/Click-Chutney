@@ -188,7 +188,7 @@ export default function ProjectDashboard() {
               </div>
               <div className="flex items-center gap-1">
                 <Calendar className="w-4 h-4" />
-                Created {new Date(project.createdAt).toLocaleDateString()}
+                Created {project.createdAt ? new Date(project.createdAt).toLocaleDateString() : 'Unknown'}
               </div>
             </div>
           </div>
@@ -209,7 +209,7 @@ export default function ProjectDashboard() {
               <Eye className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{analytics?.totalViews.toLocaleString() || 0}</div>
+              <div className="text-2xl font-bold">{analytics?.totalViews?.toLocaleString() || '0'}</div>
               <p className="text-xs text-muted-foreground">All time page views</p>
             </CardContent>
           </Card>
@@ -220,7 +220,7 @@ export default function ProjectDashboard() {
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{analytics?.uniqueVisitors.toLocaleString() || 0}</div>
+              <div className="text-2xl font-bold">{analytics?.uniqueVisitors?.toLocaleString() || '0'}</div>
               <p className="text-xs text-muted-foreground">Unique users tracked</p>
             </CardContent>
           </Card>
@@ -231,7 +231,7 @@ export default function ProjectDashboard() {
               <BarChart3 className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{project._count.events.toLocaleString()}</div>
+              <div className="text-2xl font-bold">{project._count?.events?.toLocaleString() || '0'}</div>
               <p className="text-xs text-muted-foreground">Total events captured</p>
             </CardContent>
           </Card>
@@ -300,7 +300,7 @@ export default function ProjectDashboard() {
                         </div>
                         <div className="text-xs text-muted-foreground">
                           <Clock className="w-3 h-3 inline mr-1" />
-                          {new Date(event.createdAt).toLocaleTimeString()}
+                          {event.createdAt ? new Date(event.createdAt).toLocaleTimeString() : 'Unknown'}
                         </div>
                       </div>
                     )) : (
@@ -346,7 +346,7 @@ export default function ProjectDashboard() {
                       <div className="flex items-center gap-2">
                         <Badge variant="secondary">{member.role}</Badge>
                         <span className="text-xs text-muted-foreground">
-                          Joined {new Date(member.joinedAt).toLocaleDateString()}
+                          Joined {member.joinedAt ? new Date(member.joinedAt).toLocaleDateString() : 'Unknown'}
                         </span>
                       </div>
                     </div>

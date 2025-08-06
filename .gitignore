@@ -61,6 +61,7 @@ plugin/lambda/*/package-lock.json
 # Development files
 ANALYTICS_PACKAGE_PLAN.md
 PLUGIN_INTEGRATION_GUIDE.md
+ANALYTICS_TESTING_SUMMARY.md
 
 # IDE files
 .vscode/

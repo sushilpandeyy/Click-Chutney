@@ -96,7 +96,7 @@ export default function ProjectIntegrationPage() {
   }
 
   const trackingId = project.trackingId
-  const scriptTag = `<script src="https://unpkg.com/@click-chutney/analytics@2.0.4/dist/clickchutney.min.js"></script>
+  const scriptTag = `<script src="https://unpkg.com/@click-chutney/analytics@2.0.9/dist/clickchutney.min.js"></script>
 <script>cc('init', '${trackingId}');</script>`
 
   const envVariable = `NEXT_PUBLIC_CLICKCHUTNEY_ID=${trackingId}`
@@ -191,7 +191,7 @@ export default function RootLayout({ children }) {
                       React/Next.js Integration (Recommended)
                     </CardTitle>
                     <p className="text-sm text-muted-foreground">
-                      Zero-configuration setup for React and Next.js applications
+                      Zero-configuration setup for React and Next.js applications. Works with App Router, Pages Router, and all React frameworks.
                     </p>
                   </CardHeader>
                   <CardContent className="space-y-6">
@@ -233,12 +233,25 @@ export default function RootLayout({ children }) {
                       </div>
                     </div>
 
-                    <Alert>
-                      <CheckCircle2 className="w-4 h-4" />
-                      <AlertDescription>
-                        <strong>That's it!</strong> Analytics will automatically start tracking when visitors land on your site.
-                      </AlertDescription>
-                    </Alert>
+                    <div className="space-y-3">
+                      <Alert>
+                        <CheckCircle2 className="w-4 h-4" />
+                        <AlertDescription>
+                          <strong>That's it!</strong> Analytics will automatically start tracking when visitors land on your site.
+                        </AlertDescription>
+                      </Alert>
+                      
+                      <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                        <h5 className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-2">What gets tracked automatically:</h5>
+                        <ul className="text-xs text-blue-700 dark:text-blue-300 space-y-1">
+                          <li>• Page views and route changes</li>
+                          <li>• Button and link clicks</li>
+                          <li>• Form submissions</li>
+                          <li>• Performance metrics (load time, FCP, LCP)</li>
+                          <li>• Session duration and user behavior</li>
+                        </ul>
+                      </div>
+                    </div>
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -282,6 +295,96 @@ export default function RootLayout({ children }) {
               </TabsContent>
             </Tabs>
 
+            {/* Custom Events Section */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Code className="w-5 h-5 text-primary" />
+                  Custom Event Tracking
+                </CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Track specific user actions beyond automatic tracking
+                </p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <h4 className="font-medium text-sm mb-2">React/Next.js Hook Usage</h4>
+                  <div className="bg-muted rounded-lg p-4">
+                    <pre className="text-xs font-mono text-wrap">{`import { useAnalytics } from '@click-chutney/analytics/react';
+
+function MyComponent() {
+  const analytics = useAnalytics();
+  
+  const handleSignup = () => {
+    analytics.track('signup_clicked', {
+      plan: 'premium',
+      source: 'pricing_page'
+    });
+  };
+  
+  const handlePurchase = (amount) => {
+    analytics.track('purchase_completed', {
+      amount: amount,
+      currency: 'USD',
+      items: 1
+    });
+  };
+  
+  return (
+    <div>
+      <button onClick={handleSignup}>Sign Up</button>
+      <button onClick={() => handlePurchase(99)}>Buy Now</button>
+    </div>
+  );
+}`}</pre>
+                  </div>
+                </div>
+                
+                <div>
+                  <h4 className="font-medium text-sm mb-2">HTML/JavaScript Usage</h4>
+                  <div className="bg-muted rounded-lg p-4">
+                    <pre className="text-xs font-mono text-wrap">{`<!-- After your analytics script -->
+<script>
+// Track button clicks
+function trackSignup() {
+  cc('track', 'signup_clicked', {
+    plan: 'premium',
+    source: 'homepage'
+  });
+}
+
+// Track purchases
+function trackPurchase(amount) {
+  cc('track', 'purchase_completed', {
+    amount: amount,
+    currency: 'USD'
+  });
+}
+
+// Identify users (optional)
+function identifyUser(userId, email) {
+  cc('identify', userId, {
+    email: email,
+    subscription: 'premium'
+  });
+}
+</script>
+
+<!-- Add to your buttons -->
+<button onclick="trackSignup()">Sign Up</button>
+<button onclick="trackPurchase(99)">Buy Now $99</button>`}</pre>
+                  </div>
+                </div>
+                
+                <Alert>
+                  <CheckCircle2 className="w-4 h-4" />
+                  <AlertDescription>
+                    <strong>Pro Tip:</strong> Custom events appear in your dashboard within seconds and help you understand user behavior patterns.
+                  </AlertDescription>
+                </Alert>
+              </CardContent>
+            </Card>
+
             {/* Tracking Information */}
             <Card>
               <CardHeader>
@@ -316,13 +419,61 @@ export default function RootLayout({ children }) {
                       <li>• Button and link clicks</li>
                       <li>• Form submissions</li>
                       <li>• User sessions and behavior</li>
-                      <li>• Performance metrics</li>
-                      <li>• Geographic data (anonymous)</li>
+                      <li>• Performance metrics (load time, FCP, LCP)</li>
+                      <li>• Geographic data (anonymous, IP-based)</li>
+                      <li>• Session duration and user flow</li>
                     </ul>
                   </div>
                 </div>
               </CardContent>
             </Card>
+            
+            {/* Troubleshooting Section */}
+            {!project.isVerified && (
+              <Card className="border-yellow-200 bg-yellow-50 dark:bg-yellow-900/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-yellow-800 dark:text-yellow-200">
+                    <AlertTriangle className="w-5 h-5" />
+                    Troubleshooting
+                  </CardTitle>
+                  <p className="text-sm text-yellow-700 dark:text-yellow-300">
+                    Having issues with verification? Here's how to debug.
+                  </p>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <h4 className="font-medium mb-2 text-yellow-800 dark:text-yellow-200">Browser Console Check</h4>
+                      <ol className="text-sm text-yellow-700 dark:text-yellow-300 space-y-1 list-decimal list-inside">
+                        <li>Open your website in a browser</li>
+                        <li>Press F12 to open developer tools</li>
+                        <li>Go to the Console tab</li>
+                        <li>Look for: <code className="bg-yellow-200 dark:bg-yellow-800 px-1 rounded text-xs">✅ ClickChutney: Initialized successfully</code></li>
+                        <li>Visit a few pages to generate events</li>
+                      </ol>
+                    </div>
+                    
+                    <div>
+                      <h4 className="font-medium mb-2 text-yellow-800 dark:text-yellow-200">Network Tab Check</h4>
+                      <ol className="text-sm text-yellow-700 dark:text-yellow-300 space-y-1 list-decimal list-inside">
+                        <li>In dev tools, go to Network tab</li>
+                        <li>Visit your website pages</li>
+                        <li>Look for POST requests to <code className="bg-yellow-200 dark:bg-yellow-800 px-1 rounded text-xs">/api/analytics</code></li>
+                        <li>Check if requests return 200 OK status</li>
+                        <li>Wait 1-2 minutes, then try verification</li>
+                      </ol>
+                    </div>
+                  </div>
+                  
+                  <Alert>
+                    <CheckCircle2 className="w-4 h-4" />
+                    <AlertDescription>
+                      <strong>Still having issues?</strong> The verification process checks for events from <code className="bg-yellow-200 dark:bg-yellow-800 px-1 rounded">{project.domain}</code> specifically. Make sure you're testing on the exact domain you registered.
+                    </AlertDescription>
+                  </Alert>
+                </CardContent>
+              </Card>
+            )}
           </div>
         </main>
       </div>

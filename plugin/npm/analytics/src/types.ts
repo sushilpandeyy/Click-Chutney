@@ -4,6 +4,13 @@ export interface ClickChutneyConfig {
   debug?: boolean;
   autoTrack?: boolean;
   sessionTimeout?: number;
+  flushInterval?: number;
+  maxBatchSize?: number;
+  maxRetries?: number;
+  retryDelay?: number;
+  enableOfflineSupport?: boolean;
+  corsMode?: 'same-origin' | 'cors' | 'no-cors';
+  timeout?: number;
 }
 
 export interface PageViewEvent {
@@ -52,6 +59,7 @@ export type AnalyticsEvent =
   | SessionEvent;
 
 export interface EventPayload {
+  id?: string;
   trackingId: string;
   event: string;
   domain: string;
@@ -62,6 +70,8 @@ export interface EventPayload {
   userAgent?: string;
   url?: string;
   referrer?: string;
+  retryCount?: number;
+  queuedAt?: number;
 }
 
 export interface SessionData {
@@ -70,6 +80,8 @@ export interface SessionData {
   lastActivity: number;
   pageViews: number;
   events: number;
+  isActive: boolean;
+  deviceId?: string;
 }
 
 export interface UserData {
@@ -77,6 +89,8 @@ export interface UserData {
   traits?: Record<string, any>;
   firstSeen?: number;
   lastSeen?: number;
+  deviceId?: string;
+  consentGiven?: boolean;
 }
 
 export interface TrackerOptions {
@@ -85,4 +99,10 @@ export interface TrackerOptions {
   sessionTimeout?: number;
   queueSize?: number;
   flushInterval?: number;
+  maxBatchSize?: number;
+  maxRetries?: number;
+  retryDelay?: number;
+  enableOfflineSupport?: boolean;
+  corsMode?: 'same-origin' | 'cors' | 'no-cors';
+  timeout?: number;
 }

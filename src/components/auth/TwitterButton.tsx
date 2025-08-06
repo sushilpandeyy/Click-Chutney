@@ -46,15 +46,8 @@ export function TwitterButton({
     setError(null)
 
     try {
-      const result = await authActions.signInWithTwitter(redirectTo)
-
-      if (result.success) {
-        toast.success("🎉 X Connected!", {
-          description: "Redirecting to your dashboard...",
-        })
-      } else {
-        throw new Error(result.error || "X authentication failed")
-      }
+      // Twitter auth not implemented yet
+      throw new Error("Twitter authentication is not available yet")
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "X authentication failed"
       setError(errorMessage)
