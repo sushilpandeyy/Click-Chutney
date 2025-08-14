@@ -111,7 +111,7 @@ if (process.env.NEXT_PHASE === 'phase-production-build') {
 const githubConfig = getGitHubConfig()
 
 const createAuthConfig = () => {
-  const config: any = {
+  const config = {
     emailAndPassword: {
       enabled: true,
     },
@@ -125,13 +125,16 @@ const createAuthConfig = () => {
     baseURL: getBaseURL(),
     secret: process.env.BETTER_AUTH_SECRET || process.env.AUTH_SECRET || "default-secret-change-in-production",
     logger: {
-      level: process.env.NODE_ENV === 'development' && process.env.NEXT_PHASE !== 'phase-production-build' ? 'debug' : 'error'
+      level: (process.env.NODE_ENV === 'development' && process.env.NEXT_PHASE !== 'phase-production-build' ? 'debug' : 'error') as 'debug' | 'error'
     }
   }
 
   // Only add database during runtime, not build time
   if (process.env.NEXT_PHASE !== 'phase-production-build' && db && typeof db.collection === 'function') {
-    config.database = mongodbAdapter(db)
+    return {
+      ...config,
+      database: mongodbAdapter(db)
+    }
   }
 
   return config
