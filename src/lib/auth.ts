@@ -88,7 +88,10 @@ export const auth = betterAuth({
     enabled: true,
   },
   socialProviders: {
-    github: githubConfig,
+    github: {
+      ...githubConfig,
+      redirectURI: `${process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/auth/callback/github`
+    },
   },
   plugins: [nextCookies()],
   baseURL: process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000",

@@ -1,13 +1,29 @@
 'use client';
 
 import { signIn } from '@/lib/auth-client';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function SignUpPage() {
+function SignUpContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Handle error parameters from OAuth callback
+  useEffect(() => {
+    const errorParam = searchParams.get('error');
+    if (errorParam) {
+      const errorMessages: Record<string, string> = {
+        'access_denied': 'You denied access to GitHub. Please try again.',
+        'missing_code': 'Authorization code was missing. Please try again.',
+        'auth_failed': 'Authentication failed. Please try again.',
+        'callback_error': 'There was an error during the OAuth process. Please try again.',
+      };
+      
+      setError(errorMessages[errorParam] || 'An authentication error occurred. Please try again.');
+    }
+  }, [searchParams]);
 
   const handleGitHubSignIn = async () => {
     try {
@@ -142,5 +158,17 @@ export default function SignUpPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SignUpPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#0a0a0a] text-white flex items-center justify-center">
+        <div className="w-6 h-6 border-2 border-gray-400 border-t-white rounded-full animate-spin" />
+      </div>
+    }>
+      <SignUpContent />
+    </Suspense>
   );
 }
