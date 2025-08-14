@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum ProjectStatus {
+  PENDING_SETUP
+  ACTIVE
+  INACTIVE
+}
+
+model User {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  email     String    @unique
+  name      String?
+  projects  Project[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Project {
+  id         String        @id @default(auto()) @map("_id") @db.ObjectId
+  name       String
+  trackingId String        @unique
+  status     ProjectStatus @default(PENDING_SETUP)
+  userId     String        @db.ObjectId
+  user       User          @relation(fields: [userId], references: [id])
+  events     AnalyticsEvent[]
+  stats      ProjectStats?
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+}
+
+model AnalyticsEvent {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  projectId  String   @db.ObjectId
+  trackingId String
+  event      String
+  properties Json?
+  url        String?
+  userAgent  String?
+  ip         String?
+  referrer   String?
+  timestamp  DateTime @default(now())
+  project    Project  @relation(fields: [projectId], references: [id])
+}
+
+model ProjectStats {
+  id             String    @id @default(auto()) @map("_id") @db.ObjectId
+  projectId      String    @unique @db.ObjectId
+  totalEvents    Int       @default(0)
+  uniqueVisitors Int       @default(0)
+  pageViews      Int       @default(0)
+  sessions       Int       @default(0)
+  lastActivity   DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  project        Project   @relation(fields: [projectId], references: [id])
+}
