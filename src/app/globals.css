@@ -1,27 +1,41 @@
 @import "tailwindcss";
 
 :root {
-  /* ClickChutney Light Mode Colors */
-  --color-primary: #FFB800; /* Mango */
-  --color-danger: #FF4444; /* Spicy Red */
-  --color-success: #10B981; /* Fresh Coriander */
-  --color-background: #FFFFFF; /* Pure White */
-  --color-surface: #FEF7E0; /* Warm Cream */
-  --color-text-primary: #1F2937; /* Charcoal */
-  --color-text-secondary: #8B4513; /* Masala Brown */
-  --color-border: #E5E7EB;
+  /* Shadcn-Inspired Light Mode Colors */
+  --color-primary: #3B82F6; /* Blue */
+  --color-danger: #EF4444; /* Red */
+  --color-success: #22C55E; /* Emerald */
+  --color-warning: #FACC15; /* Yellow */
+  --color-background: #FFFFFF; /* White */
+  --color-surface: #F8FAFC; /* Light Gray */
+  --color-muted-background: #F1F5F9; /* Muted Light */
+  --color-text-primary: #0F172A; /* Dark */
+  --color-text-secondary: #64748B; /* Gray */
+  --color-text-muted: #94A3B8; /* Muted Gray */
+  --color-border: #E2E8F0;
+  --color-divider: #F1F5F9;
+  --color-hover-overlay: rgba(0, 0, 0, 0.05);
+  --color-active-overlay: rgba(0, 0, 0, 0.08);
+  --color-focus-ring: #E2E8F0;
 }
 
 [data-theme="dark"], .dark {
-  /* ClickChutney Dark Mode Colors */
-  --color-primary: #FFCC33; /* Golden Mango */
-  --color-danger: #FF6B6B; /* Ember Red */
-  --color-success: #34D399; /* Mint Green */
-  --color-background: #0F0A05; /* Rich Tamarind */
-  --color-surface: #1A1411; /* Deep Masala */
-  --color-text-primary: #F3E8D0; /* Soft Cream */
-  --color-text-secondary: #D4A574; /* Warm Sand */
-  --color-border: #2D1B1B; /* Midnight Spice */
+  /* Shadcn-Inspired Dark Theme Colors */
+  --color-primary: #3B82F6; /* Info Blue */
+  --color-danger: #EF4444; /* Error Red */
+  --color-success: #22C55E; /* Success Emerald */
+  --color-warning: #FACC15; /* Warning Yellow */
+  --color-background: #0A0A0A; /* Almost Black */
+  --color-surface: #111111; /* Lifted Panels */
+  --color-muted-background: #1A1A1A; /* Sections/Sidebars */
+  --color-text-primary: #FAFAFA; /* Near White */
+  --color-text-secondary: #A1A1A1; /* Muted Gray */
+  --color-text-muted: #737373; /* Placeholder/Inactive */
+  --color-border: #262626; /* Thin Neutral Separator */
+  --color-divider: #1F1F1F; /* Faint Separation */
+  --color-hover-overlay: rgba(255, 255, 255, 0.05); /* Subtle Light Layer */
+  --color-active-overlay: rgba(255, 255, 255, 0.08);
+  --color-focus-ring: #27272A; /* Dark Outline */
 }
 
 @theme inline {
@@ -29,22 +43,20 @@
   --font-poppins: var(--font-poppins);
   --font-inter: var(--font-inter);
   
-  /* ClickChutney Color System */
-  --color-mango: #FFB800;
-  --color-golden-mango: #FFCC33;
-  --color-spicy-red: #FF4444;
-  --color-ember-red: #FF6B6B;
-  --color-fresh-coriander: #10B981;
-  --color-mint-green: #34D399;
-  --color-warm-cream: #FEF7E0;
-  --color-masala-brown: #8B4513;
-  --color-pure-white: #FFFFFF;
-  --color-charcoal: #1F2937;
-  --color-rich-tamarind: #0F0A05;
-  --color-deep-masala: #1A1411;
-  --color-warm-sand: #D4A574;
-  --color-soft-cream: #F3E8D0;
-  --color-midnight-spice: #2D1B1B;
+  /* Shadcn Color System */
+  --color-blue: #3B82F6;
+  --color-emerald: #22C55E;
+  --color-yellow: #FACC15;
+  --color-red: #EF4444;
+  --color-almost-black: #0A0A0A;
+  --color-lifted-panels: #111111;
+  --color-sections: #1A1A1A;
+  --color-near-white: #FAFAFA;
+  --color-muted-gray: #A1A1A1;
+  --color-placeholder: #737373;
+  --color-separator: #262626;
+  --color-faint-separation: #1F1F1F;
+  --color-dark-outline: #27272A;
   
   /* Semantic colors using CSS variables */
   --color-background: var(--color-background);
@@ -52,53 +64,63 @@
   --color-card: var(--color-surface);
   --color-card-foreground: var(--color-text-primary);
   --color-primary: var(--color-primary);
-  --color-primary-foreground: var(--color-background);
+  --color-primary-foreground: var(--color-white);
   --color-secondary: var(--color-surface);
   --color-secondary-foreground: var(--color-text-primary);
   --color-muted: var(--color-surface);
   --color-muted-foreground: var(--color-text-secondary);
   --color-destructive: var(--color-danger);
-  --color-destructive-foreground: var(--color-background);
+  --color-destructive-foreground: var(--color-white);
   --color-border: var(--color-border);
   --color-input: var(--color-border);
   --color-ring: var(--color-primary);
   
-  /* Chart colors with food inspiration */
-  --color-chart-1: var(--color-mango);
-  --color-chart-2: var(--color-fresh-coriander);
-  --color-chart-3: var(--color-spicy-red);
-  --color-chart-4: var(--color-masala-brown);
-  --color-chart-5: var(--color-warm-sand);
+  /* Chart colors */
+  --color-chart-1: var(--color-blue);
+  --color-chart-2: var(--color-emerald);
+  --color-chart-3: var(--color-yellow);
+  --color-chart-4: var(--color-red);
+  --color-chart-5: var(--color-muted-gray);
   
   /* Component styling */
-  --radius: 12px;
+  --radius: 8px;
   
-  /* Food-inspired animations */
+  /* Modern animations */
   @keyframes float {
     0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
+    50% { transform: translateY(-8px); }
   }
-  @keyframes spice-bounce {
-    0%, 100% { transform: translateY(0) scale(1); }
-    50% { transform: translateY(-8px) scale(1.05); }
-  }
-  @keyframes samosa-roll {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-  @keyframes chutney-glow {
+  @keyframes glow-pulse {
     0%, 100% { 
-      box-shadow: 0 0 20px rgba(255, 184, 0, 0.3);
-      filter: brightness(1);
+      box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+      transform: scale(1);
     }
     50% { 
-      box-shadow: 0 0 30px rgba(255, 184, 0, 0.6);
-      filter: brightness(1.1);
+      box-shadow: 0 0 40px rgba(59, 130, 246, 0.8);
+      transform: scale(1.05);
+    }
+  }
+  @keyframes glass-shimmer {
+    0% { 
+      background-position: -200% center;
+    }
+    100% { 
+      background-position: 200% center;
+    }
+  }
+  @keyframes fade-in-up {
+    0% {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
     }
   }
   
   --animate-float: float 3s ease-in-out infinite;
-  --animate-spice-bounce: spice-bounce 2s ease-in-out infinite;
-  --animate-samosa-roll: samosa-roll 8s linear infinite;
-  --animate-chutney-glow: chutney-glow 4s ease-in-out infinite;
+  --animate-glow-pulse: glow-pulse 4s ease-in-out infinite;
+  --animate-glass-shimmer: glass-shimmer 3s ease-in-out infinite;
+  --animate-fade-in-up: fade-in-up 1s ease-out forwards;
 }

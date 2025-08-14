@@ -5,8 +5,10 @@ import { mongodbAdapter } from "better-auth/adapters/mongodb"
 
 const getDatabaseUrl = () => {
   const url = process.env.DATABASE_URL
+  const dbName = process.env.DATABASE_NAME || 'clickchutney'
+  
   if (!url) {
-    return "mongodb://localhost:27017/clickchutney"
+    return `mongodb://localhost:27017/${dbName}`
   }
   return url
 }
@@ -30,7 +32,8 @@ let db: ReturnType<MongoClient['db']>
 
 try {
   client = new MongoClient(getDatabaseUrl())
-  db = client.db()
+  const dbName = process.env.DATABASE_NAME || 'clickchutney'
+  db = client.db(dbName)
 } catch (error) {
   console.warn("MongoDB client initialization failed during build:", error)
   client = {} as MongoClient

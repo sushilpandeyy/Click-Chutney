@@ -15,3 +15,11 @@ export const authClient = createAuthClient({
     cache: "no-store",
   }
 })
+
+export const {
+  signIn,
+  signOut,
+  signUp,
+  useSession,
+  getSession
+} = authClient
