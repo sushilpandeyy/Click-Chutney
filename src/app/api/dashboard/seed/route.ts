@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
         name: p.name,
         status: p.status,
         trackingId: p.trackingId,
-        stats: p.stats
+        stats: 'stats' in p ? p.stats : null
       })),
       eventsCreated: sampleEvents.length
     })
