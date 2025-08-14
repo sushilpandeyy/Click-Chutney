@@ -62,7 +62,7 @@ export default function SignUpPage() {
           {/* Features List */}
           <div className="mt-6 pt-6 border-t border-[#262626]">
             <h3 className="text-sm font-medium text-white mb-3">
-              What you'll get:
+              What you&apos;ll get:
             </h3>
             <ul className="space-y-2 text-sm text-gray-400">
               <li className="flex items-center gap-2">
