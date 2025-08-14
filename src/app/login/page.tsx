@@ -6,17 +6,31 @@ import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   const handleGitHubSignIn = async () => {
     try {
       setIsLoading(true);
+      setError(null);
+      
       await signIn.social({
         provider: 'github',
-        callbackURL: '/dashboard'
+        callbackURL: '/dashboard',
+        fetchOptions: {
+          onSuccess: () => {
+            router.push('/dashboard');
+          },
+          onError: (ctx) => {
+            console.error('Auth error:', ctx.error);
+            setError('Failed to sign in with GitHub. Please try again.');
+            setIsLoading(false);
+          }
+        }
       });
     } catch (error) {
       console.error('Sign in error:', error);
+      setError('An unexpected error occurred. Please try again.');
       setIsLoading(false);
     }
   };
@@ -26,9 +40,12 @@ export default function LoginPage() {
       <div className="w-full max-w-sm">
         {/* Logo/Title */}
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-semibold text-white mb-2">
+          <button
+            onClick={() => router.push('/')}
+            className="text-2xl font-semibold text-white mb-2 hover:text-gray-300 transition-colors"
+          >
             ClickChutney
-          </h1>
+          </button>
           <p className="text-sm text-gray-400">
             Sign in to your account
           </p>
@@ -36,6 +53,13 @@ export default function LoginPage() {
 
         {/* Login Card */}
         <div className="bg-[#111111] border border-[#262626] rounded-lg p-6">
+          {/* Error Message */}
+          {error && (
+            <div className="mb-4 p-3 bg-red-900/20 border border-red-800/30 rounded-md">
+              <p className="text-red-400 text-sm">{error}</p>
+            </div>
+          )}
+          
           {/* GitHub Sign In Button */}
           <button
             onClick={handleGitHubSignIn}

@@ -1,6 +1,45 @@
+'use client';
+
+import { useSession } from '@/lib/auth-client';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+
 export default function Home() {
+  const { data: session, isPending } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (session && !isPending) {
+      router.push('/dashboard');
+    }
+  }, [session, isPending, router]);
+
+  if (isPending) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-6 h-6 border-2 border-gray-400 border-t-white rounded-full animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background flex items-center justify-center relative overflow-hidden">
+      {/* Auth buttons in top right */}
+      <div className="absolute top-6 right-6 z-20 flex gap-3">
+        <button
+          onClick={() => router.push('/login')}
+          className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors"
+        >
+          Sign in
+        </button>
+        <button
+          onClick={() => router.push('/signup')}
+          className="px-4 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
+        >
+          Sign up
+        </button>
+      </div>
+
       {/* Shadcn-inspired gradient background */}
       <div className="absolute inset-0 bg-gradient-to-br from-almost-black via-lifted-panels to-almost-black"></div>
       
@@ -39,8 +78,24 @@ export default function Home() {
             </div>
           </div>
 
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-[fade-in-up_1s_ease-out_0.6s_forwards] opacity-0 mb-8">
+            <button
+              onClick={() => router.push('/signup')}
+              className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+            >
+              Get Started
+            </button>
+            <button
+              onClick={() => router.push('/login')}
+              className="px-8 py-3 border border-separator hover:bg-surface text-foreground rounded-lg font-medium transition-colors"
+            >
+              Sign In
+            </button>
+          </div>
+
           {/* Shadcn-style loading indicators */}
-          <div className="flex justify-center items-center space-x-4 animate-[fade-in-up_1s_ease-out_0.6s_forwards] opacity-0">
+          <div className="flex justify-center items-center space-x-4 animate-[fade-in-up_1s_ease-out_0.8s_forwards] opacity-0">
             <div className="w-3 h-3 rounded-full bg-blue animate-[glow-pulse_2s_ease-in-out_infinite] shadow-lg shadow-blue/50"></div>
             <div className="w-4 h-4 rounded-full bg-emerald animate-[glow-pulse_2s_ease-in-out_infinite] shadow-lg shadow-emerald/50" style={{animationDelay: '0.2s'}}></div>
             <div className="w-5 h-5 rounded-full bg-yellow animate-[glow-pulse_2s_ease-in-out_infinite] shadow-lg shadow-yellow/50" style={{animationDelay: '0.4s'}}></div>
