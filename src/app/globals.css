@@ -1,76 +1,104 @@
 @import "tailwindcss";
 
+:root {
+  /* ClickChutney Light Mode Colors */
+  --color-primary: #FFB800; /* Mango */
+  --color-danger: #FF4444; /* Spicy Red */
+  --color-success: #10B981; /* Fresh Coriander */
+  --color-background: #FFFFFF; /* Pure White */
+  --color-surface: #FEF7E0; /* Warm Cream */
+  --color-text-primary: #1F2937; /* Charcoal */
+  --color-text-secondary: #8B4513; /* Masala Brown */
+  --color-border: #E5E7EB;
+}
+
+[data-theme="dark"], .dark {
+  /* ClickChutney Dark Mode Colors */
+  --color-primary: #FFCC33; /* Golden Mango */
+  --color-danger: #FF6B6B; /* Ember Red */
+  --color-success: #34D399; /* Mint Green */
+  --color-background: #0F0A05; /* Rich Tamarind */
+  --color-surface: #1A1411; /* Deep Masala */
+  --color-text-primary: #F3E8D0; /* Soft Cream */
+  --color-text-secondary: #D4A574; /* Warm Sand */
+  --color-border: #2D1B1B; /* Midnight Spice */
+}
+
 @theme inline {
-  --color-background: hsl(0 0% 100%);
-  --color-foreground: hsl(224 71.4% 4.1%);
-  --color-card: hsl(0 0% 100%);
-  --color-card-foreground: hsl(224 71.4% 4.1%);
-  --color-popover: hsl(0 0% 100%);
-  --color-popover-foreground: hsl(224 71.4% 4.1%);
-  --color-primary: hsl(220.9 39.3% 11%);
-  --color-primary-foreground: hsl(210 20% 98%);
-  --color-secondary: hsl(220 14.3% 95.9%);
-  --color-secondary-foreground: hsl(220.9 39.3% 11%);
-  --color-muted: hsl(220 14.3% 95.9%);
-  --color-muted-foreground: hsl(220 8.9% 46.1%);
-  --color-accent: hsl(220 14.3% 95.9%);
-  --color-accent-foreground: hsl(220.9 39.3% 11%);
-  --color-destructive: hsl(0 84.2% 60.2%);
-  --color-destructive-foreground: hsl(210 20% 98%);
-  --color-border: hsl(220 13% 91%);
-  --color-input: hsl(220 13% 91%);
-  --color-ring: hsl(224 71.4% 4.1%);
-  --color-chart-1: hsl(12 76% 61%);
-  --color-chart-2: hsl(173 58% 39%);
-  --color-chart-3: hsl(197 37% 24%);
-  --color-chart-4: hsl(43 74% 66%);
-  --color-chart-5: hsl(27 87% 67%);
-  --radius: 0.5rem;
+  /* Font families */
+  --font-poppins: var(--font-poppins);
+  --font-inter: var(--font-inter);
   
-  /* Custom animations */
+  /* ClickChutney Color System */
+  --color-mango: #FFB800;
+  --color-golden-mango: #FFCC33;
+  --color-spicy-red: #FF4444;
+  --color-ember-red: #FF6B6B;
+  --color-fresh-coriander: #10B981;
+  --color-mint-green: #34D399;
+  --color-warm-cream: #FEF7E0;
+  --color-masala-brown: #8B4513;
+  --color-pure-white: #FFFFFF;
+  --color-charcoal: #1F2937;
+  --color-rich-tamarind: #0F0A05;
+  --color-deep-masala: #1A1411;
+  --color-warm-sand: #D4A574;
+  --color-soft-cream: #F3E8D0;
+  --color-midnight-spice: #2D1B1B;
+  
+  /* Semantic colors using CSS variables */
+  --color-background: var(--color-background);
+  --color-foreground: var(--color-text-primary);
+  --color-card: var(--color-surface);
+  --color-card-foreground: var(--color-text-primary);
+  --color-primary: var(--color-primary);
+  --color-primary-foreground: var(--color-background);
+  --color-secondary: var(--color-surface);
+  --color-secondary-foreground: var(--color-text-primary);
+  --color-muted: var(--color-surface);
+  --color-muted-foreground: var(--color-text-secondary);
+  --color-destructive: var(--color-danger);
+  --color-destructive-foreground: var(--color-background);
+  --color-border: var(--color-border);
+  --color-input: var(--color-border);
+  --color-ring: var(--color-primary);
+  
+  /* Chart colors with food inspiration */
+  --color-chart-1: var(--color-mango);
+  --color-chart-2: var(--color-fresh-coriander);
+  --color-chart-3: var(--color-spicy-red);
+  --color-chart-4: var(--color-masala-brown);
+  --color-chart-5: var(--color-warm-sand);
+  
+  /* Component styling */
+  --radius: 12px;
+  
+  /* Food-inspired animations */
   @keyframes float {
     0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-20px); }
-  }
-  @keyframes float-delayed {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-15px); }
-  }
-  @keyframes bounce-slow {
-    0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-10px); }
+  }
+  @keyframes spice-bounce {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-8px) scale(1.05); }
+  }
+  @keyframes samosa-roll {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  @keyframes chutney-glow {
+    0%, 100% { 
+      box-shadow: 0 0 20px rgba(255, 184, 0, 0.3);
+      filter: brightness(1);
+    }
+    50% { 
+      box-shadow: 0 0 30px rgba(255, 184, 0, 0.6);
+      filter: brightness(1.1);
+    }
   }
   
   --animate-float: float 3s ease-in-out infinite;
-  --animate-float-delayed: float-delayed 4s ease-in-out infinite;
-  --animate-bounce-slow: bounce-slow 2s ease-in-out infinite;
-}
-
-@media (prefers-color-scheme: dark) {
-  @theme inline {
-    --color-background: hsl(224 71.4% 4.1%);
-    --color-foreground: hsl(210 20% 98%);
-    --color-card: hsl(224 71.4% 4.1%);
-    --color-card-foreground: hsl(210 20% 98%);
-    --color-popover: hsl(224 71.4% 4.1%);
-    --color-popover-foreground: hsl(210 20% 98%);
-    --color-primary: hsl(210 20% 98%);
-    --color-primary-foreground: hsl(220.9 39.3% 11%);
-    --color-secondary: hsl(215 27.9% 16.9%);
-    --color-secondary-foreground: hsl(210 20% 98%);
-    --color-muted: hsl(215 27.9% 16.9%);
-    --color-muted-foreground: hsl(217.9 10.6% 64.9%);
-    --color-accent: hsl(215 27.9% 16.9%);
-    --color-accent-foreground: hsl(210 20% 98%);
-    --color-destructive: hsl(0 62.8% 30.6%);
-    --color-destructive-foreground: hsl(210 20% 98%);
-    --color-border: hsl(215 27.9% 16.9%);
-    --color-input: hsl(215 27.9% 16.9%);
-    --color-ring: hsl(216 12.2% 83.9%);
-    --color-chart-1: hsl(220 70% 50%);
-    --color-chart-2: hsl(160 60% 45%);
-    --color-chart-3: hsl(30 80% 55%);
-    --color-chart-4: hsl(280 65% 60%);
-    --color-chart-5: hsl(340 75% 55%);
-  }
+  --animate-spice-bounce: spice-bounce 2s ease-in-out infinite;
+  --animate-samosa-roll: samosa-roll 8s linear infinite;
+  --animate-chutney-glow: chutney-glow 4s ease-in-out infinite;
 }

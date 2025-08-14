@@ -1,96 +1,75 @@
 import { Button } from "@/components/ui/button"
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 
 export default function Home() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted p-4">
-      <div className="text-center px-4 max-w-4xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-6xl md:text-8xl font-bold text-foreground mb-4 animate-[float_3s_ease-in-out_infinite]">
+    <div className="min-h-screen bg-background flex items-center justify-center relative overflow-hidden">
+      {/* Subtle background pattern */}
+      <div className="absolute inset-0 bg-gradient-to-br from-background via-background to-card opacity-60"></div>
+      
+      <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
+        {/* Main heading with Poppins font */}
+        <div className="mb-12">
+          <h1 className="font-poppins text-5xl md:text-7xl lg:text-8xl font-bold text-foreground mb-6 animate-[float_3s_ease-in-out_infinite]">
             ClickChutney
           </h1>
-          <div className="w-24 h-1 bg-gradient-to-r from-chart-1 to-chart-2 mx-auto rounded-full"></div>
+          
+          {/* Mango-colored accent line */}
+          <div className="w-32 h-1 bg-gradient-to-r from-mango to-golden-mango mx-auto rounded-full mb-8 animate-[chutney-glow_4s_ease-in-out_infinite]"></div>
+          
+          {/* Subtitle with Inter font */}
+          <h2 className="font-poppins text-2xl md:text-3xl lg:text-4xl font-semibold text-muted-foreground mb-6">
+            Analytics Made Digestible
+          </h2>
         </div>
         
-        <div className="mb-12">
-          <h2 className="text-2xl md:text-3xl font-light text-muted-foreground mb-6 animate-[float-delayed_4s_ease-in-out_infinite]">
-            Analytics Dashboard Components
-          </h2>
-          <p className="text-lg text-muted-foreground max-w-md mx-auto mb-8">
-            Testing our UI components for the analytics platform!
+        {/* Description */}
+        <div className="mb-16">
+          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed mb-8">
+            Like sharing snacks with friends, ClickChutney makes data enjoyable and accessible. 
+            Track your website&apos;s story with the warmth of Indian street food culture.
+          </p>
+          
+          {/* Tagline */}
+          <p className="text-base text-primary font-medium">
+            🌶️ Spice up your analytics • 🥭 Sweet insights • 🫖 Served fresh
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
-          <Card>
-            <CardHeader>
-              <CardTitle>Button Component</CardTitle>
-              <CardDescription>Various button styles and variants</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <Button>Default Button</Button>
-              <Button variant="secondary">Secondary</Button>
-              <Button variant="outline">Outline</Button>
-              <Button variant="ghost">Ghost</Button>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Card Component</CardTitle>
-              <CardDescription>This is a card component with header, content, and footer</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Perfect for displaying analytics data, project information, and dashboard widgets.
-              </p>
-            </CardContent>
-            <CardFooter>
-              <Button size="sm" variant="outline">Learn More</Button>
-            </CardFooter>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Dialog Component</CardTitle>
-              <CardDescription>Modal dialogs for user interactions</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button variant="outline">Open Dialog</Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Sample Dialog</DialogTitle>
-                    <DialogDescription>
-                      This is a sample dialog component that will be used throughout the analytics dashboard.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <DialogFooter>
-                    <Button variant="outline">Cancel</Button>
-                    <Button>Confirm</Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            </CardContent>
-          </Card>
+        {/* CTA Buttons */}
+        <div className="flex flex-col sm:flex-row justify-center gap-4 mb-16">
+          <Button 
+            size="lg" 
+            className="px-8 py-3 text-lg font-medium bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+          >
+            Start Cooking 🍳
+          </Button>
+          <Button 
+            size="lg" 
+            variant="outline" 
+            className="px-8 py-3 text-lg font-medium border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground rounded-lg transition-all duration-300"
+          >
+            Taste Demo 👅
+          </Button>
         </div>
 
-        <div className="flex justify-center space-x-4">
-          <Button size="lg">Get Started</Button>
-          <Button size="lg" variant="outline">Learn More</Button>
+        {/* Animated food-inspired indicators */}
+        <div className="flex justify-center items-center space-x-6">
+          <div className="w-4 h-4 rounded-full bg-mango animate-[spice-bounce_2s_ease-in-out_infinite] shadow-lg"></div>
+          <div className="w-3 h-3 rounded-full bg-fresh-coriander animate-[spice-bounce_2s_ease-in-out_infinite] shadow-lg" style={{animationDelay: '0.2s'}}></div>
+          <div className="w-5 h-5 rounded-full bg-spicy-red animate-[spice-bounce_2s_ease-in-out_infinite] shadow-lg" style={{animationDelay: '0.4s'}}></div>
+          <div className="w-3 h-3 rounded-full bg-masala-brown animate-[spice-bounce_2s_ease-in-out_infinite] shadow-lg" style={{animationDelay: '0.6s'}}></div>
         </div>
-
-        <div className="flex justify-center mt-8">
-          <div className="flex space-x-2">
-            <div className="w-3 h-3 bg-chart-1 rounded-full animate-[bounce-slow_2s_ease-in-out_infinite]"></div>
-            <div className="w-3 h-3 bg-chart-2 rounded-full animate-[bounce-slow_2s_ease-in-out_infinite]" style={{animationDelay: '0.1s'}}></div>
-            <div className="w-3 h-3 bg-chart-3 rounded-full animate-[bounce-slow_2s_ease-in-out_infinite]" style={{animationDelay: '0.2s'}}></div>
-          </div>
-        </div>
+        
+        {/* Subtle footer text */}
+        <p className="text-sm text-muted-foreground mt-12 opacity-70">
+          Analytics that bring people together, just like good food
+        </p>
       </div>
+
+      {/* Decorative elements */}
+      <div className="absolute top-20 left-10 w-8 h-8 rounded-full bg-primary/20 animate-[samosa-roll_8s_linear_infinite]"></div>
+      <div className="absolute bottom-32 right-16 w-6 h-6 rounded-full bg-success/20 animate-[float_4s_ease-in-out_infinite]"></div>
+      <div className="absolute top-1/3 right-10 w-4 h-4 rounded-full bg-destructive/20 animate-[spice-bounce_3s_ease-in-out_infinite]"></div>
     </div>
   );
 }
