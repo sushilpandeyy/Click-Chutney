@@ -26,7 +26,7 @@ const getGitHubConfig = () => {
 }
 
 let client: MongoClient
-let db: any
+let db: ReturnType<MongoClient['db']>
 
 try {
   client = new MongoClient(getDatabaseUrl())
@@ -34,7 +34,7 @@ try {
 } catch (error) {
   console.warn("MongoDB client initialization failed during build:", error)
   client = {} as MongoClient
-  db = {}
+  db = {} as ReturnType<MongoClient['db']>
 }
 
 const githubConfig = getGitHubConfig()
