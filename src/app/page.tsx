@@ -14,7 +14,7 @@ export default function Home() {
             Something Amazing is Coming Soon
           </h2>
           <p className="text-lg text-slate-600 dark:text-slate-400 max-w-md mx-auto">
-            We're working hard to bring you something incredible. Stay tuned!
+            We&apos;re working hard to bring you something incredible. Stay tuned!
           </p>
         </div>
 
