@@ -49,10 +49,18 @@ const getDatabaseConfig = () => {
 }
 
 const getGitHubConfig = () => {
+  // During build time, skip credential validation
+  if (process.env.NEXT_PHASE === 'phase-production-build') {
+    return {
+      clientId: "build-time-dummy",
+      clientSecret: "build-time-dummy",
+    }
+  }
+
   const clientId = process.env.AUTH_GITHUB_ID
   const clientSecret = process.env.AUTH_GITHUB_SECRET
   
-  // Debug logging
+  // Debug logging only in development runtime
   if (process.env.NODE_ENV === 'development') {
     console.log('🍛 GitHub OAuth Config:', {
       clientId: clientId ? `${clientId.slice(0, 8)}...` : 'missing',
@@ -79,38 +87,54 @@ const getBaseURL = () => {
 let client: MongoClient
 let db: ReturnType<MongoClient['db']>
 
-try {
-  const dbConfig = getDatabaseConfig()
-  client = new MongoClient(dbConfig.url)
-  db = client.db(dbConfig.dbName)
-  
-  // Log which database is being used (helpful for debugging)
-  if (process.env.NODE_ENV === 'development') {
-    console.log(`🍛 ClickChutney connecting to database: ${dbConfig.dbName}`)
-  }
-} catch (error) {
-  console.warn("MongoDB client initialization failed during build:", error)
+// Skip database initialization during build time
+if (process.env.NEXT_PHASE === 'phase-production-build') {
   client = {} as MongoClient
   db = {} as ReturnType<MongoClient['db']>
+} else {
+  try {
+    const dbConfig = getDatabaseConfig()
+    client = new MongoClient(dbConfig.url)
+    db = client.db(dbConfig.dbName)
+    
+    // Log which database is being used (helpful for debugging)
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`🍛 ClickChutney connecting to database: ${dbConfig.dbName}`)
+    }
+  } catch (error) {
+    console.warn("MongoDB client initialization failed during build:", error)
+    client = {} as MongoClient
+    db = {} as ReturnType<MongoClient['db']>
+  }
 }
 
 const githubConfig = getGitHubConfig()
 
-export const auth = betterAuth({
-  database: db && typeof db.collection === 'function' ? mongodbAdapter(db) : undefined,
-  emailAndPassword: {
-    enabled: true,
-  },
-  socialProviders: {
-    github: {
-      ...githubConfig,
-      redirectURI: `${getBaseURL()}/api/auth/callback/github`
+const createAuthConfig = () => {
+  const config: any = {
+    emailAndPassword: {
+      enabled: true,
     },
-  },
-  plugins: [nextCookies()],
-  baseURL: getBaseURL(),
-  secret: process.env.BETTER_AUTH_SECRET || process.env.AUTH_SECRET || "default-secret-change-in-production",
-  logger: {
-    level: process.env.NODE_ENV === 'development' ? 'debug' : 'error'
+    socialProviders: {
+      github: {
+        ...githubConfig,
+        redirectURI: `${getBaseURL()}/api/auth/callback/github`
+      },
+    },
+    plugins: [nextCookies()],
+    baseURL: getBaseURL(),
+    secret: process.env.BETTER_AUTH_SECRET || process.env.AUTH_SECRET || "default-secret-change-in-production",
+    logger: {
+      level: process.env.NODE_ENV === 'development' && process.env.NEXT_PHASE !== 'phase-production-build' ? 'debug' : 'error'
+    }
   }
-})
+
+  // Only add database during runtime, not build time
+  if (process.env.NEXT_PHASE !== 'phase-production-build' && db && typeof db.collection === 'function') {
+    config.database = mongodbAdapter(db)
+  }
+
+  return config
+}
+
+export const auth = betterAuth(createAuthConfig())
