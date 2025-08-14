@@ -52,7 +52,16 @@ const getGitHubConfig = () => {
   const clientId = process.env.AUTH_GITHUB_ID
   const clientSecret = process.env.AUTH_GITHUB_SECRET
   
+  // Debug logging
+  if (process.env.NODE_ENV === 'development') {
+    console.log('🍛 GitHub OAuth Config:', {
+      clientId: clientId ? `${clientId.slice(0, 8)}...` : 'missing',
+      clientSecret: clientSecret ? 'present' : 'missing'
+    })
+  }
+  
   if (!clientId || !clientSecret) {
+    console.warn('⚠️ GitHub OAuth credentials not found, using dummy values')
     return {
       clientId: "dummy-client-id",
       clientSecret: "dummy-client-secret",
@@ -60,6 +69,11 @@ const getGitHubConfig = () => {
   }
   
   return { clientId, clientSecret }
+}
+
+const getBaseURL = () => {
+  const url = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
+  return url.endsWith('/') ? url.slice(0, -1) : url
 }
 
 let client: MongoClient
@@ -90,11 +104,11 @@ export const auth = betterAuth({
   socialProviders: {
     github: {
       ...githubConfig,
-      redirectURI: `${process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/auth/callback/github`
+      redirectURI: `${getBaseURL()}/api/auth/callback/github`
     },
   },
   plugins: [nextCookies()],
-  baseURL: process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000",
+  baseURL: getBaseURL(),
   secret: process.env.BETTER_AUTH_SECRET || process.env.AUTH_SECRET || "default-secret-change-in-production",
   logger: {
     level: process.env.NODE_ENV === 'development' ? 'debug' : 'error'
