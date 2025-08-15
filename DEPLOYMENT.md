@@ -50,8 +50,8 @@ BETTER_AUTH_SECRET=your_generated_32_character_secret
 NEXTAUTH_URL=https://your-domain.vercel.app
 
 # GitHub OAuth (from your production GitHub OAuth App)
-AUTH_GITHUB_ID=your_production_github_client_id
-AUTH_GITHUB_SECRET=your_production_github_client_secret
+GITHUB_CLIENT_ID=your_production_github_client_id
+GITHUB_CLIENT_SECRET=your_production_github_client_secret
 
 # MongoDB Database (from MongoDB Atlas)
 DATABASE_URL=mongodb+srv://username:password@cluster.mongodb.net/clickchutney?retryWrites=true&w=majority
@@ -86,8 +86,8 @@ Copy this checklist when setting up production environment:
 - [ ] `AUTH_SECRET` - Generated 32-character secret
 - [ ] `BETTER_AUTH_SECRET` - Generated 32-character secret  
 - [ ] `NEXTAUTH_URL` - Production domain URL
-- [ ] `AUTH_GITHUB_ID` - Production GitHub OAuth Client ID
-- [ ] `AUTH_GITHUB_SECRET` - Production GitHub OAuth Client Secret
+- [ ] `GITHUB_CLIENT_ID` - Production GitHub OAuth Client ID
+- [ ] `GITHUB_CLIENT_SECRET` - Production GitHub OAuth Client Secret
 - [ ] `DATABASE_URL` - MongoDB Atlas connection string
 
 ### 📝 Optional Variables
