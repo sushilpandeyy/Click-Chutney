@@ -57,8 +57,8 @@ const getGitHubConfig = () => {
     }
   }
 
-  const clientId = process.env.AUTH_GITHUB_ID
-  const clientSecret = process.env.AUTH_GITHUB_SECRET
+  const clientId = process.env.GITHUB_CLIENT_ID
+  const clientSecret = process.env.GITHUB_CLIENT_SECRET
   
   // Debug logging only in development runtime
   if (process.env.NODE_ENV === 'development') {
@@ -116,10 +116,7 @@ const createAuthConfig = () => {
       enabled: true,
     },
     socialProviders: {
-      github: {
-        ...githubConfig,
-        redirectURI: `${getBaseURL()}/api/auth/callback/github`
-      },
+      github: githubConfig,
     },
     plugins: [nextCookies()],
     baseURL: getBaseURL(),

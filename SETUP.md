@@ -53,8 +53,8 @@ Visit [http://localhost:3000](http://localhost:3000) to see the application.
 | `AUTH_SECRET` | Authentication secret | Generate with `openssl rand -base64 32` |
 | `BETTER_AUTH_SECRET` | Better Auth secret | Generate with `openssl rand -base64 32` |
 | `NEXTAUTH_URL` | Base URL for auth | `http://localhost:3000` |
-| `AUTH_GITHUB_ID` | GitHub OAuth Client ID | From GitHub OAuth App |
-| `AUTH_GITHUB_SECRET` | GitHub OAuth Client Secret | From GitHub OAuth App |
+| `GITHUB_CLIENT_ID` | GitHub OAuth Client ID | From GitHub OAuth App |
+| `GITHUB_CLIENT_SECRET` | GitHub OAuth Client Secret | From GitHub OAuth App |
 | `DATABASE_URL` | MongoDB connection string | `mongodb+srv://...` |
 
 ### Optional Variables
@@ -80,8 +80,8 @@ Visit [http://localhost:3000](http://localhost:3000) to see the application.
    ```
 
 3. **Copy Credentials**
-   - Copy Client ID → `AUTH_GITHUB_ID`
-   - Generate Client Secret → `AUTH_GITHUB_SECRET`
+   - Copy Client ID → `GITHUB_CLIENT_ID`
+   - Generate Client Secret → `GITHUB_CLIENT_SECRET`
 
 ---
 
@@ -195,7 +195,7 @@ npx prisma db push --preview-only
 **GitHub OAuth Issues**
 - Verify callback URL matches exactly
 - Check GitHub OAuth app configuration
-- Ensure `AUTH_GITHUB_*` variables are set correctly
+- Ensure `GITHUB_CLIENT_*` variables are set correctly
 
 **Environment Variable Issues**
 - Use `node scripts/check-env.js` to validate

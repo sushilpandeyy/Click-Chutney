@@ -4,8 +4,8 @@ console.log('🔍 Environment Variables Check\n')
 
 const requiredEnvVars = [
   'DATABASE_URL',
-  'AUTH_GITHUB_ID',
-  'AUTH_GITHUB_SECRET',
+  'GITHUB_CLIENT_ID',
+  'GITHUB_CLIENT_SECRET',
   'BETTER_AUTH_SECRET',
   'NEXTAUTH_URL'
 ]
