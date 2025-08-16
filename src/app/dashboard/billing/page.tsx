@@ -2,9 +2,9 @@ import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { DashboardLayout } from '@/components/dashboard-layout';
-import { DashboardOverview } from './dashboard-overview';
+import { BillingOverview } from './billing-overview';
 
-export default async function DashboardPage() {
+export default async function BillingPage() {
   const session = await auth.api.getSession({
     headers: await headers()
   });
@@ -15,7 +15,7 @@ export default async function DashboardPage() {
 
   return (
     <DashboardLayout session={session}>
-      <DashboardOverview session={session} />
+      <BillingOverview session={session} />
     </DashboardLayout>
   );
 }

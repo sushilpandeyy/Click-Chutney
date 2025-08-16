@@ -23,15 +23,24 @@
       enableHeartbeat: true,
       heartbeatInterval: 30000, // 30 seconds
       sessionTimeout: 30 * 60 * 1000, // 30 minutes
+      enableSPATracking: true, // Auto-detect route changes in SPAs
+      trackUtmParams: true, // Capture UTM parameters
+      trackReferrers: true, // Enhanced referrer tracking
     },
     _session: {
       id: null,
       startTime: null,
       lastActivity: null,
-      pageviews: 0
+      pageviews: 0,
+      landingPage: null,
+      referrer: null,
+      utmParams: {},
+      userJourney: []
     },
     _queue: [],
     _heartbeatTimer: null,
+    _currentUrl: null,
+    _currentTitle: null,
 
     /**
      * Initialize ClickChutney Analytics
@@ -67,6 +76,11 @@
       // Set up page visibility handling
       this._setupVisibilityHandling();
 
+      // Set up SPA navigation tracking
+      if (this._config.enableSPATracking) {
+        this._setupSPATracking();
+      }
+
       // Track initial pageview if enabled
       if (this._config.autoPageview) {
         this.pageview();
@@ -94,15 +108,28 @@
      * @param {string} [title] - Page title (defaults to document title)
      */
     pageview: function(page, title) {
+      const currentPage = page || this._getCurrentPage();
+      const currentTitle = title || document.title;
+
       const data = {
         type: 'pageview',
-        page: page || this._getCurrentPage(),
-        title: title || document.title,
+        page: currentPage,
+        title: currentTitle,
         referrer: document.referrer || null,
         timestamp: Date.now()
       };
 
+      // Add session context
+      if (this._session.landingPage) {
+        data.landingPage = this._session.landingPage;
+        data.sessionReferrer = this._session.referrer;
+        data.utmParams = this._session.utmParams;
+        data.sessionPageviews = this._session.pageviews + 1;
+        data.userJourney = this._session.userJourney.slice(-5); // Last 5 pages
+      }
+
       this._session.pageviews++;
+      this._saveSessionData();
       this._track(data);
     },
 
@@ -246,6 +273,7 @@
         const timeSinceActivity = now - parseInt(lastActivity, 10);
         if (timeSinceActivity > this._config.sessionTimeout) {
           sessionId = null; // Session expired
+          this._clearSessionData();
         }
       }
 
@@ -253,12 +281,28 @@
       if (!sessionId) {
         sessionId = this._generateSessionId();
         localStorage.setItem('cc_session_id', sessionId);
+        this._session.userJourney = [];
+      } else {
+        // Restore existing session data
+        this._restoreSessionData();
       }
 
       this._session.id = sessionId;
       this._session.startTime = now;
       this._session.lastActivity = now;
-      this._session.pageviews = 0;
+      
+      // Initialize landing page and referrer
+      if (!this._session.landingPage) {
+        this._session.landingPage = this._getCurrentPage();
+        this._session.referrer = document.referrer;
+        
+        // Parse UTM parameters
+        if (this._config.trackUtmParams) {
+          this._session.utmParams = this._parseUtmParams();
+        }
+        
+        this._saveSessionData();
+      }
 
       this._updateActivity();
     },
@@ -374,6 +418,192 @@
         return localStorage.getItem('cc_session_id');
       } catch (e) {
         return null;
+      }
+    },
+
+    /**
+     * Set up SPA navigation tracking
+     * @private
+     */
+    _setupSPATracking: function() {
+      this._currentUrl = window.location.href;
+      this._currentTitle = document.title;
+
+      // History API detection
+      const originalPushState = history.pushState;
+      const originalReplaceState = history.replaceState;
+
+      history.pushState = function() {
+        originalPushState.apply(history, arguments);
+        this._handleUrlChange();
+      }.bind(this);
+
+      history.replaceState = function() {
+        originalReplaceState.apply(history, arguments);
+        this._handleUrlChange();
+      }.bind(this);
+
+      // Handle back/forward navigation
+      window.addEventListener('popstate', function() {
+        this._handleUrlChange();
+      }.bind(this));
+
+      // Handle hash changes
+      window.addEventListener('hashchange', function() {
+        this._handleUrlChange();
+      }.bind(this));
+
+      // Check for URL changes periodically (fallback)
+      setInterval(function() {
+        this._checkUrlChange();
+      }.bind(this), 500);
+    },
+
+    /**
+     * Handle URL changes for SPA tracking
+     * @private
+     */
+    _handleUrlChange: function() {
+      setTimeout(function() {
+        this._checkUrlChange();
+      }.bind(this), 10); // Small delay to let DOM update
+    },
+
+    /**
+     * Check if URL has changed
+     * @private
+     */
+    _checkUrlChange: function() {
+      const currentUrl = window.location.href;
+      const currentTitle = document.title;
+
+      if (currentUrl !== this._currentUrl) {
+        this._log('debug', 'SPA route change detected', {
+          from: this._currentUrl,
+          to: currentUrl
+        });
+
+        // Add to user journey
+        this._addToUserJourney(this._currentUrl, this._currentTitle);
+
+        // Update current state
+        this._currentUrl = currentUrl;
+        this._currentTitle = currentTitle;
+
+        // Track pageview for new route
+        if (this._config.autoPageview) {
+          this.pageview();
+        }
+      } else if (currentTitle !== this._currentTitle) {
+        this._currentTitle = currentTitle;
+      }
+    },
+
+    /**
+     * Add page to user journey
+     * @private
+     */
+    _addToUserJourney: function(url, title) {
+      if (!url) return;
+
+      const journeyEntry = {
+        url: url,
+        title: title || '',
+        timestamp: Date.now(),
+        duration: Date.now() - this._session.lastActivity
+      };
+
+      this._session.userJourney.push(journeyEntry);
+
+      // Keep only last 20 pages to avoid storage issues
+      if (this._session.userJourney.length > 20) {
+        this._session.userJourney = this._session.userJourney.slice(-20);
+      }
+
+      this._saveSessionData();
+    },
+
+    /**
+     * Parse UTM parameters from URL
+     * @private
+     */
+    _parseUtmParams: function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const utmParams = {};
+
+      // Standard UTM parameters
+      const utmKeys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
+      
+      utmKeys.forEach(function(key) {
+        const value = urlParams.get(key);
+        if (value) {
+          utmParams[key] = value;
+        }
+      });
+
+      // Additional tracking parameters
+      const additionalKeys = ['gclid', 'fbclid', 'ref', 'referrer'];
+      additionalKeys.forEach(function(key) {
+        const value = urlParams.get(key);
+        if (value) {
+          utmParams[key] = value;
+        }
+      });
+
+      return utmParams;
+    },
+
+    /**
+     * Save session data to localStorage
+     * @private
+     */
+    _saveSessionData: function() {
+      try {
+        const sessionData = {
+          landingPage: this._session.landingPage,
+          referrer: this._session.referrer,
+          utmParams: this._session.utmParams,
+          userJourney: this._session.userJourney,
+          pageviews: this._session.pageviews
+        };
+        localStorage.setItem('cc_session_data', JSON.stringify(sessionData));
+      } catch (e) {
+        this._log('error', 'Failed to save session data', e);
+      }
+    },
+
+    /**
+     * Restore session data from localStorage
+     * @private
+     */
+    _restoreSessionData: function() {
+      try {
+        const savedData = localStorage.getItem('cc_session_data');
+        if (savedData) {
+          const sessionData = JSON.parse(savedData);
+          this._session.landingPage = sessionData.landingPage;
+          this._session.referrer = sessionData.referrer;
+          this._session.utmParams = sessionData.utmParams || {};
+          this._session.userJourney = sessionData.userJourney || [];
+          this._session.pageviews = sessionData.pageviews || 0;
+        }
+      } catch (e) {
+        this._log('error', 'Failed to restore session data', e);
+        this._clearSessionData();
+      }
+    },
+
+    /**
+     * Clear session data from localStorage
+     * @private
+     */
+    _clearSessionData: function() {
+      try {
+        localStorage.removeItem('cc_session_data');
+        localStorage.removeItem('cc_session_id');
+        localStorage.removeItem('cc_last_activity');
+      } catch (e) {
+        this._log('error', 'Failed to clear session data', e);
       }
     },
 

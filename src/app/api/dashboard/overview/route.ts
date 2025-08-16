@@ -1,93 +1,113 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+import { auth } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
+import { headers } from 'next/headers';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const session = await auth.api.getSession({
-      headers: request.headers
-    })
+      headers: await headers()
+    });
 
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    if (!session?.user?.id) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Get user with projects and stats
+    const userId = session.user.id;
+
+    // Get user info
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: userId },
       include: {
-        projects: {
-          include: {
-            stats: true,
-            events: {
-              take: 5,
-              orderBy: { timestamp: 'desc' }
-            }
-          }
-        }
+        accounts: true
       }
-    })
+    });
 
     if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 })
+      return Response.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // Calculate statistics
-    const totalProjects = user.projects.length
-    const activeProjects = user.projects.filter(p => p.status === 'ACTIVE').length
-    const pendingProjects = user.projects.filter(p => p.status === 'PENDING_SETUP').length
-    
-    const totalEvents = user.projects.reduce((sum, project) => 
+    // Get projects
+    const projects = await prisma.project.findMany({
+      where: { userId },
+      include: {
+        stats: true
+      }
+    });
+
+    // Calculate statistics from project stats
+    const totalProjects = projects.length;
+    const activeProjects = projects.filter(p => p.status === 'ACTIVE').length;
+    const pendingProjects = projects.filter(p => p.status === 'PENDING_SETUP').length;
+
+    const totalEvents = projects.reduce((sum, project) => 
       sum + (project.stats?.totalEvents || 0), 0
-    )
+    );
     
-    const totalPageViews = user.projects.reduce((sum, project) => 
+    const totalPageViews = projects.reduce((sum, project) => 
       sum + (project.stats?.pageViews || 0), 0
-    )
+    );
     
-    const totalSessions = user.projects.reduce((sum, project) => 
+    const totalSessions = projects.reduce((sum, project) => 
       sum + (project.stats?.sessions || 0), 0
-    )
+    );
 
-    // Get recent activity from all projects
-    const recentActivity = user.projects
-      .flatMap(project => 
-        project.events.map(event => ({
-          id: event.id,
-          event: event.event,
-          url: event.url,
-          timestamp: event.timestamp,
-          projectName: project.name,
-          projectId: project.id
-        }))
-      )
-      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-      .slice(0, 10)
+    // Get recent activity
+    const recentActivity = await prisma.analyticsEvent.findMany({
+      where: {
+        project: {
+          userId
+        }
+      },
+      include: {
+        project: {
+          select: {
+            name: true
+          }
+        }
+      },
+      orderBy: {
+        timestamp: 'desc'
+      },
+      take: 10
+    });
 
-    // Calculate this month's stats
-    const thisMonth = new Date()
-    thisMonth.setDate(1)
-    thisMonth.setHours(0, 0, 0, 0)
+    // Calculate this month's events
+    const thisMonth = new Date();
+    thisMonth.setDate(1);
+    thisMonth.setHours(0, 0, 0, 0);
     
     const thisMonthEvents = await prisma.analyticsEvent.count({
       where: {
         project: {
-          userId: session.user.id
+          userId
         },
         timestamp: {
           gte: thisMonth
         }
       }
-    })
+    });
 
-    const overview = {
+    // Prepare quick projects data
+    const quickProjects = projects.slice(0, 6).map(project => ({
+      id: project.id,
+      name: project.name,
+      status: project.status,
+      trackingId: project.trackingId,
+      stats: project.stats ? {
+        totalEvents: project.stats.totalEvents,
+        pageViews: project.stats.pageViews,
+        uniqueVisitors: project.stats.uniqueVisitors
+      } : null
+    }));
+
+    const response = {
       user: {
         id: user.id,
         name: user.name,
         email: user.email,
         image: user.image,
-        githubLogin: user.githubLogin,
-        memberSince: user.createdAt
+        githubLogin: user.accounts.find(a => a.providerId === 'github')?.providerAccountId || null,
+        memberSince: user.createdAt.toISOString()
       },
       statistics: {
         totalProjects,
@@ -98,19 +118,23 @@ export async function GET(request: NextRequest) {
         totalSessions,
         thisMonthEvents
       },
-      recentActivity,
-      quickProjects: user.projects.slice(0, 3).map(project => ({
-        id: project.id,
-        name: project.name,
-        status: project.status,
-        trackingId: project.trackingId,
-        stats: project.stats
-      }))
-    }
+      recentActivity: recentActivity.map(activity => ({
+        id: activity.id,
+        event: activity.event,
+        url: activity.url,
+        timestamp: activity.timestamp.toISOString(),
+        projectName: activity.project.name,
+        projectId: activity.projectId
+      })),
+      quickProjects
+    };
 
-    return NextResponse.json(overview)
+    return Response.json(response);
   } catch (error) {
-    console.error('Dashboard overview error:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    console.error('Dashboard overview error:', error);
+    return Response.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
   }
 }

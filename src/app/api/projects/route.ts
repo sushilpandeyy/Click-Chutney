@@ -47,16 +47,27 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { name } = await request.json()
+    const { name, description, website } = await request.json()
 
     if (!name) {
       return NextResponse.json({ error: 'Project name is required' }, { status: 400 })
     }
 
+    // Check if user has reached project limit (optional)
+    const existingProjects = await prisma.project.count({
+      where: { userId: user.id }
+    })
+
+    if (existingProjects >= 10) { // Limit to 10 projects per user
+      return NextResponse.json({ error: 'Project limit reached. Maximum 10 projects allowed.' }, { status: 400 })
+    }
+
     const project = await prisma.project.create({
       data: {
         name,
-        trackingId: nanoid(12),
+        description: description || null,
+        website: website || null,
+        trackingId: `cc_${nanoid(12)}`,
         userId: user.id,
       }
     })

@@ -60,7 +60,7 @@ export async function PUT(
     }
 
     const resolvedParams = await params
-    const { name, status } = await request.json()
+    const { name, description, website, status } = await request.json()
 
     const project = await prisma.project.findFirst({
       where: { 
@@ -73,11 +73,18 @@ export async function PUT(
       return NextResponse.json({ error: 'Project not found' }, { status: 404 })
     }
 
+    if (!name) {
+      return NextResponse.json({ error: 'Project name is required' }, { status: 400 })
+    }
+
     const updatedProject = await prisma.project.update({
       where: { id: resolvedParams.id },
       data: {
-        ...(name && { name }),
+        name,
+        description: description || null,
+        website: website || null,
         ...(status && { status }),
+        updatedAt: new Date()
       },
       include: {
         stats: true,
