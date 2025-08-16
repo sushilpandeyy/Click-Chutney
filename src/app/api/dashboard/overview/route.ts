@@ -1,29 +1,55 @@
+import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { headers } from 'next/headers';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const session = await auth.api.getSession({
-      headers: await headers()
+      headers: request.headers
     });
 
     if (!session?.user?.id) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const userId = session.user.id;
 
     // Get user info
-    const user = await prisma.user.findUnique({
+    let user = await prisma.user.findUnique({
       where: { id: userId },
       include: {
         accounts: true
       }
     });
 
+    // If user doesn't exist in Prisma but session exists, create the user
+    if (!user && session?.user) {
+      console.log('🔄 Creating user in Prisma database from session');
+      try {
+        user = await prisma.user.create({
+          data: {
+            id: session.user.id,
+            email: session.user.email,
+            name: session.user.name || null,
+            image: session.user.image || null,
+            emailVerified: session.user.emailVerified || false,
+            // Add any GitHub-specific fields if available
+            githubId: (session.user as any).githubId || null,
+            githubLogin: (session.user as any).githubLogin || null,
+          },
+          include: {
+            accounts: true
+          }
+        });
+        console.log('✅ User created successfully in Prisma');
+      } catch (error) {
+        console.error('❌ Error creating user in Prisma:', error);
+        return NextResponse.json({ error: 'Failed to create user' }, { status: 500 });
+      }
+    }
+
     if (!user) {
-      return Response.json({ error: 'User not found' }, { status: 404 });
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
     // Get projects
@@ -71,19 +97,34 @@ export async function GET() {
       take: 10
     });
 
-    // Calculate this month's events
-    const thisMonth = new Date();
-    thisMonth.setDate(1);
-    thisMonth.setHours(0, 0, 0, 0);
+    // Calculate time-based events
+    const now = new Date();
     
+    // This month's events
+    const thisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     const thisMonthEvents = await prisma.analyticsEvent.count({
       where: {
-        project: {
-          userId
-        },
-        timestamp: {
-          gte: thisMonth
-        }
+        project: { userId },
+        timestamp: { gte: thisMonth }
+      }
+    });
+
+    // This week's events  
+    const thisWeek = new Date(now);
+    thisWeek.setDate(now.getDate() - 7);
+    const thisWeekEvents = await prisma.analyticsEvent.count({
+      where: {
+        project: { userId },
+        timestamp: { gte: thisWeek }
+      }
+    });
+
+    // Today's events
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const todayEvents = await prisma.analyticsEvent.count({
+      where: {
+        project: { userId },
+        timestamp: { gte: today }
       }
     });
 
@@ -93,10 +134,14 @@ export async function GET() {
       name: project.name,
       status: project.status,
       trackingId: project.trackingId,
+      website: project.website,
+      createdAt: project.createdAt.toISOString(),
       stats: project.stats ? {
         totalEvents: project.stats.totalEvents,
         pageViews: project.stats.pageViews,
-        uniqueVisitors: project.stats.uniqueVisitors
+        uniqueVisitors: project.stats.uniqueVisitors,
+        bounceRate: project.stats.bounceRate,
+        avgSessionDuration: project.stats.avgSessionDuration
       } : null
     }));
 
@@ -116,7 +161,9 @@ export async function GET() {
         totalEvents,
         totalPageViews,
         totalSessions,
-        thisMonthEvents
+        thisMonthEvents,
+        thisWeekEvents,
+        todayEvents
       },
       recentActivity: recentActivity.map(activity => ({
         id: activity.id,
@@ -129,10 +176,10 @@ export async function GET() {
       quickProjects
     };
 
-    return Response.json(response);
+    return NextResponse.json(response);
   } catch (error) {
     console.error('Dashboard overview error:', error);
-    return Response.json(
+    return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
     );

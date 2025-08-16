@@ -7,13 +7,8 @@ const getDatabaseConfig = () => {
   const baseUrl = process.env.DATABASE_URL
   const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL === '1'
   
-  // Determine database name based on environment
-  let dbName: string
-  if (process.env.DATABASE_NAME) {
-    dbName = process.env.DATABASE_NAME
-  } else {
-    dbName = isProduction ? 'clickchutney_prod' : 'clickchutney_dev'
-  }
+  // Use hardcoded DEV database name
+  const dbName = 'DEV'
   
   // Handle different URL formats
   if (!baseUrl) {
@@ -94,7 +89,14 @@ if (process.env.NEXT_PHASE === 'phase-production-build') {
 } else {
   try {
     const dbConfig = getDatabaseConfig()
-    client = new MongoClient(dbConfig.url)
+    client = new MongoClient(dbConfig.url, {
+      serverSelectionTimeoutMS: 5000,
+      connectTimeoutMS: 5000,
+      socketTimeoutMS: 5000,
+      maxPoolSize: 10,
+      retryWrites: true,
+      retryReads: true
+    })
     db = client.db(dbConfig.dbName)
     
     // Log which database is being used (helpful for debugging)
@@ -123,6 +125,18 @@ const createAuthConfig = () => {
     secret: process.env.BETTER_AUTH_SECRET || process.env.AUTH_SECRET || "default-secret-change-in-production",
     logger: {
       level: (process.env.NODE_ENV === 'development' && process.env.NEXT_PHASE !== 'phase-production-build' ? 'debug' : 'error') as 'debug' | 'error'
+    },
+    user: {
+      additionalFields: {
+        githubId: {
+          type: "string",
+          required: false,
+        },
+        githubLogin: {
+          type: "string", 
+          required: false,
+        }
+      }
     }
   }
 
@@ -130,7 +144,13 @@ const createAuthConfig = () => {
   if (process.env.NEXT_PHASE !== 'phase-production-build' && db && typeof db.collection === 'function') {
     return {
       ...config,
-      database: mongodbAdapter(db)
+      database: mongodbAdapter(db, {
+        // Map Better Auth collections to Prisma collections
+        users: "User",
+        accounts: "Account", 
+        sessions: "Session",
+        verificationTokens: "VerificationToken"
+      })
     }
   }
 

@@ -13,7 +13,7 @@ export async function GET() {
         callbackURL,
         githubConfigured: !!githubClientId,
         environment: process.env.NODE_ENV,
-        databaseName: process.env.DATABASE_NAME
+        databaseName: 'DEV'
       }
     })
   } catch (error) {

@@ -127,6 +127,7 @@ export async function POST(request: NextRequest) {
         userAgent: body.userAgent || request.headers.get('user-agent') || null,
         ip: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown',
         referrer: body.referrer || null,
+        sessionId: body.sessionId || null,
         timestamp: body.timestamp ? new Date(body.timestamp) : new Date()
       }
     })

@@ -1,17 +1,16 @@
 import type { Metadata } from "next";
-import { Inter, Poppins } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({
+// Use CSS imports for fonts instead of next/font/google to avoid Turbopack issues
+const inter = {
   variable: "--font-inter",
-  subsets: ["latin"],
-});
+  className: "font-inter",
+};
 
-const poppins = Poppins({
-  variable: "--font-poppins",
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800"],
-});
+const poppins = {
+  variable: "--font-poppins", 
+  className: "font-poppins",
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://clickchutney.com'),

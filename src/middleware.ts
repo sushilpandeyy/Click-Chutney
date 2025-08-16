@@ -30,10 +30,10 @@ export default async function authMiddleware(request: NextRequest) {
         },
         retry: {
           type: "linear",
-          attempts: 1,
-          delay: 100
+          attempts: 2,
+          delay: 200
         },
-        timeout: 5000,
+        timeout: 10000,
       },
     )
 
@@ -54,6 +54,14 @@ export default async function authMiddleware(request: NextRequest) {
   } catch (error) {
     console.warn('Auth middleware error:', error);
     const isPublicPage = ["/", "/login", "/signup"].includes(request.nextUrl.pathname)
+    
+    // If it's an AbortError or timeout, allow the request to continue
+    if (error instanceof Error && (error.name === 'AbortError' || error.message.includes('timeout'))) {
+      console.warn('Auth check timed out, allowing request to continue');
+      if (!isPublicPage) {
+        return NextResponse.redirect(new URL("/login", request.url))
+      }
+    }
     
     if (!isPublicPage) {
       return NextResponse.redirect(new URL("/login", request.url))

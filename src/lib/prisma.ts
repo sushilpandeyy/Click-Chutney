@@ -9,6 +9,17 @@ let prismaClient: PrismaClient
 try {
   prismaClient = global.__prisma || new PrismaClient({
     log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
+    datasources: {
+      db: {
+        url: process.env.DATABASE_URL
+      }
+    },
+    __internal: {
+      engine: {
+        connectTimeout: 10000,
+        queryTimeout: 10000
+      }
+    }
   })
 
   if (process.env.NODE_ENV === 'development') {

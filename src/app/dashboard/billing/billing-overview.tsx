@@ -140,13 +140,18 @@ export function BillingOverview({ session }: BillingOverviewProps) {
       
       // Mock billing data for now
       // In production, this would fetch from your billing API
+      const freePlan = PLANS[0];
+      if (!freePlan) {
+        throw new Error('No plans available');
+      }
+      
       const mockData: BillingData = {
         user: {
           id: session.user.id,
           name: session.user.name || null,
           email: session.user.email
         },
-        currentPlan: PLANS[0], // Free plan
+        currentPlan: freePlan, // Free plan
         usage: {
           currentPeriod: {
             events: 450,
@@ -154,7 +159,7 @@ export function BillingOverview({ session }: BillingOverviewProps) {
             storage: 2.5,
             apiCalls: 45
           },
-          limits: PLANS[0].limits,
+          limits: freePlan.limits,
           periodStart: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString(),
           periodEnd: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).toISOString()
         },
@@ -252,7 +257,7 @@ export function BillingOverview({ session }: BillingOverviewProps) {
           </div>
           {billingData?.currentPlan.name !== 'Business' && (
             <button 
-              onClick={() => setSelectedPlan('Pro')}
+              onClick={() => handlePlanChange('Pro')}
               className="mt-4 md:mt-0 bg-blue-600 hover:bg-blue-700 text-white rounded-md px-6 py-2 text-sm font-medium transition-colors"
             >
               Upgrade Plan

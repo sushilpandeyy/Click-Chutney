@@ -64,7 +64,6 @@ export function DashboardOverview({ session }: DashboardOverviewProps) {
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isSeeding, setIsSeeding] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
 
   // Fetch dashboard data
@@ -76,8 +75,10 @@ export function DashboardOverview({ session }: DashboardOverviewProps) {
     try {
       setIsLoading(true);
       setError(null);
+      
       const response = await fetch('/api/dashboard/overview', {
-        credentials: 'include'
+        credentials: 'include',
+        cache: 'no-cache'
       });
       
       if (!response.ok) {
@@ -85,7 +86,7 @@ export function DashboardOverview({ session }: DashboardOverviewProps) {
           router.push('/login');
           return;
         }
-        throw new Error('Failed to fetch dashboard data');
+        throw new Error(`Failed to fetch dashboard data: ${response.status}`);
       }
       
       const data = await response.json();
@@ -98,26 +99,6 @@ export function DashboardOverview({ session }: DashboardOverviewProps) {
     }
   };
 
-  const createSampleData = async () => {
-    try {
-      setIsSeeding(true);
-      const response = await fetch('/api/dashboard/seed', {
-        method: 'POST'
-      });
-      
-      if (response.ok) {
-        await fetchDashboardData();
-      } else {
-        const errorData = await response.json();
-        setError(errorData.error || 'Failed to create sample data');
-      }
-    } catch (err) {
-      console.error('Sample data creation error:', err);
-      setError('Failed to create sample data');
-    } finally {
-      setIsSeeding(false);
-    }
-  };
 
   const handleProjectCreated = () => {
     fetchDashboardData();
@@ -140,23 +121,12 @@ export function DashboardOverview({ session }: DashboardOverviewProps) {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <p className="text-red-400 mb-4">{error}</p>
-          <div className="flex gap-3 justify-center">
-            <button
-              onClick={fetchDashboardData}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
-            >
-              Retry
-            </button>
-            {process.env.NODE_ENV === 'development' && (
-              <button
-                onClick={createSampleData}
-                disabled={isSeeding}
-                className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors disabled:opacity-50"
-              >
-                {isSeeding ? 'Creating...' : 'Create Sample Data'}
-              </button>
-            )}
-          </div>
+          <button
+            onClick={fetchDashboardData}
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
+          >
+            Retry
+          </button>
         </div>
       </div>
     );
@@ -185,12 +155,6 @@ export function DashboardOverview({ session }: DashboardOverviewProps) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
               New Project
-            </button>
-            <button 
-              onClick={() => router.push('/dashboard/projects')}
-              className="bg-[#111111] border border-[#262626] text-white rounded-md px-4 py-2 text-sm font-medium hover:bg-[#1a1a1a] hover:border-[#404040] transition-colors"
-            >
-              View All Projects
             </button>
           </div>
         </div>
@@ -282,12 +246,6 @@ export function DashboardOverview({ session }: DashboardOverviewProps) {
                 </svg>
                 Recent Activity
               </h3>
-              <button 
-                onClick={() => router.push('/dashboard/analytics')}
-                className="text-gray-400 hover:text-white text-sm transition-colors"
-              >
-                View all activity
-              </button>
             </div>
             
             {dashboardData?.recentActivity && dashboardData.recentActivity.length > 0 ? (
@@ -354,38 +312,6 @@ export function DashboardOverview({ session }: DashboardOverviewProps) {
                 {stats?.totalProjects === 0 ? "Create First Project" : "New Project"}
               </button>
               
-              <button 
-                onClick={() => router.push('/dashboard/projects')}
-                className="w-full bg-[#0a0a0a] border border-[#262626] text-white rounded-md px-4 py-3 text-sm font-medium hover:bg-[#1a1a1a] hover:border-[#404040] transition-colors flex items-center gap-3"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                </svg>
-                Manage Projects
-              </button>
-              
-              <button 
-                onClick={() => router.push('/dashboard/analytics')}
-                className="w-full bg-[#0a0a0a] border border-[#262626] text-white rounded-md px-4 py-3 text-sm font-medium hover:bg-[#1a1a1a] hover:border-[#404040] transition-colors flex items-center gap-3"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-                View Analytics
-              </button>
-
-              {process.env.NODE_ENV === 'development' && (
-                <button
-                  onClick={createSampleData}
-                  disabled={isSeeding}
-                  className="w-full bg-green-600 hover:bg-green-700 text-white text-sm font-medium py-3 px-4 rounded-md transition-colors disabled:opacity-50 flex items-center gap-3"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                  {isSeeding ? 'Creating...' : 'Generate Sample Data'}
-                </button>
-              )}
             </div>
           </div>
 
@@ -415,26 +341,31 @@ export function DashboardOverview({ session }: DashboardOverviewProps) {
         </div>
       </div>
 
-      {/* Recent Projects */}
-      {dashboardData?.quickProjects && dashboardData.quickProjects.length > 0 && (
-        <div className="mt-12">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-semibold flex items-center gap-2">
-              <svg className="w-6 h-6 text-orange-500" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" />
-              </svg>
-              Recent Projects
-            </h3>
+      {/* Projects Section */}
+      <div className="mt-12">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-xl font-semibold flex items-center gap-2">
+            <svg className="w-6 h-6 text-orange-500" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" />
+            </svg>
+            Your Projects ({dashboardData?.statistics?.totalProjects || 0})
+          </h3>
+          {dashboardData?.quickProjects && dashboardData.quickProjects.length > 0 && (
             <button 
-              onClick={() => router.push('/dashboard/projects')}
-              className="text-gray-400 hover:text-white text-sm transition-colors"
+              onClick={() => setShowCreateModal(true)}
+              className="bg-blue-600 hover:bg-blue-700 text-white rounded-md px-4 py-2 text-sm font-medium transition-colors flex items-center gap-2"
             >
-              View all projects
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              New Project
             </button>
-          </div>
-          
+          )}
+        </div>
+        
+        {dashboardData?.quickProjects && dashboardData.quickProjects.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {dashboardData.quickProjects.slice(0, 6).map((project) => (
+            {dashboardData.quickProjects.map((project) => (
               <div key={project.id} className="bg-[#111111] border border-[#262626] rounded-lg p-6 hover:border-[#404040] transition-colors group">
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex-1 min-w-0">
@@ -464,63 +395,38 @@ export function DashboardOverview({ session }: DashboardOverviewProps) {
                   </div>
                 </div>
                 
-                <div className="flex gap-2">
-                  <button 
-                    onClick={() => router.push(`/dashboard/projects/${project.id}`)}
-                    className="flex-1 bg-[#0a0a0a] border border-[#262626] text-white rounded text-xs py-2 px-3 hover:bg-[#1a1a1a] hover:border-[#404040] transition-colors"
-                  >
-                    View
-                  </button>
-                  <button 
-                    onClick={() => router.push(`/dashboard/projects/${project.id}/analytics`)}
-                    className="flex-1 bg-[#0a0a0a] border border-[#262626] text-white rounded text-xs py-2 px-3 hover:bg-[#1a1a1a] hover:border-[#404040] transition-colors"
-                  >
-                    Analytics
-                  </button>
-                </div>
+                <button 
+                  onClick={() => router.push(`/dashboard/projects/${project.id}`)}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded text-xs py-2 px-3 transition-colors"
+                >
+                  View Dashboard
+                </button>
               </div>
             ))}
           </div>
-        </div>
-      )}
-
-      {/* Empty State */}
-      {(!dashboardData?.quickProjects || dashboardData.quickProjects.length === 0) && (
-        <div className="mt-12 bg-[#111111] border border-[#262626] rounded-lg p-12 text-center">
-          <div className="w-16 h-16 bg-gray-600/10 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-            </svg>
-          </div>
-          <h4 className="text-lg font-semibold text-white mb-2">No Projects Yet</h4>
-          <p className="text-gray-400 mb-6 max-w-md mx-auto">
-            Create your first project to start tracking analytics and user behavior across your websites and applications.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+        ) : (
+          <div className="bg-[#111111] border border-[#262626] rounded-lg p-12 text-center">
+            <div className="w-16 h-16 bg-gray-600/10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+              </svg>
+            </div>
+            <h4 className="text-lg font-semibold text-white mb-2">No Projects Yet</h4>
+            <p className="text-gray-400 mb-6 max-w-md mx-auto">
+              Create your first project to start tracking analytics and user behavior across your websites and applications.
+            </p>
             <button 
               onClick={() => setShowCreateModal(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white rounded-md px-6 py-2 text-sm font-medium transition-colors flex items-center gap-2 justify-center"
+              className="bg-blue-600 hover:bg-blue-700 text-white rounded-md px-6 py-2 text-sm font-medium transition-colors flex items-center gap-2 justify-center mx-auto"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
               Create First Project
             </button>
-            {process.env.NODE_ENV === 'development' && (
-              <button
-                onClick={createSampleData}
-                disabled={isSeeding}
-                className="bg-green-600 hover:bg-green-700 text-white rounded-md px-6 py-2 text-sm font-medium transition-colors disabled:opacity-50 flex items-center gap-2 justify-center"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-                {isSeeding ? 'Creating...' : 'Generate Sample Data'}
-              </button>
-            )}
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Project Creation Modal */}
       <ProjectCreateModal

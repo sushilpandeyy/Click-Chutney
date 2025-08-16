@@ -2,13 +2,9 @@ import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { DashboardLayout } from '@/components/dashboard-layout';
-import { ProjectDashboard } from './project-dashboard';
+import { AnalyticsOverview } from './analytics-overview';
 
-export default async function ProjectDashboardPage({ 
-  params 
-}: { 
-  params: Promise<{ id: string }> 
-}) {
+export default async function AnalyticsPage() {
   const session = await auth.api.getSession({
     headers: await headers()
   });
@@ -17,11 +13,9 @@ export default async function ProjectDashboardPage({
     redirect('/login');
   }
 
-  const resolvedParams = await params;
-
   return (
     <DashboardLayout session={session}>
-      <ProjectDashboard session={session} projectId={resolvedParams.id} />
+      <AnalyticsOverview session={session} />
     </DashboardLayout>
   );
 }
