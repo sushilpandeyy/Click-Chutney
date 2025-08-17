@@ -52,27 +52,27 @@ function LoginContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
         {/* Logo/Title */}
         <div className="text-center mb-8">
           <button
             onClick={() => router.push('/')}
-            className="text-2xl font-semibold text-white mb-2 hover:text-gray-300 transition-colors"
+            className="text-2xl font-bold text-foreground mb-2 hover:text-primary transition-all duration-200 font-display bg-gradient-to-r from-primary via-chart-1 to-chart-2 bg-clip-text text-transparent hover:scale-105"
           >
             ClickChutney
           </button>
-          <p className="text-sm text-gray-400">
-            Sign in to your account
+          <p className="text-sm text-muted-foreground">
+            Welcome back
           </p>
         </div>
 
         {/* Login Card */}
-        <div className="bg-[#111111] border border-[#262626] rounded-lg p-6">
+        <div className="bg-card border border-border rounded-xl p-6 backdrop-blur-xl shadow-xl">
           {/* Error Message */}
           {error && (
-            <div className="mb-4 p-3 bg-red-900/20 border border-red-800/30 rounded-md">
-              <p className="text-red-400 text-sm">{error}</p>
+            <div className="mb-4 p-3 bg-destructive/10 border border-destructive/30 rounded-lg">
+              <p className="text-destructive text-sm font-medium">{error}</p>
             </div>
           )}
           
@@ -80,10 +80,10 @@ function LoginContent() {
           <button
             onClick={handleGitHubSignIn}
             disabled={isLoading}
-            className="w-full bg-[#0a0a0a] border border-[#262626] text-white rounded-md px-4 py-3 text-sm font-medium hover:bg-[#1a1a1a] hover:border-[#404040] transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+            className="w-full bg-primary hover:bg-primary/90 border border-primary/20 text-primary-foreground rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 shadow-lg hover:shadow-xl hover:scale-105 font-display"
           >
             {isLoading ? (
-              <div className="w-4 h-4 border-2 border-gray-400 border-t-white rounded-full animate-spin" />
+              <div className="w-4 h-4 border-2 border-muted-foreground border-t-primary-foreground rounded-full animate-spin" />
             ) : (
               <>
                 <svg
@@ -102,20 +102,20 @@ function LoginContent() {
           {/* Divider */}
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-[#262626]" />
+              <div className="w-full border-t border-border opacity-30" />
             </div>
             <div className="relative flex justify-center text-xs">
-              <span className="bg-[#111111] px-2 text-gray-400">or</span>
+              <span className="bg-card px-3 text-muted-foreground text-xs">or</span>
             </div>
           </div>
 
           {/* Sign up link */}
           <div className="text-center">
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-muted-foreground">
               Don&apos;t have an account?{' '}
               <button
                 onClick={() => router.push('/signup')}
-                className="text-white hover:underline"
+                className="text-primary hover:text-primary/80 hover:underline font-semibold transition-colors duration-200"
               >
                 Sign up
               </button>
@@ -125,7 +125,7 @@ function LoginContent() {
 
         {/* Footer */}
         <div className="text-center mt-8">
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-muted-foreground">
             By signing in, you agree to our Terms of Service and Privacy Policy.
           </p>
         </div>
@@ -137,8 +137,8 @@ function LoginContent() {
 export default function LoginPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-[#0a0a0a] text-white flex items-center justify-center">
-        <div className="w-6 h-6 border-2 border-gray-400 border-t-white rounded-full animate-spin" />
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
+        <div className="w-6 h-6 border-2 border-primary border-t-chart-1 rounded-full animate-spin" />
       </div>
     }>
       <LoginContent />

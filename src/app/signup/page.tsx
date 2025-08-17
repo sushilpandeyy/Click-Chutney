@@ -52,27 +52,27 @@ function SignUpContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
         {/* Logo/Title */}
         <div className="text-center mb-8">
           <button
             onClick={() => router.push('/')}
-            className="text-2xl font-semibold text-white mb-2 hover:text-gray-300 transition-colors"
+            className="text-2xl font-bold text-foreground mb-2 hover:text-primary transition-all duration-200 font-display bg-gradient-to-r from-primary via-chart-1 to-chart-2 bg-clip-text text-transparent hover:scale-105"
           >
             ClickChutney
           </button>
-          <p className="text-sm text-gray-400">
+          <p className="text-sm text-muted-foreground">
             Create your account
           </p>
         </div>
 
         {/* Sign Up Card */}
-        <div className="bg-[#111111] border border-[#262626] rounded-lg p-6">
+        <div className="bg-card border border-border rounded-xl p-6 backdrop-blur-xl shadow-xl">
           {/* Error Message */}
           {error && (
-            <div className="mb-4 p-3 bg-red-900/20 border border-red-800/30 rounded-md">
-              <p className="text-red-400 text-sm">{error}</p>
+            <div className="mb-4 p-3 bg-destructive/10 border border-destructive/30 rounded-lg">
+              <p className="text-destructive text-sm font-medium">{error}</p>
             </div>
           )}
           
@@ -80,10 +80,10 @@ function SignUpContent() {
           <button
             onClick={handleGitHubSignIn}
             disabled={isLoading}
-            className="w-full bg-[#0a0a0a] border border-[#262626] text-white rounded-md px-4 py-3 text-sm font-medium hover:bg-[#1a1a1a] hover:border-[#404040] transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+            className="w-full bg-primary hover:bg-primary/90 border border-primary/20 text-primary-foreground rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 shadow-lg hover:shadow-xl hover:scale-105 font-display"
           >
             {isLoading ? (
-              <div className="w-4 h-4 border-2 border-gray-400 border-t-white rounded-full animate-spin" />
+              <div className="w-4 h-4 border-2 border-muted-foreground border-t-primary-foreground rounded-full animate-spin" />
             ) : (
               <>
                 <svg
@@ -100,25 +100,25 @@ function SignUpContent() {
           </button>
 
           {/* Features List */}
-          <div className="mt-6 pt-6 border-t border-[#262626]">
-            <h3 className="text-sm font-medium text-white mb-3">
+          <div className="mt-6 pt-6 border-t border-border/30">
+            <h3 className="text-sm font-semibold text-foreground mb-3 font-display">
               What you&apos;ll get:
             </h3>
-            <ul className="space-y-2 text-sm text-gray-400">
+            <ul className="space-y-2 text-sm text-muted-foreground">
               <li className="flex items-center gap-2">
-                <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                <svg className="w-4 h-4 text-chart-2" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                 </svg>
                 Real-time analytics dashboard
               </li>
               <li className="flex items-center gap-2">
-                <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                <svg className="w-4 h-4 text-chart-2" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                 </svg>
                 Unlimited project tracking
               </li>
               <li className="flex items-center gap-2">
-                <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                <svg className="w-4 h-4 text-chart-2" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                 </svg>
                 Advanced user insights
@@ -129,20 +129,20 @@ function SignUpContent() {
           {/* Divider */}
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-[#262626]" />
+              <div className="w-full border-t border-border opacity-30" />
             </div>
             <div className="relative flex justify-center text-xs">
-              <span className="bg-[#111111] px-2 text-gray-400">or</span>
+              <span className="bg-card px-3 text-muted-foreground text-xs">or</span>
             </div>
           </div>
 
           {/* Sign in link */}
           <div className="text-center">
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-muted-foreground">
               Already have an account?{' '}
               <button
                 onClick={() => router.push('/login')}
-                className="text-white hover:underline"
+                className="text-primary hover:text-primary/80 hover:underline font-semibold transition-colors duration-200"
               >
                 Sign in
               </button>
@@ -152,7 +152,7 @@ function SignUpContent() {
 
         {/* Footer */}
         <div className="text-center mt-8">
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-muted-foreground">
             By signing up, you agree to our Terms of Service and Privacy Policy.
           </p>
         </div>
@@ -164,8 +164,8 @@ function SignUpContent() {
 export default function SignUpPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-[#0a0a0a] text-white flex items-center justify-center">
-        <div className="w-6 h-6 border-2 border-gray-400 border-t-white rounded-full animate-spin" />
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
+        <div className="w-6 h-6 border-2 border-primary border-t-chart-1 rounded-full animate-spin" />
       </div>
     }>
       <SignUpContent />
