@@ -3,6 +3,7 @@
 import { signOut } from '@/lib/auth-client';
 import { useRouter, usePathname } from 'next/navigation';
 import { useState } from 'react';
+import Image from 'next/image';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -10,8 +11,8 @@ interface DashboardLayoutProps {
     user: {
       id: string;
       email: string;
-      name?: string;
-      image?: string;
+      name?: string | null | undefined;
+      image?: string | null | undefined;
     };
   };
 }
@@ -149,9 +150,11 @@ export function DashboardLayout({ children, session }: DashboardLayoutProps) {
             <div className={`flex items-center gap-3 ${isSidebarCollapsed ? 'justify-center' : ''}`}>
               <div className="w-8 h-8 bg-[#262626] rounded-full flex items-center justify-center flex-shrink-0">
                 {session.user.image ? (
-                  <img 
+                  <Image 
                     src={session.user.image} 
                     alt="Profile" 
+                    width={32}
+                    height={32}
                     className="w-8 h-8 rounded-full"
                   />
                 ) : (

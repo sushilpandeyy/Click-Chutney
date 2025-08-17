@@ -75,7 +75,7 @@ interface AnalyticsOverviewProps {
     user: {
       id: string;
       email: string;
-      name?: string;
+      name?: string | null | undefined;
     };
   };
 }
@@ -133,7 +133,7 @@ const METRICS_CARDS = [
   }
 ];
 
-export function AnalyticsOverview({ session }: AnalyticsOverviewProps) {
+export function AnalyticsOverview({ }: AnalyticsOverviewProps) {
   const router = useRouter();
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -143,10 +143,7 @@ export function AnalyticsOverview({ session }: AnalyticsOverviewProps) {
   const [activeTab, setActiveTab] = useState('overview');
 
   useEffect(() => {
-    fetchAnalyticsData();
-  }, [selectedProject, timeRange]);
-
-  const fetchAnalyticsData = async () => {
+    const fetchAnalyticsData = async () => {
     try {
       setIsLoading(true);
       setError(null);
@@ -177,6 +174,9 @@ export function AnalyticsOverview({ session }: AnalyticsOverviewProps) {
       setIsLoading(false);
     }
   };
+
+    fetchAnalyticsData();
+  }, [selectedProject, timeRange, router]);
 
   const formatValue = (value: number, format: string) => {
     switch (format) {
@@ -231,7 +231,7 @@ export function AnalyticsOverview({ session }: AnalyticsOverviewProps) {
         <div className="text-center">
           <p className="text-red-400 mb-4">{error}</p>
           <button
-            onClick={fetchAnalyticsData}
+            onClick={() => window.location.reload()}
             className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
           >
             Retry

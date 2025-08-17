@@ -32,12 +32,12 @@ interface ProjectsOverviewProps {
     user: {
       id: string;
       email: string;
-      name?: string;
+      name?: string | null | undefined;
     };
   };
 }
 
-export function ProjectsOverview({ session }: ProjectsOverviewProps) {
+export function ProjectsOverview({ }: ProjectsOverviewProps) {
   const router = useRouter();
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);

@@ -34,8 +34,8 @@ export async function GET(request: NextRequest) {
             image: session.user.image || null,
             emailVerified: session.user.emailVerified || false,
             // Add any GitHub-specific fields if available
-            githubId: (session.user as any).githubId || null,
-            githubLogin: (session.user as any).githubLogin || null,
+            githubId: (session.user as { githubId?: string }).githubId || null,
+            githubLogin: (session.user as { githubLogin?: string }).githubLogin || null,
           },
           include: {
             accounts: true

@@ -53,7 +53,7 @@ interface BillingOverviewProps {
     user: {
       id: string;
       email: string;
-      name?: string;
+      name?: string | null | undefined;
     };
   };
 }
@@ -130,10 +130,7 @@ export function BillingOverview({ session }: BillingOverviewProps) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchBillingData();
-  }, []);
-
-  const fetchBillingData = async () => {
+    const fetchBillingData = async () => {
     try {
       setIsLoading(true);
       setError(null);
@@ -182,6 +179,9 @@ export function BillingOverview({ session }: BillingOverviewProps) {
     }
   };
 
+    fetchBillingData();
+  }, [session.user.id, session.user.name, session.user.email]);
+
   const getUsagePercentage = (current: number, limit: number) => {
     if (limit === -1) return 0; // unlimited
     return Math.min((current / limit) * 100, 100);
@@ -215,7 +215,7 @@ export function BillingOverview({ session }: BillingOverviewProps) {
         <div className="text-center">
           <p className="text-red-400 mb-4">{error}</p>
           <button
-            onClick={fetchBillingData}
+            onClick={() => window.location.reload()}
             className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
           >
             Retry

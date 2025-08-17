@@ -46,7 +46,7 @@ interface AnalyticsClientProps {
     user: {
       id: string;
       email: string;
-      name?: string;
+      name?: string | null | undefined;
     };
   };
   projectId: string;
@@ -61,53 +61,56 @@ export function AnalyticsClient({ session, projectId }: AnalyticsClientProps) {
   const [timeRange, setTimeRange] = useState('7d');
 
   useEffect(() => {
+    const fetchProjectData = async () => {
+      try {
+        const response = await fetch(`/api/projects/${projectId}`);
+        if (!response.ok) {
+          if (response.status === 404) {
+            router.push('/dashboard/projects');
+            return;
+          }
+          throw new Error('Failed to fetch project');
+        }
+        const data = await response.json();
+        setProject(data);
+      } catch (err) {
+        console.error('Project fetch error:', err);
+        setError('Failed to load project');
+      }
+    };
+
     fetchProjectData();
-  }, [projectId]);
+  }, [projectId, router]);
 
   useEffect(() => {
     if (project) {
+      const fetchAnalytics = async () => {
+        try {
+          setIsLoading(true);
+          const params = new URLSearchParams({
+            timeRange,
+            projectId: project.id
+          });
+          
+          const response = await fetch(`/api/analytics/project?${params}`);
+          if (!response.ok) {
+            throw new Error('Failed to fetch analytics');
+          }
+          
+          const data = await response.json();
+          setAnalytics(data);
+        } catch (err) {
+          console.error('Analytics fetch error:', err);
+          setError('Failed to load analytics');
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
       fetchAnalytics();
     }
   }, [project, timeRange]);
 
-  const fetchProjectData = async () => {
-    try {
-      const response = await fetch(`/api/projects/${projectId}`);
-      if (!response.ok) {
-        if (response.status === 404) {
-          router.push('/dashboard/projects');
-          return;
-        }
-        throw new Error('Failed to fetch project');
-      }
-      
-      const data = await response.json();
-      setProject(data.project);
-    } catch (err) {
-      console.error('Project fetch error:', err);
-      setError('Failed to load project');
-    }
-  };
-
-  const fetchAnalytics = async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      
-      const response = await fetch(`/api/projects/${projectId}/analytics?timeRange=${timeRange}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch analytics');
-      }
-      
-      const data = await response.json();
-      setAnalytics(data.analytics);
-    } catch (err) {
-      console.error('Analytics fetch error:', err);
-      setError('Failed to load analytics');
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const timeRangeOptions = [
     { value: '24h', label: 'Last 24 hours' },

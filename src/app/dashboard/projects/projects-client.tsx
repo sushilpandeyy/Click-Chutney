@@ -28,7 +28,7 @@ interface ProjectsClientProps {
     user: {
       id: string;
       email: string;
-      name?: string;
+      name?: string | null | undefined;
     };
   };
 }
@@ -43,36 +43,35 @@ export function ProjectsClient({ session }: ProjectsClientProps) {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        
+        const response = await fetch('/api/projects', {
+          credentials: 'include'
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch projects');
+        }
+        
+        const data = await response.json();
+        setProjects(data.projects || []);
+      } catch (err) {
+        console.error('Projects fetch error:', err);
+        setError('Failed to load projects');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
     fetchProjects();
   }, []);
 
-  const fetchProjects = async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      
-      const response = await fetch('/api/projects');
-      if (!response.ok) {
-        if (response.status === 401) {
-          router.push('/login');
-          return;
-        }
-        throw new Error('Failed to fetch projects');
-      }
-      
-      const data = await response.json();
-      setProjects(data.projects || []);
-    } catch (err) {
-      console.error('Projects fetch error:', err);
-      setError('Failed to load projects');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const handleProjectCreated = () => {
     // Refresh the projects list after creation
-    fetchProjects();
+    window.location.reload();
   };
 
   const handleDeleteProject = async (project: Project) => {

@@ -11,13 +11,7 @@ try {
     log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
     datasources: {
       db: {
-        url: process.env.DATABASE_URL
-      }
-    },
-    __internal: {
-      engine: {
-        connectTimeout: 10000,
-        queryTimeout: 10000
+        url: process.env.DATABASE_URL || ""
       }
     }
   })

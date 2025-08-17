@@ -54,7 +54,7 @@ interface DashboardOverviewProps {
     user: {
       id: string;
       email: string;
-      name?: string;
+      name?: string | null | undefined;
     };
   };
 }
@@ -68,10 +68,7 @@ export function DashboardOverview({ session }: DashboardOverviewProps) {
 
   // Fetch dashboard data
   useEffect(() => {
-    fetchDashboardData();
-  }, []);
-
-  const fetchDashboardData = async () => {
+    const fetchDashboardData = async () => {
     try {
       setIsLoading(true);
       setError(null);
@@ -99,10 +96,13 @@ export function DashboardOverview({ session }: DashboardOverviewProps) {
     }
   };
 
+    fetchDashboardData();
+  }, [router]);
 
   const handleProjectCreated = () => {
-    fetchDashboardData();
     setShowCreateModal(false);
+    // Refetch data after project creation
+    window.location.reload();
   };
 
   if (isLoading) {
@@ -122,7 +122,7 @@ export function DashboardOverview({ session }: DashboardOverviewProps) {
         <div className="text-center">
           <p className="text-red-400 mb-4">{error}</p>
           <button
-            onClick={fetchDashboardData}
+            onClick={() => window.location.reload()}
             className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
           >
             Retry

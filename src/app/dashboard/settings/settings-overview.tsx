@@ -39,8 +39,8 @@ interface SettingsOverviewProps {
     user: {
       id: string;
       email: string;
-      name?: string;
-      image?: string;
+      name?: string | null | undefined;
+      image?: string | null | undefined;
     };
   };
 }
@@ -94,53 +94,57 @@ export function SettingsOverview({ session }: SettingsOverviewProps) {
   const [newCorsOrigin, setNewCorsOrigin] = useState('');
 
   useEffect(() => {
-    fetchSettings();
-  }, []);
-
-  const fetchSettings = async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      
-      const response = await fetch('/api/user/settings');
-      if (!response.ok) {
-        throw new Error('Failed to fetch settings');
+    const fetchSettings = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        
+        // Mock settings data for now
+        // In production, this would fetch from your settings API
+        const mockSettings: UserSettings = {
+          // Profile
+          name: session.user.name || '',
+          email: session.user.email,
+          timezone: 'UTC',
+          dateFormat: 'MM/DD/YYYY',
+          
+          // Notifications
+          emailNotifications: true,
+          weeklyReports: true,
+          monthlyReports: false,
+          alertsEnabled: true,
+          marketingEmails: false,
+          
+          // Privacy & Security
+          dataRetentionDays: 90,
+          allowDataExport: true,
+          twoFactorEnabled: false,
+          sessionTimeout: 120,
+          
+          // Analytics
+          theme: 'dark',
+          defaultTimeRange: '7d',
+          autoRefresh: true,
+          showRealTime: true,
+          
+          // API & Integrations
+          apiKeyVisible: false,
+          webhooksEnabled: false,
+          corsOrigins: []
+        };
+        
+        setSettings(mockSettings);
+      } catch (err) {
+        console.error('Error fetching settings:', err);
+        setError('Failed to load settings');
+      } finally {
+        setIsLoading(false);
       }
-      
-      const data = await response.json();
-      
-      // Merge with defaults and session data
-      const defaultSettings: UserSettings = {
-        name: session.user.name || '',
-        email: session.user.email,
-        timezone: 'UTC',
-        dateFormat: 'MM/DD/YYYY',
-        emailNotifications: true,
-        weeklyReports: true,
-        monthlyReports: true,
-        alertsEnabled: true,
-        marketingEmails: false,
-        dataRetentionDays: 365,
-        allowDataExport: true,
-        twoFactorEnabled: false,
-        sessionTimeout: 120,
-        theme: 'dark',
-        defaultTimeRange: '7d',
-        autoRefresh: true,
-        showRealTime: true,
-        apiKeyVisible: false,
-        webhooksEnabled: false,
-        corsOrigins: []
-      };
-      
-      setSettings({ ...defaultSettings, ...data.settings });
-    } catch (err) {
-      console.error('Error fetching settings:', err);
-      setError('Failed to load settings');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    };
+
+    fetchSettings();
+  }, [session.user.name, session.user.email]);
+
 
   const saveSettings = async (updatedSettings: Partial<UserSettings>) => {
     try {

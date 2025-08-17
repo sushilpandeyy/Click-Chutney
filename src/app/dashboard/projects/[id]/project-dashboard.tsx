@@ -29,7 +29,7 @@ interface ProjectDashboardProps {
     user: {
       id: string;
       email: string;
-      name?: string;
+      name?: string | null | undefined;
     };
   };
   projectId: string;
@@ -65,7 +65,7 @@ const projectTabs = [
   },
 ];
 
-export function ProjectDashboard({ session, projectId }: ProjectDashboardProps) {
+export function ProjectDashboard({ projectId }: ProjectDashboardProps) {
   const router = useRouter();
   const [project, setProject] = useState<Project | null>(null);
   const [stats, setStats] = useState<ProjectStats | null>(null);
@@ -74,39 +74,40 @@ export function ProjectDashboard({ session, projectId }: ProjectDashboardProps) 
   const [activeTab, setActiveTab] = useState('analytics');
 
   useEffect(() => {
-    fetchProjectData();
-  }, [projectId]);
-
-  const fetchProjectData = async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      
-      const response = await fetch(`/api/projects/${projectId}`);
-      if (!response.ok) {
-        if (response.status === 404) {
-          router.push('/dashboard');
-          return;
+    const fetchProjectData = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        
+        const response = await fetch(`/api/projects/${projectId}`);
+        if (!response.ok) {
+          if (response.status === 404) {
+            router.push('/dashboard/projects');
+            return;
+          }
+          throw new Error('Failed to fetch project');
         }
-        throw new Error('Failed to fetch project');
+        
+        const data = await response.json();
+        setProject(data.project);
+        
+        // Fetch project stats
+        const statsResponse = await fetch(`/api/projects/${projectId}/stats`);
+        if (statsResponse.ok) {
+          const statsData = await statsResponse.json();
+          setStats(statsData);
+        }
+      } catch (err) {
+        console.error('Project fetch error:', err);
+        setError('Failed to load project');
+      } finally {
+        setIsLoading(false);
       }
-      
-      const data = await response.json();
-      setProject(data.project);
-      
-      // Fetch project stats
-      const statsResponse = await fetch(`/api/projects/${projectId}/stats`);
-      if (statsResponse.ok) {
-        const statsData = await statsResponse.json();
-        setStats(statsData.stats);
-      }
-    } catch (err) {
-      console.error('Project fetch error:', err);
-      setError('Failed to load project');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    };
+
+    fetchProjectData();
+  }, [projectId, router]);
+
 
   if (isLoading) {
     return (

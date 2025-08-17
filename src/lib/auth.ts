@@ -5,7 +5,6 @@ import { mongodbAdapter } from "better-auth/adapters/mongodb"
 
 const getDatabaseConfig = () => {
   const baseUrl = process.env.DATABASE_URL
-  const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL === '1'
   
   // Use hardcoded DEV database name
   const dbName = 'DEV'
@@ -129,11 +128,11 @@ const createAuthConfig = () => {
     user: {
       additionalFields: {
         githubId: {
-          type: "string",
+          type: "string" as const,
           required: false,
         },
         githubLogin: {
-          type: "string", 
+          type: "string" as const, 
           required: false,
         }
       }
@@ -144,13 +143,7 @@ const createAuthConfig = () => {
   if (process.env.NEXT_PHASE !== 'phase-production-build' && db && typeof db.collection === 'function') {
     return {
       ...config,
-      database: mongodbAdapter(db, {
-        // Map Better Auth collections to Prisma collections
-        users: "User",
-        accounts: "Account", 
-        sessions: "Session",
-        verificationTokens: "VerificationToken"
-      })
+      database: mongodbAdapter(db)
     }
   }
 
