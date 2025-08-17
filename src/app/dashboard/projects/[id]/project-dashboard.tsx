@@ -142,8 +142,8 @@ export function ProjectDashboard({ projectId }: ProjectDashboardProps) {
         return (
           <div className="space-y-6">
             {/* Analytics Overview */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div className="bg-[#111111] border border-[#262626] rounded-lg p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="bg-[#0a0a0a] border border-[#262626] rounded-lg p-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-gray-400 text-sm font-medium">Total Events</p>
@@ -157,7 +157,7 @@ export function ProjectDashboard({ projectId }: ProjectDashboardProps) {
                 </div>
               </div>
 
-              <div className="bg-[#111111] border border-[#262626] rounded-lg p-6">
+              <div className="bg-[#0a0a0a] border border-[#262626] rounded-lg p-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-gray-400 text-sm font-medium">Page Views</p>
@@ -172,7 +172,7 @@ export function ProjectDashboard({ projectId }: ProjectDashboardProps) {
                 </div>
               </div>
 
-              <div className="bg-[#111111] border border-[#262626] rounded-lg p-6">
+              <div className="bg-[#0a0a0a] border border-[#262626] rounded-lg p-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-gray-400 text-sm font-medium">Sessions</p>
@@ -186,7 +186,7 @@ export function ProjectDashboard({ projectId }: ProjectDashboardProps) {
                 </div>
               </div>
 
-              <div className="bg-[#111111] border border-[#262626] rounded-lg p-6">
+              <div className="bg-[#0a0a0a] border border-[#262626] rounded-lg p-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-gray-400 text-sm font-medium">Bounce Rate</p>
@@ -202,7 +202,7 @@ export function ProjectDashboard({ projectId }: ProjectDashboardProps) {
             </div>
 
             {/* Analytics Details */}
-            <div className="bg-[#111111] border border-[#262626] rounded-lg p-6">
+            <div className="bg-[#0a0a0a] border border-[#262626] rounded-lg p-6">
               <h3 className="text-lg font-semibold text-white mb-4">Analytics Overview</h3>
               <p className="text-gray-400 mb-4">
                 Detailed analytics and insights will be available here. This includes charts, graphs, 
@@ -316,58 +316,74 @@ export function ProjectDashboard({ projectId }: ProjectDashboardProps) {
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      {/* Header */}
-      <div className="mb-8">
+    <div className="space-y-8">
+      {/* Header with improved styling */}
+      <div className="bg-[#111111] border border-[#262626] rounded-lg p-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <div className="flex items-center gap-3 mb-2">
+          <div className="flex-1">
+            <div className="flex items-center gap-3 mb-3">
               <button
                 onClick={() => router.push('/dashboard')}
-                className="text-gray-400 hover:text-white transition-colors"
+                className="p-2 text-gray-400 hover:text-white hover:bg-[#1a1a1a] rounded-lg transition-colors"
+                title="Back to Dashboard"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
-              <h1 className="text-3xl font-bold text-white">{project.name}</h1>
-              <span className={`text-xs px-2 py-1 rounded-full ${
-                project.status === 'ACTIVE' 
-                  ? 'bg-green-600/20 text-green-400 border border-green-600/30' 
-                  : 'bg-yellow-600/20 text-yellow-400 border border-yellow-600/30'
-              }`}>
-                {project.status === 'ACTIVE' ? 'Active' : 'Setup'}
-              </span>
+              <div>
+                <h1 className="text-2xl font-bold text-white">{project.name}</h1>
+                <div className="flex items-center gap-3 mt-1">
+                  <span className={`text-xs px-2 py-1 rounded-full font-medium ${
+                    project.status === 'ACTIVE' 
+                      ? 'bg-green-600/20 text-green-400 border border-green-600/30' 
+                      : 'bg-yellow-600/20 text-yellow-400 border border-yellow-600/30'
+                  }`}>
+                    {project.status === 'ACTIVE' ? 'Active' : 'Setup Required'}
+                  </span>
+                  <span className="text-xs text-gray-500">
+                    ID: {project.trackingId}
+                  </span>
+                </div>
+              </div>
             </div>
-            <p className="text-gray-400">
-              {project.description || `Analytics dashboard for ${project.name}`}
-            </p>
-            {project.website && (
-              <a 
-                href={project.website} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-blue-400 hover:text-blue-300 text-sm transition-colors"
-              >
-                {project.website}
-              </a>
-            )}
+            
+            <div className="space-y-2">
+              <p className="text-gray-400">
+                {project.description || `Analytics dashboard for ${project.name}`}
+              </p>
+              {project.website && (
+                <div className="flex items-center gap-2">
+                  <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                  </svg>
+                  <a 
+                    href={project.website} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-blue-400 hover:text-blue-300 text-sm transition-colors hover:underline"
+                  >
+                    {project.website}
+                  </a>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Project Navigation Tabs */}
-      <div className="mb-8">
-        <div className="border-b border-[#262626]">
-          <nav className="flex space-x-8">
+      {/* Project Navigation Tabs with improved styling */}
+      <div className="bg-[#111111] border border-[#262626] rounded-lg">
+        <div className="px-6 pt-6">
+          <nav className="flex space-x-1">
             {projectTabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                className={`flex items-center gap-2 px-4 py-3 rounded-lg font-medium text-sm transition-all ${
                   activeTab === tab.id
-                    ? 'border-blue-500 text-blue-400'
-                    : 'border-transparent text-gray-400 hover:text-white hover:border-gray-600'
+                    ? 'bg-blue-600/20 text-blue-400 border border-blue-600/30'
+                    : 'text-gray-400 hover:text-white hover:bg-[#1a1a1a]'
                 }`}
               >
                 {tab.icon}
@@ -376,10 +392,12 @@ export function ProjectDashboard({ projectId }: ProjectDashboardProps) {
             ))}
           </nav>
         </div>
+        
+        {/* Tab Content */}
+        <div className="p-6 pt-4">
+          {renderTabContent()}
+        </div>
       </div>
-
-      {/* Tab Content */}
-      {renderTabContent()}
     </div>
   );
 }
