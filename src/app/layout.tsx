@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { AnalyticsProvider } from "@/components/AnalyticsProvider";
 
 // Use CSS imports for fonts instead of next/font/google to avoid Turbopack issues
 const inter = {
@@ -90,9 +89,7 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${poppins.variable} antialiased font-inter`}
       >
-        <AnalyticsProvider>
           {children}
-        </AnalyticsProvider>
       </body>
     </html>
   );
