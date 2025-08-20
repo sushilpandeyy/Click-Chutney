@@ -1,0 +1,22 @@
+name = "analyticseventtracker"
+main = "src/index.ts"
+compatibility_date = "2024-03-18"
+compatibility_flags = ["nodejs_compat"]
+account_id = "be91b6ecc68669742a3f3bffc9447b43"
+
+[vars]
+DATABASE_NAME = "clickchutney_prod"
+
+# Environment variables (set these using wrangler secret put)
+# MONGODB_API_KEY = "your-mongodb-data-api-key"
+# MONGODB_APP_ID = "your-mongodb-app-id"
+
+# Production deployment settings
+[env.production]
+name = "analyticseventtracker"
+vars = { DATABASE_NAME = "clickchutney_prod" }
+
+# Development deployment settings  
+[env.staging]
+name = "analyticseventtracker-staging"
+vars = { DATABASE_NAME = "clickchutney_dev" }

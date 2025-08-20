@@ -222,10 +222,11 @@ export function ProjectDashboard({ projectId }: ProjectDashboardProps) {
           <div className="space-y-6">
             {/* Tracking Setup */}
             <div className="bg-[#111111] border border-[#262626] rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-white mb-4">Tracking Setup</h3>
-              <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-white mb-4">Next.js Analytics Component</h3>
+              <div className="space-y-6">
+                {/* Tracking ID */}
                 <div>
-                  <p className="text-gray-400 text-sm mb-2">Tracking ID:</p>
+                  <p className="text-gray-400 text-sm mb-2">Your Tracking ID:</p>
                   <div className="flex items-center gap-3">
                     <code className="bg-[#0a0a0a] border border-[#262626] rounded px-3 py-2 text-sm text-white flex-1">
                       {project.trackingId}
@@ -238,36 +239,209 @@ export function ProjectDashboard({ projectId }: ProjectDashboardProps) {
                     </button>
                   </div>
                 </div>
+
                 
+
+                {/* Analytics Component */}
                 <div>
-                  <p className="text-gray-400 text-sm mb-2">Tracking Script:</p>
-                  <div className="bg-[#0a0a0a] border border-[#262626] rounded p-4">
-                    <code className="text-sm text-gray-300">
-{`<script>
-  (function() {
-    var script = document.createElement('script');
-    script.src = '${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/tracker.js';
-    script.async = true;
-    script.setAttribute('data-tracking-id', '${project.trackingId}');
-    document.head.appendChild(script);
-  })();
-</script>`}
+                  <p className="text-gray-400 text-sm mb-2">1. Create Analytics Component (components/Analytics.tsx):</p>
+                  <div className="bg-[#0a0a0a] border border-[#262626] rounded p-4 overflow-x-auto">
+                    <code className="text-sm text-gray-300 whitespace-pre-wrap">
+{`'use client';
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+
+interface AnalyticsConfig {
+  trackingId: string;
+  endpoint: string;
+  debug?: boolean;
+}
+
+const AnalyticsContext = createContext<any>(null);
+
+export function Analytics({ children, config }: { 
+  children: ReactNode; 
+  config: AnalyticsConfig;
+}) {
+  const [visitorId, setVisitorId] = useState('');
+  const [sessionId, setSessionId] = useState('');
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  useEffect(() => {
+    // Only run on client side to prevent hydration mismatch
+    if (typeof window !== 'undefined') {
+      let vid = localStorage.getItem('analytics_visitor');
+      if (!vid) {
+        vid = 'visitor_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+        localStorage.setItem('analytics_visitor', vid);
+      }
+      setVisitorId(vid);
+      
+      // Generate session ID (new for each page load)
+      const sid = 'session_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+      setSessionId(sid);
+      
+      setIsInitialized(true);
+    }
+  }, []);
+
+  const track = async (eventName: string, properties: any = {}) => {
+    // Ensure we're running on the client side and initialized
+    if (typeof window === 'undefined') {
+      console.warn('⚠️ Analytics: track() called on server side, skipping');
+      return;
+    }
+    
+    if (!isInitialized || !visitorId || !sessionId) {
+      console.warn('⚠️ Analytics: Not initialized yet, skipping event:', eventName);
+      return;
+    }
+
+    const payload = {
+      event: eventName,
+      properties,
+      trackingId: config.trackingId,
+      visitorId,
+      sessionId,
+      timestamp: Date.now(),
+      url: window.location.href,
+      page: window.location.pathname,
+      userAgent: navigator.userAgent,
+      referrer: document.referrer
+    };
+
+    if (config.debug) {
+      console.log('📊 Sending Analytics Event:', {
+        event: payload.event,
+        properties: payload.properties,
+        trackingId: payload.trackingId,
+        visitorId: payload.visitorId,
+        url: payload.url,
+        endpoint: config.endpoint
+      });
+    }
+
+    try {
+      const response = await fetch(config.endpoint, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+      
+      if (!response.ok) {
+        throw new Error(\`HTTP \${response.status}: \${response.statusText}\`);
+      }
+      
+      const result = await response.json();
+      
+      if (config.debug) {
+        console.log('✅ Analytics Event Sent Successfully:', result);
+      }
+      
+      return result;
+      
+    } catch (error) {
+      console.error('❌ Analytics Error:', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        endpoint: config.endpoint,
+        event: eventName,
+        trackingId: config.trackingId
+      });
+      
+      // Don't throw error - analytics failures shouldn't break the app
+      return null;
+    }
+  };
+
+  return (
+    <AnalyticsContext.Provider value={{ track }}>
+      {children}
+    </AnalyticsContext.Provider>
+  );
+}
+
+export function useAnalytics() {
+  return useContext(AnalyticsContext);
+}`}
                     </code>
                   </div>
                 </div>
-              </div>
-            </div>
 
-            {/* Event Tracking */}
-            <div className="bg-[#111111] border border-[#262626] rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-white mb-4">Event Tracking</h3>
-              <p className="text-gray-400 mb-4">
-                Configure custom events and goals to track specific user interactions on your website.
-              </p>
-              <div className="bg-[#0a0a0a] border border-[#262626] rounded-md p-4">
-                <p className="text-sm text-gray-400">
-                  🎯 Coming soon: Custom event setup, goal tracking, and conversion funnels.
-                </p>
+                {/* Cloudflare Worker */}
+                <div>
+                  <p className="text-gray-400 text-sm mb-2">2. Cloudflare Worker Endpoint (Global CDN):</p>
+                  <div className="bg-[#0a0a0a] border border-[#262626] rounded p-4 overflow-x-auto">
+                    <code className="text-sm text-gray-300 whitespace-pre-wrap">
+{`// ✅ Global Cloudflare Worker deployed at:
+// https://analyticseventtracker.contact-sushilpandey.workers.dev
+
+// Features:
+// - Global CDN with edge locations worldwide
+// - Full CORS support for any origin
+// - Direct MongoDB logging via Data API
+// - Automatic project stats updates
+// - Geolocation data from Cloudflare
+// - High performance & reliability
+
+// Use this endpoint in your config:
+endpoint: "https://analyticseventtracker.contact-sushilpandey.workers.dev"`}
+                    </code>
+                  </div>
+                </div>
+
+                {/* Usage Example */}
+                <div>
+                  <p className="text-gray-400 text-sm mb-2">3. Use in Your App:</p>
+                  <div className="bg-[#0a0a0a] border border-[#262626] rounded p-4 overflow-x-auto">
+                    <code className="text-sm text-gray-300 whitespace-pre-wrap">
+{`// app/layout.tsx
+import { Analytics } from '@/components/Analytics';
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html>
+      <body>
+        <Analytics 
+          config={{
+            trackingId: "${project.trackingId}",
+            endpoint: "https://analyticseventtracker.contact-sushilpandey.workers.dev",
+            debug: true
+          }}
+        >
+          {children}
+        </Analytics>
+      </body>
+    </html>
+  );
+}
+
+// Any component
+'use client';
+import { useAnalytics } from '@/components/Analytics';
+
+export default function MyPage() {
+  const { track } = useAnalytics();
+
+  return (
+    <div>
+      <button onClick={() => track('button_click', { button: 'hero' })}>
+        Click Me (Global Cloudflare Worker!)
+      </button>
+      
+      <button onClick={() => track('purchase', { 
+        value: 99.99, 
+        currency: 'USD' 
+      })}>
+        Buy Now
+      </button>
+    </div>
+  );
+}`}
+                    </code>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
