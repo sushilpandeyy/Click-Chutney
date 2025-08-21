@@ -85,15 +85,20 @@ model AnalyticsEvent {
 
 model ProjectStats {
   id                   String    @id @default(auto()) @map("_id") @db.ObjectId
-  projectId            String    @unique @db.ObjectId
+  trackingId           String    @unique
   totalEvents          Int       @default(0)
   uniqueVisitors       Int       @default(0)
-  pageViews            Int       @default(0)
-  sessions             Int       @default(0)
+  uniqueSessions       Int       @default(0)
+  pageviews            Int       @default(0)
   bounceRate           Float     @default(0)
   avgSessionDuration   Float     @default(0)
+  todayEvents          Int       @default(0)
+  thisWeekEvents       Int       @default(0)
+  thisMonthEvents      Int       @default(0)
   lastActivity         DateTime?
+  lastEventAt          DateTime?
+  firstEventAt         DateTime?
   createdAt            DateTime  @default(now())
   updatedAt            DateTime  @updatedAt
-  project              Project   @relation(fields: [projectId], references: [id])
+  project              Project   @relation(fields: [trackingId], references: [trackingId])
 }

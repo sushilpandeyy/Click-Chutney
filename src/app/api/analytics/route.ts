@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { MongoClient } from 'mongodb';
+import { MongoClient, Db, ClientSession } from 'mongodb';
 
 interface AnalyticsEvent {
   trackingId: string;
   event: string;
-  properties: Record<string, any>;
+  properties: Record<string, unknown>;
   visitorId: string;
   sessionId: string;
   timestamp: number;
@@ -26,7 +26,7 @@ interface AnalyticsEvent {
 interface IncomingData {
   trackingId: string;
   event: string;
-  properties?: Record<string, any>;
+  properties?: Record<string, unknown>;
   visitorId?: string;
   sessionId?: string;
   timestamp?: number;
@@ -36,8 +36,8 @@ interface IncomingData {
   referrer?: string;
 }
 
-const MONGODB_URI = process.env.MONGODB_URI;
-const DATABASE_NAME = 'DEV';
+const MONGODB_URI = process.env.MONGODB_URI || process.env.DATABASE_URL;
+const DATABASE_NAME = process.env.DATABASE_NAME || 'DEV';
 
 let cachedClient: MongoClient | null = null;
 
@@ -62,33 +62,7 @@ async function connectToMongoDB(): Promise<MongoClient> {
   }
 }
 
-export default async function handler(request: NextRequest) {
-  if (request.method === 'OPTIONS') {
-    return new NextResponse(null, {
-      status: 204,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
-        'Access-Control-Max-Age': '86400',
-      },
-    });
-  }
-
-  if (request.method !== 'POST') {
-    return NextResponse.json(
-      { error: 'Method not allowed' },
-      { 
-        status: 405,
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'POST, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
-        }
-      }
-    );
-  }
-
+export async function POST(request: NextRequest) {
   try {
     const bodyText = await request.text();
     
@@ -171,8 +145,8 @@ export default async function handler(request: NextRequest) {
       userAgent: data.userAgent || request.headers.get('user-agent') || '',
       referrer: data.referrer || request.headers.get('referer') || '',
       ip: clientIp,
-      country: (request as any).geo?.country || 'unknown',
-      city: (request as any).geo?.city || 'unknown',
+      country: (request as { geo?: { country?: string; city?: string } }).geo?.country || 'unknown',
+      city: (request as { geo?: { country?: string; city?: string } }).geo?.city || 'unknown',
       createdAt: new Date().toISOString(),
       _metadata: {
         source: 'vercel-function',
@@ -189,26 +163,79 @@ export default async function handler(request: NextRequest) {
 
     const client = await connectToMongoDB();
     const db = client.db(DATABASE_NAME);
+    const session = client.startSession();
+    
+    try {
+      let insertedId: string = '';
+      
+      await session.withTransaction(async () => {
+        const project = await db.collection('Project').findOne(
+          { trackingId: analyticsEvent.trackingId }, 
+          { session }
+        );
+        
+        if (!project) {
+          throw new Error('Project not found for trackingId: ' + analyticsEvent.trackingId);
+        }
 
-    const insertResult = await db.collection('AnalyticsEvent').insertOne(analyticsEvent);
-    console.log('Event inserted to MongoDB:', insertResult.insertedId);
+        const eventWithProjectId = {
+          ...analyticsEvent,
+          projectId: project._id.toString()
+        };
 
-    updateProjectStats(analyticsEvent.trackingId, db);
+        const insertResult = await db.collection('AnalyticsEvent').insertOne(eventWithProjectId, { session });
+        insertedId = insertResult.insertedId.toString();
+        console.log('Event inserted to MongoDB:', insertedId);
 
-    console.log('Analytics event processed and stored successfully');
+        await updateProjectStatsInTransaction(analyticsEvent.trackingId, analyticsEvent.event, db, session);
+      });
 
-    return NextResponse.json({
-      success: true,
-      eventId: `${analyticsEvent.trackingId}_${analyticsEvent.timestamp}`,
-      insertedId: insertResult.insertedId.toString(),
-      timestamp: analyticsEvent.createdAt
-    }, {
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
+      console.log('Analytics event processed and stored successfully');
+
+      return NextResponse.json({
+        success: true,
+        eventId: `${analyticsEvent.trackingId}_${analyticsEvent.timestamp}`,
+        insertedId: insertedId,
+        timestamp: analyticsEvent.createdAt
+      }, {
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'POST, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
+        }
+      });
+
+    } catch (transactionError) {
+      console.error('Transaction failed:', transactionError);
+      
+      if (transactionError instanceof Error && transactionError.message.includes('Project not found')) {
+        return NextResponse.json({
+          error: 'Invalid tracking ID',
+          message: 'Project not found for the provided tracking ID'
+        }, { 
+          status: 400,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'POST, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
+          }
+        });
       }
-    });
+
+      return NextResponse.json({
+        error: 'Failed to process event',
+        message: 'Transaction failed during event processing'
+      }, { 
+        status: 500,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'POST, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
+        }
+      });
+    } finally {
+      await session.endSession();
+    }
 
   } catch (error) {
     console.error('Analytics tracking error:', {
@@ -234,43 +261,70 @@ export default async function handler(request: NextRequest) {
   }
 }
 
-async function updateProjectStats(trackingId: string, db: any): Promise<void> {
-  try {
-    console.log('Updating project stats for:', trackingId);
-    
-    const currentDate = new Date();
-    const today = currentDate.toISOString().split('T')[0];
-    
-    const updateResult = await db.collection('ProjectStats').updateOne(
-      { trackingId },
-      {
-        $inc: {
-          totalEvents: 1,
-          [`dailyEvents.${today}`]: 1,
-          thisWeekEvents: 1,
-          thisMonthEvents: 1,
-        },
-        $set: {
-          lastEventAt: currentDate.toISOString(),
-          lastUpdated: currentDate.toISOString(),
-        },
-        $setOnInsert: {
-          trackingId,
-          createdAt: currentDate.toISOString(),
-          firstEventAt: currentDate.toISOString(),
-        }
-      },
-      { upsert: true }
-    );
+async function updateProjectStatsInTransaction(trackingId: string, eventType: string, db: Db, session: ClientSession): Promise<void> {
+  console.log('Updating project stats for:', trackingId, 'event:', eventType);
+  
+  const currentDate = new Date();
+  
+  const incOps: Record<string, number> = {
+    totalEvents: 1,
+  };
+  
+  const setOnInsertOps: Record<string, unknown> = {
+    trackingId,
+    uniqueVisitors: 0,
+    uniqueSessions: 0,
+    bounceRate: 0,
+    avgSessionDuration: 0,
+    createdAt: currentDate,
+    firstEventAt: currentDate,
+  };
 
-    console.log('Project stats updated successfully:', {
-      trackingId,
-      matched: updateResult.matchedCount,
-      modified: updateResult.modifiedCount,
-      upserted: updateResult.upsertedId
-    });
-    
-  } catch (error) {
-    console.error('Project stats update error:', error);
+  if (eventType === 'page_view') {
+    incOps.pageviews = 1;
+    incOps.todayEvents = 1;
+    incOps.thisWeekEvents = 1;
+    incOps.thisMonthEvents = 1;
+  } else {
+    setOnInsertOps.pageviews = 0;
+    setOnInsertOps.todayEvents = 0;
+    setOnInsertOps.thisWeekEvents = 0;
+    setOnInsertOps.thisMonthEvents = 0;
   }
+
+  const updateOps = {
+    $inc: incOps,
+    $set: {
+      lastActivity: currentDate,
+      lastEventAt: currentDate,
+      updatedAt: currentDate,
+    },
+    $setOnInsert: setOnInsertOps
+  };
+
+  const updateResult = await db.collection('ProjectStats').updateOne(
+    { trackingId },
+    updateOps,
+    { upsert: true, session }
+  );
+
+  console.log('Project stats updated successfully:', {
+    trackingId,
+    eventType,
+    matched: updateResult.matchedCount,
+    modified: updateResult.modifiedCount,
+    upserted: updateResult.upsertedId
+  });
+}
+
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
+      'Access-Control-Max-Age': '86400',
+    },
+  });
 }

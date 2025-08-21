@@ -124,7 +124,7 @@ export async function DELETE(
 
     // Delete related data first
     await prisma.projectStats.deleteMany({
-      where: { projectId: resolvedParams.id }
+      where: { trackingId: project.trackingId }
     })
 
     await prisma.analyticsEvent.deleteMany({

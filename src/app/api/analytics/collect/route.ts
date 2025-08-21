@@ -47,12 +47,10 @@ export async function POST(request: NextRequest) {
   try {
     const body: AnalyticsRequest = await request.json()
 
-    // Validate required fields
     if (!body.trackingId || !body.type) {
       return NextResponse.json({ error: 'trackingId and type are required' }, { status: 400 })
     }
 
-    // Validate type-specific requirements
     if (body.type === 'event' && !body.event) {
       return NextResponse.json({ error: 'event name is required for event type' }, { status: 400 })
     }
@@ -61,7 +59,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'userId is required for identify type' }, { status: 400 })
     }
 
-    // Find project
     const project = await prisma.project.findUnique({
       where: { trackingId: body.trackingId }
     })
@@ -70,7 +67,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid tracking ID' }, { status: 404 })
     }
 
-    // Prepare event data based on type
     let eventName: string
     let eventProperties: Record<string, unknown> = {}
 
@@ -109,14 +105,12 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Invalid event type' }, { status: 400 })
     }
 
-    // Add browser/device context to properties
     if (body.screen) eventProperties.screen = body.screen
     if (body.viewport) eventProperties.viewport = body.viewport
     if (body.timezone) eventProperties.timezone = body.timezone
     if (body.language) eventProperties.language = body.language
     if (body.sessionId) eventProperties.sessionId = body.sessionId
 
-    // Create analytics event
     const analyticsEvent = await prisma.analyticsEvent.create({
       data: {
         projectId: project.id,
@@ -132,32 +126,37 @@ export async function POST(request: NextRequest) {
       }
     })
 
-    // Update project stats
     try {
       const updateData: Record<string, unknown> = {
         totalEvents: { increment: 1 },
         lastActivity: new Date(),
       }
       
-      // Increment pageviews for pageview events
       if (body.type === 'pageview') {
-        updateData.pageViews = { increment: 1 }
+        updateData.pageviews = { increment: 1 }
+        updateData.todayEvents = { increment: 1 }
+        updateData.thisWeekEvents = { increment: 1 }
+        updateData.thisMonthEvents = { increment: 1 }
       }
 
       await prisma.projectStats.upsert({
-        where: { projectId: project.id },
+        where: { trackingId: body.trackingId },
         update: updateData,
         create: {
-          projectId: project.id,
+          trackingId: body.trackingId,
           totalEvents: 1,
           uniqueVisitors: 0,
-          pageViews: body.type === 'pageview' ? 1 : 0,
-          sessions: 0,
+          uniqueSessions: 0,
+          pageviews: body.type === 'pageview' ? 1 : 0,
+          bounceRate: 0,
+          avgSessionDuration: 0,
+          todayEvents: body.type === 'pageview' ? 1 : 0,
+          thisWeekEvents: body.type === 'pageview' ? 1 : 0,
+          thisMonthEvents: body.type === 'pageview' ? 1 : 0,
           lastActivity: new Date()
         }
       })
 
-      // Activate project if it's pending setup
       if (project.status === ProjectStatus.PENDING_SETUP) {
         await prisma.project.update({
           where: { id: project.id },
@@ -167,8 +166,6 @@ export async function POST(request: NextRequest) {
     } catch (statsError) {
       console.error('Stats update failed:', statsError)
     }
-
-    // Return success response with CORS headers
     const response = NextResponse.json({
       success: true,
       eventId: analyticsEvent.id,

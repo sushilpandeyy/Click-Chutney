@@ -44,20 +44,21 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: 'Project not found' }, { status: 404 });
     }
 
-    // Get or create project stats
     let stats = project.stats;
     
     if (!stats) {
-      // Create initial stats if they don't exist
       stats = await prisma.projectStats.create({
         data: {
-          projectId: project.id,
+          trackingId: project.trackingId,
           totalEvents: 0,
           uniqueVisitors: 0,
-          pageViews: 0,
-          sessions: 0,
+          uniqueSessions: 0,
+          pageviews: 0,
           bounceRate: 0,
-          avgSessionDuration: 0
+          avgSessionDuration: 0,
+          todayEvents: 0,
+          thisWeekEvents: 0,
+          thisMonthEvents: 0
         }
       });
     }
@@ -96,8 +97,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const response = {
       stats: {
         totalEvents: stats.totalEvents,
-        uniqueSessions: stats.sessions,
-        pageviews: stats.pageViews,
+        uniqueSessions: stats.uniqueSessions,
+        pageviews: stats.pageviews,
         bounceRate: stats.bounceRate,
         avgSessionDuration: stats.avgSessionDuration,
         todayEvents,

@@ -70,11 +70,11 @@ export async function GET(request: NextRequest) {
     );
     
     const totalPageViews = projects.reduce((sum, project) => 
-      sum + (project.stats?.pageViews || 0), 0
+      sum + (project.stats?.pageviews || 0), 0
     );
     
     const totalSessions = projects.reduce((sum, project) => 
-      sum + (project.stats?.sessions || 0), 0
+      sum + (project.stats?.uniqueSessions || 0), 0
     );
 
     // Get recent activity
@@ -138,7 +138,7 @@ export async function GET(request: NextRequest) {
       createdAt: project.createdAt.toISOString(),
       stats: project.stats ? {
         totalEvents: project.stats.totalEvents,
-        pageViews: project.stats.pageViews,
+        pageViews: project.stats.pageviews,
         uniqueVisitors: project.stats.uniqueVisitors,
         bounceRate: project.stats.bounceRate,
         avgSessionDuration: project.stats.avgSessionDuration
