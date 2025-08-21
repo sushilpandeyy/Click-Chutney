@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { TrackingInstructions } from '@/components/tracking-instructions';
+import { AnalyticsChart } from '@/components/ui/analytics-chart';
+import { Breadcrumb } from '@/components/ui/breadcrumb';
 
 interface Project {
   id: string;
@@ -23,6 +25,32 @@ interface ProjectStats {
   todayEvents: number;
   thisWeekEvents: number;
   thisMonthEvents: number;
+}
+
+interface AnalyticsData {
+  summary: ProjectStats;
+  timeSeries: Array<{
+    timestamp: string;
+    pageviews: number;
+    events: number;
+  }>;
+  topPages: Array<{
+    url: string;
+    views: number;
+  }>;
+  topEvents: Array<{
+    event: string;
+    count: number;
+  }>;
+  deviceStats: Array<{
+    device: string;
+    count: number;
+    percentage: number;
+  }>;
+  referrerStats: Array<{
+    source: string;
+    count: number;
+  }>;
 }
 
 interface ProjectDashboardProps {
@@ -70,6 +98,7 @@ export function ProjectDashboard({ projectId }: ProjectDashboardProps) {
   const router = useRouter();
   const [project, setProject] = useState<Project | null>(null);
   const [stats, setStats] = useState<ProjectStats | null>(null);
+  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('analytics');
@@ -96,7 +125,14 @@ export function ProjectDashboard({ projectId }: ProjectDashboardProps) {
         const statsResponse = await fetch(`/api/projects/${projectId}/stats`);
         if (statsResponse.ok) {
           const statsData = await statsResponse.json();
-          setStats(statsData);
+          setStats(statsData.stats);
+        }
+
+        // Fetch detailed analytics data
+        const analyticsResponse = await fetch(`/api/projects/${projectId}/analytics?timeRange=7d`);
+        if (analyticsResponse.ok) {
+          const analyticsData = await analyticsResponse.json();
+          setAnalytics(analyticsData.analytics);
         }
       } catch (err) {
         console.error('Project fetch error:', err);
@@ -202,17 +238,151 @@ export function ProjectDashboard({ projectId }: ProjectDashboardProps) {
               </div>
             </div>
 
-            {/* Analytics Details */}
-            <div className="bg-card border border-border rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-card-foreground mb-4">Analytics Overview</h3>
-              <p className="text-muted-foreground mb-4">
-                Detailed analytics and insights will be available here. This includes charts, graphs, 
-                and detailed breakdowns of user behavior, traffic sources, and conversion metrics.
-              </p>
-              <div className="bg-muted border border-border rounded-md p-4">
-                <p className="text-sm text-muted-foreground">
-                  📊 Coming soon: Interactive charts, funnel analysis, cohort analysis, and custom event tracking.
-                </p>
+            {/* Analytics Chart */}
+            {analytics?.timeSeries && analytics.timeSeries.length > 0 && (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <AnalyticsChart
+                  data={analytics.timeSeries}
+                  metric="pageviews"
+                  type="line"
+                  height={240}
+                />
+                <AnalyticsChart
+                  data={analytics.timeSeries}
+                  metric="events"
+                  type="bar"
+                  height={240}
+                />
+              </div>
+            )}
+
+            {/* Top Pages and Events */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Top Pages */}
+              <div className="bg-card border border-border rounded-lg p-6">
+                <h3 className="text-lg font-semibold text-card-foreground mb-4">Top Pages</h3>
+                {analytics?.topPages && analytics.topPages.length > 0 ? (
+                  <div className="space-y-3">
+                    {analytics.topPages.slice(0, 5).map((page, index) => (
+                      <div key={index} className="flex items-center justify-between py-2">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-card-foreground truncate">
+                            {page.url || '/'}
+                          </p>
+                        </div>
+                        <div className="ml-4 flex items-center gap-2">
+                          <span className="text-sm text-muted-foreground">{page.views}</span>
+                          <div className="w-16 bg-muted rounded-full h-2">
+                            <div 
+                              className="bg-chart-1 h-2 rounded-full transition-all"
+                              style={{ 
+                                width: `${analytics.topPages.length > 0 && analytics.topPages[0] ? (page.views / analytics.topPages[0].views) * 100 : 0}%` 
+                              }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground">No page data available</p>
+                )}
+              </div>
+
+              {/* Top Events */}
+              <div className="bg-card border border-border rounded-lg p-6">
+                <h3 className="text-lg font-semibold text-card-foreground mb-4">Top Events</h3>
+                {analytics?.topEvents && analytics.topEvents.length > 0 ? (
+                  <div className="space-y-3">
+                    {analytics.topEvents.slice(0, 5).map((event, index) => (
+                      <div key={index} className="flex items-center justify-between py-2">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-card-foreground capitalize">
+                            {event.event}
+                          </p>
+                        </div>
+                        <div className="ml-4 flex items-center gap-2">
+                          <span className="text-sm text-muted-foreground">{event.count}</span>
+                          <div className="w-16 bg-muted rounded-full h-2">
+                            <div 
+                              className="bg-chart-2 h-2 rounded-full transition-all"
+                              style={{ 
+                                width: `${analytics.topEvents.length > 0 && analytics.topEvents[0] ? (event.count / analytics.topEvents[0].count) * 100 : 0}%` 
+                              }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground">No event data available</p>
+                )}
+              </div>
+            </div>
+
+            {/* Device and Referrer Stats */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Device Stats */}
+              <div className="bg-card border border-border rounded-lg p-6">
+                <h3 className="text-lg font-semibold text-card-foreground mb-4">Device Types</h3>
+                {analytics?.deviceStats && analytics.deviceStats.length > 0 ? (
+                  <div className="space-y-3">
+                    {analytics.deviceStats.map((device, index) => (
+                      <div key={index} className="flex items-center justify-between py-2">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-card-foreground">
+                            {device.device}
+                          </p>
+                        </div>
+                        <div className="ml-4 flex items-center gap-2">
+                          <span className="text-sm text-muted-foreground">
+                            {device.percentage.toFixed(1)}%
+                          </span>
+                          <div className="w-16 bg-muted rounded-full h-2">
+                            <div 
+                              className="bg-chart-3 h-2 rounded-full transition-all"
+                              style={{ width: `${device.percentage}%` }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground">No device data available</p>
+                )}
+              </div>
+
+              {/* Referrer Stats */}
+              <div className="bg-card border border-border rounded-lg p-6">
+                <h3 className="text-lg font-semibold text-card-foreground mb-4">Traffic Sources</h3>
+                {analytics?.referrerStats && analytics.referrerStats.length > 0 ? (
+                  <div className="space-y-3">
+                    {analytics.referrerStats.slice(0, 5).map((referrer, index) => (
+                      <div key={index} className="flex items-center justify-between py-2">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-card-foreground truncate">
+                            {referrer.source}
+                          </p>
+                        </div>
+                        <div className="ml-4 flex items-center gap-2">
+                          <span className="text-sm text-muted-foreground">{referrer.count}</span>
+                          <div className="w-16 bg-muted rounded-full h-2">
+                            <div 
+                              className="bg-chart-4 h-2 rounded-full transition-all"
+                              style={{ 
+                                width: `${analytics.referrerStats.length > 0 && analytics.referrerStats[0] ? (referrer.count / analytics.referrerStats[0].count) * 100 : 0}%` 
+                              }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground">No referrer data available</p>
+                )}
               </div>
             </div>
           </div>
@@ -270,8 +440,17 @@ export function ProjectDashboard({ projectId }: ProjectDashboardProps) {
     }
   };
 
+  const breadcrumbItems = [
+    { label: 'Dashboard', href: '/dashboard' },
+    { label: 'Projects', href: '/dashboard/projects' },
+    { label: project?.name || 'Project', isActive: true }
+  ];
+
   return (
     <div className="space-y-8 p-6">
+      {/* Breadcrumb Navigation */}
+      <Breadcrumb items={breadcrumbItems} className="animate-fade-in" />
+
       {/* Header with improved styling */}
       <div className="bg-card border border-border rounded-lg p-6 animate-fade-in">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
