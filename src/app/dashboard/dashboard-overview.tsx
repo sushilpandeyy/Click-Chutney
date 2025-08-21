@@ -3,6 +3,11 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { ProjectCreateModal } from '@/components/project-create-modal';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { EmptyState } from '@/components/ui/empty-state';
+import { StatCard } from '@/components/ui/stat-card';
+import { Breadcrumb } from '@/components/ui/breadcrumb';
+import { Button } from '@/components/ui/button';
 
 interface Project {
   id: string;
@@ -80,7 +85,7 @@ export function DashboardOverview({ }: DashboardOverviewProps) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="flex items-center gap-3">
-          <div className="w-6 h-6 border-2 border-muted-foreground border-t-primary rounded-full animate-spin" />
+          <LoadingSpinner size="md" />
           <span className="text-muted-foreground">Loading projects...</span>
         </div>
       </div>
@@ -92,12 +97,12 @@ export function DashboardOverview({ }: DashboardOverviewProps) {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <p className="text-destructive mb-4">{error}</p>
-          <button
+          <Button
             onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors"
+            variant="outline"
           >
             Retry
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -105,27 +110,37 @@ export function DashboardOverview({ }: DashboardOverviewProps) {
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
+      {/* Breadcrumb Navigation */}
+      <Breadcrumb 
+        items={[
+          { label: "Dashboard", href: "/dashboard" },
+          { label: "Overview", isActive: true }
+        ]}
+        className="mb-6"
+      />
+      
       {/* Header Section */}
       <div className="mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-3xl font-bold text-foreground mb-2 font-display">
-              Projects
+              Projects Overview
             </h1>
             <p className="text-muted-foreground">
-              Manage your analytics projects
+              Monitor and manage your analytics projects
             </p>
           </div>
           <div className="mt-4 sm:mt-0">
-            <button 
+            <Button 
               onClick={() => setShowCreateModal(true)}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl px-6 py-3 text-sm font-semibold transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 flex items-center gap-2 font-display"
+              size="lg"
+              className="rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
               {projects.length === 0 ? "Create First Project" : "New Project"}
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -183,28 +198,20 @@ export function DashboardOverview({ }: DashboardOverviewProps) {
           ))}
         </div>
       ) : (
-        <div className="bg-card border border-border rounded-xl p-12 text-center">
-          <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <EmptyState
+          icon={
+            <svg className="w-12 h-12 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
             </svg>
-          </div>
-          <h4 className="text-lg font-semibold text-card-foreground mb-2 font-display">
-            No Projects Yet
-          </h4>
-          <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-            Create your first project to start tracking analytics and user behavior across your websites and applications.
-          </p>
-          <button 
-            onClick={() => setShowCreateModal(true)}
-            className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl px-6 py-3 text-sm font-semibold transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 flex items-center gap-2 justify-center mx-auto font-display"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-            </svg>
-            Create First Project
-          </button>
-        </div>
+          }
+          title="No Projects Yet"
+          description="Create your first project to start tracking analytics and user behavior across your websites and applications."
+          action={{
+            label: "Create First Project",
+            onClick: () => setShowCreateModal(true)
+          }}
+          className="bg-card border border-border rounded-xl"
+        />
       )}
 
       {/* Project Creation Modal */}

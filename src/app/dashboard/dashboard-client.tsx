@@ -4,6 +4,10 @@ import { signOut } from '@/lib/auth-client';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { ProjectCreateModal } from '@/components/project-create-modal';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { StatCard } from '@/components/ui/stat-card';
+import { EmptyState } from '@/components/ui/empty-state';
+import { Button } from '@/components/ui/button';
 
 interface DashboardData {
   user: {
@@ -141,10 +145,10 @@ export function DashboardClient({ session }: DashboardClientProps) {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] text-white flex items-center justify-center">
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
         <div className="flex items-center gap-3">
-          <div className="w-6 h-6 border-2 border-gray-400 border-t-white rounded-full animate-spin" />
-          <span className="text-gray-400">Loading dashboard...</span>
+          <LoadingSpinner size="lg" />
+          <span className="text-muted-foreground">Loading dashboard...</span>
         </div>
       </div>
     );
@@ -152,24 +156,31 @@ export function DashboardClient({ session }: DashboardClientProps) {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] text-white flex items-center justify-center">
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
         <div className="text-center">
-          <p className="text-red-400 mb-4">{error}</p>
-          <div className="flex gap-3">
-            <button
+          <p className="text-destructive mb-6">{error}</p>
+          <div className="flex gap-3 justify-center">
+            <Button
               onClick={fetchDashboardData}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
+              variant="outline"
             >
               Retry
-            </button>
+            </Button>
             {process.env.NODE_ENV === 'development' && (
-              <button
+              <Button
                 onClick={createSampleData}
                 disabled={isSeeding}
-                className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors disabled:opacity-50"
+                className="gap-2"
               >
-                {isSeeding ? 'Creating...' : 'Create Sample Data'}
-              </button>
+                {isSeeding ? (
+                  <>
+                    <LoadingSpinner size="sm" />
+                    Creating...
+                  </>
+                ) : (
+                  'Create Sample Data'
+                )}
+              </Button>
             )}
           </div>
         </div>
@@ -181,9 +192,9 @@ export function DashboardClient({ session }: DashboardClientProps) {
   const user = dashboardData?.user;
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
-      <header className="border-b border-[#262626] bg-[#111111]">
+      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-8">
@@ -222,28 +233,42 @@ export function DashboardClient({ session }: DashboardClientProps) {
             
             <div className="flex items-center gap-4">
               <div className="hidden sm:flex items-center gap-3">
-                <div className="w-8 h-8 bg-[#262626] rounded-full flex items-center justify-center">
+                <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center ring-2 ring-border">
                   <span className="text-xs font-medium">
                     {(user?.name || session.user.name || session.user.email || 'U').charAt(0).toUpperCase()}
                   </span>
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-sm text-white">
+                  <span className="text-sm text-foreground font-medium">
                     {user?.name || session.user.name || 'User'}
                   </span>
-                  <span className="text-xs text-gray-400">
+                  <span className="text-xs text-muted-foreground">
                     {session.user.email}
                   </span>
                 </div>
               </div>
               
-              <button
+              <Button
                 onClick={handleSignOut}
                 disabled={isSigningOut}
-                className="text-sm text-gray-400 hover:text-white transition-colors disabled:opacity-50 px-3 py-1.5 rounded-md hover:bg-[#1a1a1a]"
+                variant="ghost"
+                size="sm"
+                className="gap-2"
               >
-                {isSigningOut ? 'Signing out...' : 'Sign out'}
-              </button>
+                {isSigningOut ? (
+                  <>
+                    <LoadingSpinner size="sm" />
+                    Signing out...
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    Sign out
+                  </>
+                )}
+              </Button>
             </div>
           </div>
         </div>
@@ -276,74 +301,52 @@ export function DashboardClient({ session }: DashboardClientProps) {
 
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-[#111111] border border-[#262626] rounded-lg p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-400 text-sm font-medium">Total Projects</p>
-                <p className="text-2xl font-bold text-white">{stats?.totalProjects || 0}</p>
-              </div>
-              <div className="w-12 h-12 bg-blue-600/10 rounded-lg flex items-center justify-center">
-                <svg className="w-6 h-6 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" />
-                </svg>
-              </div>
-            </div>
-            <div className="mt-4">
-              <span className="text-green-500 text-sm">{stats?.activeProjects || 0} active</span>
-            </div>
-          </div>
-
-          <div className="bg-[#111111] border border-[#262626] rounded-lg p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-400 text-sm font-medium">Total Events</p>
-                <p className="text-2xl font-bold text-white">{(stats?.totalEvents || 0).toLocaleString()}</p>
-              </div>
-              <div className="w-12 h-12 bg-emerald-600/10 rounded-lg flex items-center justify-center">
-                <svg className="w-6 h-6 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-              </div>
-            </div>
-            <div className="mt-4">
-              <span className="text-blue-500 text-sm">+{(stats?.thisMonthEvents || 0).toLocaleString()} this month</span>
-            </div>
-          </div>
-
-          <div className="bg-[#111111] border border-[#262626] rounded-lg p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-400 text-sm font-medium">Page Views</p>
-                <p className="text-2xl font-bold text-white">{(stats?.totalPageViews || 0).toLocaleString()}</p>
-              </div>
-              <div className="w-12 h-12 bg-yellow-600/10 rounded-lg flex items-center justify-center">
-                <svg className="w-6 h-6 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                  <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
-                </svg>
-              </div>
-            </div>
-            <div className="mt-4">
-              <span className="text-yellow-500 text-sm">Across all projects</span>
-            </div>
-          </div>
-
-          <div className="bg-[#111111] border border-[#262626] rounded-lg p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-400 text-sm font-medium">Sessions</p>
-                <p className="text-2xl font-bold text-white">{(stats?.totalSessions || 0).toLocaleString()}</p>
-              </div>
-              <div className="w-12 h-12 bg-purple-600/10 rounded-lg flex items-center justify-center">
-                <svg className="w-6 h-6 text-purple-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
-                </svg>
-              </div>
-            </div>
-            <div className="mt-4">
-              <span className="text-purple-500 text-sm">User sessions tracked</span>
-            </div>
-          </div>
+          <StatCard
+            title="Total Projects"
+            value={stats?.totalProjects || 0}
+            change={`${stats?.activeProjects || 0} active`}
+            changeType="positive"
+            icon={
+              <svg className="w-6 h-6 text-primary" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" />
+              </svg>
+            }
+          />
+          
+          <StatCard
+            title="Total Events"
+            value={stats?.totalEvents || 0}
+            change={`+${(stats?.thisMonthEvents || 0).toLocaleString()} this month`}
+            changeType="positive"
+            icon={
+              <svg className="w-6 h-6 text-chart-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+            }
+          />
+          
+          <StatCard
+            title="Page Views"
+            value={stats?.totalPageViews || 0}
+            description="Across all projects"
+            icon={
+              <svg className="w-6 h-6 text-chart-5" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
+              </svg>
+            }
+          />
+          
+          <StatCard
+            title="Sessions"
+            value={stats?.totalSessions || 0}
+            description="User sessions tracked"
+            icon={
+              <svg className="w-6 h-6 text-chart-3" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+              </svg>
+            }
+          />
         </div>
 
         {/* Content Grid */}
@@ -394,13 +397,16 @@ export function DashboardClient({ session }: DashboardClientProps) {
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-12">
-                  <svg className="w-12 h-12 text-gray-600 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                  <p className="text-gray-400 text-sm">No recent activity</p>
-                  <p className="text-gray-500 text-xs mt-1">Events will appear here once you start tracking</p>
-                </div>
+                <EmptyState
+                  icon={
+                    <svg className="w-12 h-12 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  }
+                  title="No Recent Activity"
+                  description="Events will appear here once you start tracking user interactions on your websites."
+                  className="py-8"
+                />
               )}
             </div>
           </div>
@@ -416,38 +422,50 @@ export function DashboardClient({ session }: DashboardClientProps) {
               </h3>
               
               <div className="space-y-3">
-                <button 
+                <Button 
                   onClick={() => setShowCreateModal(true)}
-                  className="w-full bg-[#0a0a0a] border border-[#262626] text-white rounded-md px-4 py-3 text-sm font-medium hover:bg-[#1a1a1a] hover:border-[#404040] transition-colors duration-200 flex items-center gap-3"
+                  className="w-full gap-3 justify-start"
+                  variant="outline"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                   </svg>
                   {stats?.totalProjects === 0 ? "Create First Project" : "New Project"}
-                </button>
+                </Button>
                 
-                <button 
+                <Button 
                   onClick={() => router.push('/dashboard/projects')}
-                  className="w-full bg-[#0a0a0a] border border-[#262626] text-white rounded-md px-4 py-3 text-sm font-medium hover:bg-[#1a1a1a] hover:border-[#404040] transition-colors duration-200 flex items-center gap-3"
+                  className="w-full gap-3 justify-start"
+                  variant="outline"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                   </svg>
-                  View Projects
-                </button>
+                  View All Projects
+                </Button>
                 
                 {process.env.NODE_ENV === 'development' && (
-                  <button
+                  <Button
                     onClick={createSampleData}
                     disabled={isSeeding}
-                    className="w-full bg-green-600 hover:bg-green-700 text-white text-sm font-medium py-3 px-4 rounded-md transition-colors disabled:opacity-50 flex items-center gap-3"
+                    className="w-full gap-3 justify-start"
+                    variant="secondary"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                    {isSeeding ? 'Creating...' : 'Generate Sample Data'}
-                  </button>
-                )}
+                    {isSeeding ? (
+                      <>
+                        <LoadingSpinner size="sm" />
+                        Creating...
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        Generate Sample Data
+                      </>
+                    )}
+                  </Button>
+                )
               </div>
             </div>
 
@@ -539,40 +557,24 @@ export function DashboardClient({ session }: DashboardClientProps) {
               ))}
             </div>
           ) : (
-            <div className="bg-[#111111] border border-[#262626] rounded-lg p-12 text-center">
-              <div className="w-16 h-16 bg-gray-600/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <EmptyState
+              icon={
+                <svg className="w-16 h-16 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                 </svg>
-              </div>
-              <h4 className="text-lg font-semibold text-white mb-2">No Projects Yet</h4>
-              <p className="text-gray-400 mb-6 max-w-md mx-auto">
-                Create your first project to start tracking analytics and user behavior across your websites and applications.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <button 
-                  onClick={() => setShowCreateModal(true)}
-                  className="bg-[#0a0a0a] border border-[#262626] text-white rounded-md px-6 py-2 text-sm font-medium hover:bg-[#1a1a1a] hover:border-[#404040] transition-colors duration-200 flex items-center gap-2 justify-center"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                  Create First Project
-                </button>
-                {process.env.NODE_ENV === 'development' && (
-                  <button
-                    onClick={createSampleData}
-                    disabled={isSeeding}
-                    className="bg-green-600 hover:bg-green-700 text-white rounded-md px-6 py-2 text-sm font-medium transition-colors disabled:opacity-50 flex items-center gap-2 justify-center"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                    {isSeeding ? 'Creating...' : 'Generate Sample Data'}
-                  </button>
-                )}
-              </div>
-            </div>
+              }
+              title="Welcome to ClickChutney!"
+              description="Create your first project to start tracking analytics and user behavior across your websites and applications. Get insights that actually matter for your business."
+              action={{
+                label: "Create First Project",
+                onClick: () => setShowCreateModal(true)
+              }}
+              secondaryAction={process.env.NODE_ENV === 'development' ? {
+                label: isSeeding ? 'Creating...' : 'Generate Sample Data',
+                onClick: createSampleData
+              } : undefined}
+              className="bg-card border border-border rounded-xl p-12"
+            />
           )}
         </div>
       </main>

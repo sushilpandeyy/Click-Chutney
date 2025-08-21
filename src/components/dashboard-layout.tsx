@@ -79,7 +79,7 @@ export function DashboardLayout({ children, session }: DashboardLayoutProps) {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white flex">
+    <div className="min-h-screen bg-background text-foreground flex">
       {/* Mobile overlay */}
       {isMobileMenuOpen && (
         <div 
@@ -90,16 +90,16 @@ export function DashboardLayout({ children, session }: DashboardLayoutProps) {
 
       {/* Sidebar */}
       <div className={`
-        fixed inset-y-0 left-0 z-50 w-64 bg-[#111111] border-r border-[#262626] transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0
+        fixed inset-y-0 left-0 z-50 w-64 bg-sidebar-background border-r border-sidebar-border transform transition-all duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0
         ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
         ${isSidebarCollapsed ? 'lg:w-20' : 'lg:w-64'}
       `}>
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="flex items-center justify-between h-16 px-6 border-b border-[#262626]">
+          <div className="flex items-center justify-between h-16 px-6 border-b border-sidebar-border">
             <button
               onClick={() => router.push('/')}
-              className={`text-xl font-bold text-white hover:text-gray-300 transition-colors ${
+              className={`text-xl font-bold bg-gradient-to-r from-primary via-chart-1 to-chart-2 bg-clip-text text-transparent hover:opacity-80 transition-opacity ${
                 isSidebarCollapsed ? 'hidden' : 'block'
               }`}
             >
@@ -107,7 +107,7 @@ export function DashboardLayout({ children, session }: DashboardLayoutProps) {
             </button>
             <button
               onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-              className="hidden lg:block p-1.5 rounded-md hover:bg-[#1a1a1a] transition-colors"
+              className="hidden lg:block p-1.5 rounded-md hover:bg-sidebar-accent transition-colors"
             >
               <svg 
                 className={`w-4 h-4 transition-transform ${isSidebarCollapsed ? 'rotate-180' : ''}`} 
@@ -132,8 +132,8 @@ export function DashboardLayout({ children, session }: DashboardLayoutProps) {
                 className={`
                   w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200
                   ${isActiveRoute(item.href)
-                    ? 'bg-blue-600/20 text-blue-400 border border-blue-600/30'
-                    : 'text-gray-400 hover:text-white hover:bg-[#1a1a1a]'
+                    ? 'bg-sidebar-primary/20 text-sidebar-primary border border-sidebar-primary/30 shadow-sm'
+                    : 'text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent'
                   }
                   ${isSidebarCollapsed ? 'justify-center' : 'justify-start'}
                 `}
@@ -146,9 +146,9 @@ export function DashboardLayout({ children, session }: DashboardLayoutProps) {
           </nav>
 
           {/* User section */}
-          <div className="border-t border-[#262626] p-4">
+          <div className="border-t border-sidebar-border p-4">
             <div className={`flex items-center gap-3 ${isSidebarCollapsed ? 'justify-center' : ''}`}>
-              <div className="w-8 h-8 bg-[#262626] rounded-full flex items-center justify-center flex-shrink-0">
+              <div className="w-8 h-8 bg-sidebar-accent rounded-full flex items-center justify-center flex-shrink-0 ring-2 ring-sidebar-border">
                 {session.user.image ? (
                   <Image 
                     src={session.user.image} 
@@ -165,10 +165,10 @@ export function DashboardLayout({ children, session }: DashboardLayoutProps) {
               </div>
               {!isSidebarCollapsed && (
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-white truncate">
+                  <p className="text-sm font-medium text-sidebar-foreground truncate">
                     {session.user.name || 'User'}
                   </p>
-                  <p className="text-xs text-gray-400 truncate">
+                  <p className="text-xs text-sidebar-foreground/60 truncate">
                     {session.user.email}
                   </p>
                 </div>
@@ -178,7 +178,7 @@ export function DashboardLayout({ children, session }: DashboardLayoutProps) {
               <button
                 onClick={handleSignOut}
                 disabled={isSigningOut}
-                className="w-full mt-3 flex items-center gap-2 px-3 py-2 text-sm text-gray-400 hover:text-white hover:bg-[#1a1a1a] rounded-lg transition-colors disabled:opacity-50"
+                className="w-full mt-3 flex items-center gap-2 px-3 py-2 text-sm text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent rounded-lg transition-colors disabled:opacity-50"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -193,16 +193,16 @@ export function DashboardLayout({ children, session }: DashboardLayoutProps) {
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Mobile header */}
-        <div className="lg:hidden flex items-center justify-between h-16 px-4 bg-[#111111] border-b border-[#262626]">
+        <div className="lg:hidden flex items-center justify-between h-16 px-4 bg-sidebar-background border-b border-sidebar-border backdrop-blur-sm">
           <button
             onClick={() => setIsMobileMenuOpen(true)}
-            className="p-2 rounded-md hover:bg-[#1a1a1a] transition-colors"
+            className="p-2 rounded-md hover:bg-sidebar-accent transition-colors"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
-          <span className="text-lg font-semibold">ClickChutney</span>
+          <span className="text-lg font-bold bg-gradient-to-r from-primary via-chart-1 to-chart-2 bg-clip-text text-transparent">ClickChutney</span>
           <div className="w-8" /> {/* Spacer */}
         </div>
 

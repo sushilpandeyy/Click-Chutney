@@ -3,6 +3,10 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { ProjectCreateModal } from '@/components/project-create-modal';
+import { Breadcrumb } from '@/components/ui/breadcrumb';
+import { Button } from '@/components/ui/button';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { EmptyState } from '@/components/ui/empty-state';
 
 interface Project {
   id: string;
@@ -157,8 +161,8 @@ chutney('track', 'pageview');
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="flex items-center gap-3">
-          <div className="w-6 h-6 border-2 border-gray-400 border-t-white rounded-full animate-spin" />
-          <span className="text-gray-400">Loading projects...</span>
+          <LoadingSpinner size="lg" />
+          <span className="text-muted-foreground">Loading projects...</span>
         </div>
       </div>
     );
@@ -166,32 +170,41 @@ chutney('track', 'pageview');
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
+      {/* Breadcrumb */}
+      <Breadcrumb 
+        items={[
+          { label: "Dashboard", href: "/dashboard" },
+          { label: "Projects", isActive: true }
+        ]}
+        className="mb-6"
+      />
+      
       {/* Header */}
       <div className="mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-white mb-2">Projects</h1>
-            <p className="text-gray-400">
+            <h1 className="text-3xl font-bold text-foreground mb-2 font-display">Projects</h1>
+            <p className="text-muted-foreground">
               Manage your analytics projects and tracking configurations.
             </p>
           </div>
           <div className="mt-4 sm:mt-0">
-            <button 
+            <Button 
               onClick={() => setShowCreateModal(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white rounded-md px-4 py-2 text-sm font-medium transition-colors flex items-center gap-2"
+              className="gap-2 shadow-lg hover:shadow-xl"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
               New Project
-            </button>
+            </Button>
           </div>
         </div>
       </div>
 
       {error && (
-        <div className="mb-6 p-4 bg-red-900/20 border border-red-800/30 rounded-lg">
-          <p className="text-red-400">{error}</p>
+        <div className="mb-6 p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
+          <p className="text-destructive font-medium">{error}</p>
         </div>
       )}
 
@@ -255,33 +268,24 @@ chutney('track', 'pageview');
 
       {/* Projects Grid/List */}
       {filteredProjects.length === 0 ? (
-        <div className="bg-[#111111] border border-[#262626] rounded-lg p-12 text-center">
-          <div className="w-16 h-16 bg-gray-600/10 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <EmptyState
+          icon={
+            <svg className="w-16 h-16 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
             </svg>
-          </div>
-          <h4 className="text-lg font-semibold text-white mb-2">
-            {projects.length === 0 ? 'No Projects Yet' : 'No Projects Found'}
-          </h4>
-          <p className="text-gray-400 mb-6 max-w-md mx-auto">
-            {projects.length === 0 
+          }
+          title={projects.length === 0 ? 'No Projects Yet' : 'No Projects Found'}
+          description={
+            projects.length === 0 
               ? 'Create your first project to start tracking analytics and user behavior.'
               : 'Try adjusting your search terms or filters.'
-            }
-          </p>
-          {projects.length === 0 && (
-            <button 
-              onClick={() => setShowCreateModal(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white rounded-md px-6 py-2 text-sm font-medium transition-colors flex items-center gap-2 mx-auto"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-              Create First Project
-            </button>
-          )}
-        </div>
+          }
+          action={projects.length === 0 ? {
+            label: "Create First Project",
+            onClick: () => setShowCreateModal(true)
+          } : undefined}
+          className="bg-card border border-border rounded-xl"
+        />
       ) : (
         <div className="space-y-4">
           {filteredProjects.map((project) => (

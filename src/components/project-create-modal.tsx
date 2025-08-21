@@ -1,6 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 
 interface ProjectCreateModalProps {
   isOpen: boolean;
@@ -64,95 +67,104 @@ export function ProjectCreateModal({ isOpen, onClose, onProjectCreated }: Projec
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-[#111111] border border-[#262626] rounded-lg w-full max-w-md">
-        <div className="flex items-center justify-between p-6 border-b border-[#262626]">
-          <h2 className="text-xl font-semibold text-white">Create New Project</h2>
-          <button
-            onClick={handleClose}
-            className="text-gray-400 hover:text-white transition-colors"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+    <Dialog open={isOpen} onOpenChange={handleClose}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="text-xl font-bold font-display flex items-center gap-2">
+            <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
             </svg>
-          </button>
-        </div>
+            Create New Project
+          </DialogTitle>
+        </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
-            <div className="p-3 bg-red-900/20 border border-red-800/30 rounded-md">
-              <p className="text-red-400 text-sm">{error}</p>
+            <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
+              <p className="text-destructive text-sm font-medium">{error}</p>
             </div>
           )}
 
-          <div>
-            <label htmlFor="name" className="block text-sm font-medium text-white mb-2">
-              Project Name *
+          <div className="space-y-2">
+            <label htmlFor="name" className="block text-sm font-semibold text-foreground">
+              Project Name
+              <span className="text-destructive ml-1">*</span>
             </label>
             <input
               type="text"
               id="name"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full bg-[#0a0a0a] border border-[#262626] text-white rounded-md px-3 py-2 text-sm focus:outline-none focus:border-blue-500 transition-colors"
+              className="w-full bg-input border border-border text-foreground rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
               placeholder="My Awesome Project"
               required
             />
+            <p className="text-xs text-muted-foreground">Choose a descriptive name for your project</p>
           </div>
 
-          <div>
-            <label htmlFor="description" className="block text-sm font-medium text-white mb-2">
+          <div className="space-y-2">
+            <label htmlFor="description" className="block text-sm font-semibold text-foreground">
               Description
+              <span className="text-muted-foreground ml-1">(Optional)</span>
             </label>
             <textarea
               id="description"
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full bg-[#0a0a0a] border border-[#262626] text-white rounded-md px-3 py-2 text-sm focus:outline-none focus:border-blue-500 transition-colors resize-none"
-              placeholder="Optional project description..."
+              className="w-full bg-input border border-border text-foreground rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 resize-none"
+              placeholder="Brief description of what you'll be tracking..."
               rows={3}
             />
           </div>
 
-          <div>
-            <label htmlFor="website" className="block text-sm font-medium text-white mb-2">
+          <div className="space-y-2">
+            <label htmlFor="website" className="block text-sm font-semibold text-foreground">
               Website URL
+              <span className="text-muted-foreground ml-1">(Optional)</span>
             </label>
             <input
               type="url"
               id="website"
               value={formData.website}
               onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-              className="w-full bg-[#0a0a0a] border border-[#262626] text-white rounded-md px-3 py-2 text-sm focus:outline-none focus:border-blue-500 transition-colors"
-              placeholder="https://example.com"
+              className="w-full bg-input border border-border text-foreground rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+              placeholder="https://yourwebsite.com"
             />
+            <p className="text-xs text-muted-foreground">The main URL where you'll install the tracking script</p>
           </div>
 
-          <div className="flex gap-3 pt-4">
-            <button
+          <div className="flex gap-3 pt-6">
+            <Button
               type="button"
+              variant="outline"
               onClick={handleClose}
-              className="flex-1 bg-[#0a0a0a] border border-[#262626] text-white rounded-md px-4 py-2 text-sm font-medium hover:bg-[#1a1a1a] hover:border-[#404040] transition-colors duration-200"
+              className="flex-1"
+              disabled={isLoading}
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
               disabled={isLoading}
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white rounded-md px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="flex-1 gap-2"
             >
               {isLoading ? (
                 <>
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <LoadingSpinner size="sm" />
                   Creating...
                 </>
               ) : (
-                'Create Project'
+                <>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  Create Project
+                </>
               )}
-            </button>
+            </Button>
           </div>
         </form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
