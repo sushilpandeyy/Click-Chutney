@@ -569,10 +569,12 @@ export function DashboardClient({ session }: DashboardClientProps) {
                 label: "Create First Project",
                 onClick: () => setShowCreateModal(true)
               }}
-              secondaryAction={process.env.NODE_ENV === 'development' ? {
-                label: isSeeding ? 'Creating...' : 'Generate Sample Data',
-                onClick: createSampleData
-              } : undefined}
+              {...(process.env.NODE_ENV === 'development' ? {
+                secondaryAction: {
+                  label: isSeeding ? 'Creating...' : 'Generate Sample Data',
+                  onClick: createSampleData
+                }
+              } : {})}
               className="bg-card border border-border rounded-xl p-12"
             />
           )}

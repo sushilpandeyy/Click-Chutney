@@ -113,11 +113,11 @@ export function AnalyticsChart({
               {normalizedData.length > 1 && normalizedData[0] && normalizedData[normalizedData.length - 1] && (
                 <>
                   <path
-                    d={`M ${normalizedData[0].x}% ${normalizedData[0].y}% ${normalizedData.slice(1).map(d => `L ${d.x}% ${d.y}%`).join(' ')} L ${normalizedData[normalizedData.length - 1].x}% 100% L ${normalizedData[0].x}% 100% Z`}
+                    d={`M ${normalizedData[0]?.x}% ${normalizedData[0]?.y}% ${normalizedData.slice(1).map(d => `L ${d?.x}% ${d?.y}%`).join(' ')} L ${normalizedData[normalizedData.length - 1]?.x}% 100% L ${normalizedData[0]?.x}% 100% Z`}
                     fill="url(#areaGradient)"
                   />
                   <path
-                    d={`M ${normalizedData[0].x}% ${normalizedData[0].y}% ${normalizedData.slice(1).map(d => `L ${d.x}% ${d.y}%`).join(' ')}`}
+                    d={`M ${normalizedData[0]?.x}% ${normalizedData[0]?.y}% ${normalizedData.slice(1).map(d => `L ${d?.x}% ${d?.y}%`).join(' ')}`}
                     fill="none"
                     stroke="rgb(var(--chart-1))"
                     strokeWidth="2"

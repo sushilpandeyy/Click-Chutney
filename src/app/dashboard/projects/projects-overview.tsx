@@ -280,10 +280,12 @@ chutney('track', 'pageview');
               ? 'Create your first project to start tracking analytics and user behavior.'
               : 'Try adjusting your search terms or filters.'
           }
-          action={projects.length === 0 ? {
-            label: "Create First Project",
-            onClick: () => setShowCreateModal(true)
-          } : undefined}
+          {...(projects.length === 0 ? {
+            action: {
+              label: "Create First Project",
+              onClick: () => setShowCreateModal(true)
+            }
+          } : {})}
           className="bg-card border border-border rounded-xl"
         />
       ) : (
