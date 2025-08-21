@@ -5,10 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Github } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-
 export default function LoginPage() {
-  const router = useRouter();
 
   const handleGitHubLogin = async () => {
     try {

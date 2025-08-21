@@ -130,7 +130,7 @@ export function ProjectCreateModal({ isOpen, onClose, onProjectCreated }: Projec
               className="w-full bg-input border border-border text-foreground rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
               placeholder="https://yourwebsite.com"
             />
-            <p className="text-xs text-muted-foreground">The main URL where you'll install the tracking script</p>
+            <p className="text-xs text-muted-foreground">The main URL where you&apos;ll install the tracking script</p>
           </div>
 
           <div className="flex gap-3 pt-6">

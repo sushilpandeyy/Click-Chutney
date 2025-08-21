@@ -310,7 +310,7 @@ export default function Home() {
           
           <div className="text-center">
             <blockquote className="text-lg text-muted-foreground mb-4 max-w-3xl mx-auto">
-              "ClickChutney transformed how we understand our users. The insights are actionable and the setup was incredibly straightforward."
+              &quot;ClickChutney transformed how we understand our users. The insights are actionable and the setup was incredibly straightforward.&quot;
             </blockquote>
             <cite className="text-sm font-medium text-foreground">Sarah Chen, Head of Growth at TechCorp</cite>
           </div>

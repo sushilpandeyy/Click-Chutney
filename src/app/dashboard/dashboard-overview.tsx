@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { ProjectCreateModal } from '@/components/project-create-modal';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { EmptyState } from '@/components/ui/empty-state';
-import { StatCard } from '@/components/ui/stat-card';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { Button } from '@/components/ui/button';
 

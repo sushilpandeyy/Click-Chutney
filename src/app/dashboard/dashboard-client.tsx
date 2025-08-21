@@ -465,7 +465,7 @@ export function DashboardClient({ session }: DashboardClientProps) {
                       </>
                     )}
                   </Button>
-                )
+                )}
               </div>
             </div>
 
