@@ -12,7 +12,7 @@ interface EmptyStateProps {
   }
   secondaryAction?: {
     label: string
-    onClick: () => void
+    onClick: () => void | Promise<void>
   }
   className?: string
 }
