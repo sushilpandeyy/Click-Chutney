@@ -99,106 +99,84 @@ const genericNavigation = [
 
 const projectAnalyticsNavigation = [
   {
-    title: "Live Analytics",
+    title: "Analytics",
     items: [
       {
-        name: 'Real-time',
-        id: 'realtime',
-        description: 'Live visitor activity and current performance',
-        icon: (
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-          </svg>
-        ),
-        isImportant: true,
-        badge: 'Live',
-      },
-    ]
-  },
-  {
-    title: "Core Analytics",
-    items: [
-      {
-        name: 'Analytics',
+        name: 'Overview',
         id: 'analytics',
-        description: 'Comprehensive analytics and performance metrics',
         icon: (
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
           </svg>
         ),
         isImportant: true,
-        badge: null,
       },
       {
-        name: 'Acquisition',
+        name: 'Real-time',
+        id: 'realtime',
+        icon: (
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        ),
+        isImportant: false,
+        badge: 'Live',
+      },
+      {
+        name: 'Traffic',
         id: 'acquisition',
-        description: 'Traffic sources, organic search, and campaigns',
         icon: (
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9" />
           </svg>
         ),
-        isImportant: true,
-        badge: null,
+        isImportant: false,
       },
       {
-        name: 'Behavior',
+        name: 'Pages',
         id: 'behavior',
-        description: 'User behavior, page flow, and content performance',
         icon: (
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
         ),
         isImportant: false,
-        badge: null,
       },
-    ]
-  },
-  {
-    title: "Advanced",
-    items: [
       {
-        name: 'Conversions',
+        name: 'Events',
         id: 'conversions',
-        description: 'Goals, events, and conversion tracking',
         icon: (
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
           </svg>
         ),
         isImportant: false,
-        badge: 'New',
       },
     ]
   },
   {
-    title: "Management",
+    title: "Settings",
     items: [
-      {
-        name: 'Users',
-        id: 'users',
-        description: 'Team access and collaboration settings',
-        icon: (
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
-          </svg>
-        ),
-        isImportant: false,
-        badge: null,
-      },
       {
         name: 'Setup',
         id: 'tracking',
-        description: 'Install tracking code and configure settings',
         icon: (
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
           </svg>
         ),
         isImportant: false,
-        badge: null,
+      },
+      {
+        name: 'Team',
+        id: 'users',
+        icon: (
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+        ),
+        isImportant: false,
       },
     ]
   },
@@ -331,7 +309,7 @@ export function DashboardLayout({ children, session, projectContext }: Dashboard
             {navigationData.map((section) => (
               <div key={section.title} className="space-y-1">
                 {!isSidebarCollapsed && (
-                  <h3 className="text-xs font-semibold text-sidebar-foreground/40 uppercase tracking-wider px-3 py-2">
+                  <h3 className="text-xs font-medium text-sidebar-foreground/50 px-3 py-1 mb-1">
                     {section.title}
                   </h3>
                 )}
@@ -352,54 +330,35 @@ export function DashboardLayout({ children, session, projectContext }: Dashboard
                           }
                         }}
                         className={`
-                          w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 group relative
+                          w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-150 group relative
                           ${isActive
-                            ? 'bg-sidebar-primary/15 text-sidebar-primary border border-sidebar-primary/30 shadow-sm'
-                            : item.isImportant
-                              ? 'text-sidebar-foreground hover:text-sidebar-foreground hover:bg-sidebar-accent/80 border border-transparent hover:border-sidebar-border'
-                              : 'text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent'
+                            ? 'bg-primary/10 text-primary shadow-sm ring-1 ring-primary/20'
+                            : 'text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-sidebar-accent/60'
                           }
                           ${isSidebarCollapsed ? 'justify-center px-2' : 'justify-start'}
-                          ${item.isImportant ? 'font-semibold' : ''}
                         `}
-                        title={isSidebarCollapsed ? (isGenericItem ? item.name : `${item.name}: ${item.description}`) : undefined}
+                        title={isSidebarCollapsed ? item.name : undefined}
                       >
-                        <div className={`flex-shrink-0 ${
-                          isActive 
-                            ? 'text-sidebar-primary' 
-                            : item.isImportant 
-                              ? 'text-sidebar-primary' 
-                              : ''
-                        }`}>
+                        <div className={`flex-shrink-0 ${isActive ? 'text-primary' : ''}`}>
                           {item.icon}
                         </div>
                         {!isSidebarCollapsed && (
                           <div className="flex-1 flex items-center justify-between min-w-0">
-                            <div className="flex-1 min-w-0">
-                              <p className="truncate">{item.name}</p>
-                              {!isGenericItem && (
-                                <p className="text-xs text-sidebar-foreground/60 truncate leading-tight">
-                                  {item.description}
-                                </p>
-                              )}
-                            </div>
+                            <span className="truncate">{item.name}</span>
                             {item.badge && (
-                              <span className={`ml-2 text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0 ${
+                              <span className={`ml-2 text-xs px-1.5 py-0.5 rounded-md font-medium flex-shrink-0 ${
                                 item.badge === 'Live'
-                                  ? 'bg-chart-4/20 text-chart-4 border border-chart-4/30 animate-pulse'
+                                  ? 'bg-emerald-500/10 text-emerald-600 animate-pulse'
                                   : item.badge === 'New'
-                                    ? 'bg-chart-1/20 text-chart-1 border border-chart-1/30'
+                                    ? 'bg-blue-500/10 text-blue-600'
                                     : item.badge === 'Primary'
-                                      ? 'bg-sidebar-primary/20 text-sidebar-primary border border-sidebar-primary/30'
-                                      : 'bg-sidebar-primary/20 text-sidebar-primary border border-sidebar-primary/30'
+                                      ? 'bg-primary/10 text-primary'
+                                      : 'bg-primary/10 text-primary'
                               }`}>
                                 {item.badge}
                               </span>
                             )}
                           </div>
-                        )}
-                        {item.isImportant && !isActive && (
-                          <div className="absolute right-2 w-1.5 h-1.5 bg-sidebar-primary rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
                         )}
                       </button>
                     );
@@ -411,27 +370,27 @@ export function DashboardLayout({ children, session, projectContext }: Dashboard
 
           {/* Quick Actions / Stats */}
           {!isSidebarCollapsed && (
-            <div className="border-t border-sidebar-border p-4 bg-sidebar-background/30">
+            <div className="border-t border-sidebar-border/50 p-4">
               {isInProjectView ? (
-                <div>
-                  <div className="text-xs text-sidebar-foreground/60 mb-2">Quick Stats</div>
-                  <div className="grid grid-cols-2 gap-3 text-xs">
-                    <div className="text-center p-2 bg-chart-4/10 rounded-lg">
-                      <div className="font-semibold text-chart-4">{Math.floor(Math.random() * 50) + 10}</div>
-                      <div className="text-sidebar-foreground/60">Live</div>
+                <div className="space-y-3">
+                  <div className="text-xs font-medium text-sidebar-foreground/50">Live Stats</div>
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div className="text-center p-2.5 bg-emerald-500/5 rounded-lg border border-emerald-500/10">
+                      <div className="font-semibold text-emerald-600">{Math.floor(Math.random() * 50) + 10}</div>
+                      <div className="text-sidebar-foreground/60 text-xs">Active</div>
                     </div>
-                    <div className="text-center p-2 bg-sidebar-primary/10 rounded-lg">
-                      <div className="font-semibold text-sidebar-primary">{Math.floor(Math.random() * 1000) + 500}</div>
-                      <div className="text-sidebar-foreground/60">Today</div>
+                    <div className="text-center p-2.5 bg-primary/5 rounded-lg border border-primary/10">
+                      <div className="font-semibold text-primary">{Math.floor(Math.random() * 1000) + 500}</div>
+                      <div className="text-sidebar-foreground/60 text-xs">Today</div>
                     </div>
                   </div>
                 </div>
               ) : (
                 <button
                   onClick={() => router.push('/dashboard/projects')}
-                  className="w-full bg-sidebar-primary/10 hover:bg-sidebar-primary/20 text-sidebar-primary border border-sidebar-primary/20 hover:border-sidebar-primary/30 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 flex items-center gap-2 justify-center group shadow-sm"
+                  className="w-full bg-primary/8 hover:bg-primary/12 text-primary rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150 flex items-center gap-2 justify-center group"
                 >
-                  <svg className="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 group-hover:scale-105 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                   </svg>
                   New Project

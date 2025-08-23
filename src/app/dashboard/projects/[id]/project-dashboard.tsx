@@ -73,7 +73,7 @@ export function ProjectDashboard({ session, projectId }: ProjectDashboardProps) 
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState('realtime');
+  const [activeTab, setActiveTab] = useState('analytics');
 
   useEffect(() => {
     const fetchProjectData = async () => {
@@ -239,63 +239,63 @@ export function ProjectDashboard({ session, projectId }: ProjectDashboardProps) 
             </div>
 
             {/* Key Metrics */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="bg-card border border-border rounded-lg p-4 hover-lift">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="bg-white/60 dark:bg-card/60 backdrop-blur-sm border border-border/50 rounded-xl p-5 hover:shadow-sm transition-shadow">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-muted-foreground text-sm font-medium">Total Sessions</p>
-                    <p className="text-2xl font-bold text-card-foreground">{stats?.uniqueSessions?.toLocaleString() || 0}</p>
-                    <p className="text-xs text-chart-4 font-medium">+12.5% vs last period</p>
+                    <p className="text-2xl font-semibold text-foreground mt-1">{stats?.uniqueSessions?.toLocaleString() || 0}</p>
+                    <p className="text-xs text-emerald-600 font-medium mt-1">+12.5% vs last period</p>
                   </div>
-                  <div className="w-12 h-12 bg-chart-1/10 rounded-lg flex items-center justify-center">
-                    <svg className="w-6 h-6 text-chart-1" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clipRule="evenodd" />
+                  <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center">
+                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                     </svg>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-card border border-border rounded-lg p-4 hover-lift">
+              <div className="bg-white/60 dark:bg-card/60 backdrop-blur-sm border border-border/50 rounded-xl p-5 hover:shadow-sm transition-shadow">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-muted-foreground text-sm font-medium">Page Views</p>
-                    <p className="text-2xl font-bold text-card-foreground">{stats?.pageviews?.toLocaleString() || 0}</p>
-                    <p className="text-xs text-chart-4 font-medium">+8.2% vs last period</p>
+                    <p className="text-2xl font-semibold text-foreground mt-1">{stats?.pageviews?.toLocaleString() || 0}</p>
+                    <p className="text-xs text-emerald-600 font-medium mt-1">+8.2% vs last period</p>
                   </div>
-                  <div className="w-12 h-12 bg-chart-2/10 rounded-lg flex items-center justify-center">
-                    <svg className="w-6 h-6 text-chart-2" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                      <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
+                  <div className="w-10 h-10 bg-purple-500/10 rounded-xl flex items-center justify-center">
+                    <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-card border border-border rounded-lg p-4 hover-lift">
+              <div className="bg-white/60 dark:bg-card/60 backdrop-blur-sm border border-border/50 rounded-xl p-5 hover:shadow-sm transition-shadow">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-muted-foreground text-sm font-medium">Avg. Session Duration</p>
-                    <p className="text-2xl font-bold text-card-foreground">{Math.round(stats?.avgSessionDuration || 0)}s</p>
-                    <p className="text-xs text-chart-4 font-medium">+5.1% vs last period</p>
+                    <p className="text-2xl font-semibold text-foreground mt-1">{Math.round(stats?.avgSessionDuration || 0)}s</p>
+                    <p className="text-xs text-emerald-600 font-medium mt-1">+5.1% vs last period</p>
                   </div>
-                  <div className="w-12 h-12 bg-chart-3/10 rounded-lg flex items-center justify-center">
-                    <svg className="w-6 h-6 text-chart-3" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                  <div className="w-10 h-10 bg-orange-500/10 rounded-xl flex items-center justify-center">
+                    <svg className="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-card border border-border rounded-lg p-4 hover-lift">
+              <div className="bg-white/60 dark:bg-card/60 backdrop-blur-sm border border-border/50 rounded-xl p-5 hover:shadow-sm transition-shadow">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-muted-foreground text-sm font-medium">Bounce Rate</p>
-                    <p className="text-2xl font-bold text-card-foreground">{stats?.bounceRate || 0}%</p>
-                    <p className="text-xs text-destructive font-medium">-3.2% vs last period</p>
+                    <p className="text-2xl font-semibold text-foreground mt-1">{stats?.bounceRate || 0}%</p>
+                    <p className="text-xs text-emerald-600 font-medium mt-1">-3.2% vs last period</p>
                   </div>
-                  <div className="w-12 h-12 bg-chart-5/10 rounded-lg flex items-center justify-center">
-                    <svg className="w-6 h-6 text-chart-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                  <div className="w-10 h-10 bg-rose-500/10 rounded-xl flex items-center justify-center">
+                    <svg className="w-5 h-5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6" />
                     </svg>
                   </div>
                 </div>
@@ -782,44 +782,46 @@ export function ProjectDashboard({ session, projectId }: ProjectDashboardProps) 
           <Breadcrumb items={breadcrumbItems} className="animate-fade-in" />
         </div>
 
-        {/* Header with improved styling */}
-        <div className="bg-card border border-border rounded-lg p-4 lg:p-6 animate-fade-in">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex-1">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="min-w-0">
-                  <h1 className="text-xl lg:text-2xl font-bold text-foreground truncate">{project.name}</h1>
-                  <div className="flex items-center gap-3 mt-1 flex-wrap">
-                    <span className={`text-xs px-2 py-1 rounded-full font-medium ${
-                      project.status === 'ACTIVE' 
-                        ? 'bg-chart-4/20 text-chart-4 border border-chart-4/30' 
-                        : 'bg-chart-5/20 text-chart-5 border border-chart-5/30'
-                    }`}>
-                      {project.status === 'ACTIVE' ? 'Active' : 'Setup Required'}
-                    </span>
-                    <span className="text-xs text-muted-foreground font-mono truncate">
-                      ID: {project.trackingId}
-                    </span>
-                  </div>
-                </div>
+        {/* Project Header */}
+        <div className="bg-white/50 dark:bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl p-6 animate-fade-in">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-3 mb-2">
+                <h1 className="text-2xl font-semibold text-foreground truncate">{project.name}</h1>
+                <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium ${
+                  project.status === 'ACTIVE' 
+                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800' 
+                    : 'bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800'
+                }`}>
+                  {project.status === 'ACTIVE' ? 'Live' : 'Setup Required'}
+                </span>
               </div>
               
-              <div className="space-y-2">
-                <p className="text-muted-foreground text-sm lg:text-base">
-                  {project.description || `Analytics dashboard for ${project.name}`}
+              {project.description && (
+                <p className="text-muted-foreground text-sm mb-3">
+                  {project.description}
                 </p>
+              )}
+              
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3 text-xs text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                  </svg>
+                  <span className="font-mono">ID: {project.trackingId}</span>
+                </div>
                 {project.website && (
                   <div className="flex items-center gap-2">
-                    <svg className="w-4 h-4 text-muted-foreground flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                     </svg>
                     <a 
                       href={project.website} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="text-accent hover:text-accent/80 text-sm transition-colors hover:underline focus-ring truncate"
+                      className="text-primary hover:text-primary/80 transition-colors hover:underline truncate"
                     >
-                      {project.website}
+                      {project.website.replace(/^https?:\/\//, '')}
                     </a>
                   </div>
                 )}
