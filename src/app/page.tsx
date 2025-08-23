@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, BarChart3, Shield, Zap, CheckCircle, Users, TrendingUp, Globe, Award } from 'lucide-react';
+import { ArrowRight, BarChart3, Shield, CheckCircle, Users, TrendingUp, Globe, Award, Clock, Target, DollarSign, Star, Play, Eye, Rocket, Building2 } from 'lucide-react';
 
 export default function Home() {
   return (
@@ -39,51 +39,51 @@ export default function Home() {
       <section className="relative min-h-screen flex items-center justify-center px-4 pt-20">
         <div className="max-w-7xl mx-auto text-center space-y-12">
           <div className="space-y-8">
-            <div className="inline-flex items-center gap-3 bg-gradient-to-r from-primary/10 to-chart-1/10 px-6 py-3 rounded-full border border-primary/20 backdrop-blur-sm">
-              <Award className="w-4 h-4 text-primary" />
-              <span className="text-sm font-semibold text-primary">Trusted by 10,000+ businesses worldwide</span>
+            <div className="inline-flex items-center gap-3 bg-gradient-to-r from-primary/10 to-chart-1/10 px-6 py-3 rounded-full border border-primary/20 backdrop-blur-sm animate-fade-in">
+              <Award className="w-4 h-4 text-primary animate-pulse" />
+              <span className="text-sm font-semibold text-primary">Join 10,000+ businesses getting 40% better insights</span>
             </div>
             
             <div className="space-y-8">
-              <h1 className="font-display font-bold tracking-tight text-responsive-2xl md:text-responsive-3xl">
-                <span className="block text-foreground leading-none mb-4">Enterprise Analytics</span>
+              <h1 className="font-display font-bold tracking-tight text-responsive-2xl md:text-responsive-3xl animate-fade-in-up">
+                <span className="block text-foreground leading-none mb-4">Stop Guessing.</span>
                 <span className="block bg-gradient-to-r from-primary via-chart-1 to-chart-2 bg-clip-text text-transparent leading-none">
-                  That Actually Works
+                  Start Growing.
                 </span>
               </h1>
-              <p className="text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
-                Get <span className="text-primary font-semibold">actionable insights</span> from your data with our GDPR-compliant analytics platform. 
+              <p className="text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed animate-fade-in-up animation-delay-200">
+                Turn your website data into <span className="text-primary font-semibold">revenue-driving decisions</span> with analytics that actually matter. 
                 <br className="hidden md:block" />
-                Trusted by <span className="text-chart-1 font-semibold">enterprise teams</span> who value privacy and performance.
+                <span className="text-chart-1 font-semibold">40% faster insights</span>, <span className="text-chart-2 font-semibold">100% privacy-compliant</span>, <span className="text-chart-3 font-semibold">5-minute setup</span>.
               </p>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center max-w-2xl mx-auto">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center max-w-2xl mx-auto animate-fade-in-up animation-delay-400">
               <Button 
                 asChild 
                 size="lg" 
-                className="w-full sm:w-auto px-10 py-5 font-bold text-lg rounded-xl shadow-xl hover:shadow-2xl hover-lift gap-3"
+                className="w-full sm:w-auto px-10 py-6 font-bold text-lg rounded-xl shadow-xl hover:shadow-2xl hover-lift gap-3 bg-gradient-to-r from-primary to-chart-1 hover:from-primary/90 hover:to-chart-1/90 transition-all duration-300"
               >
                 <Link href="/signup">
-                  <ArrowRight className="w-5 h-5" />
-                  Start 14-Day Free Trial
+                  <Rocket className="w-5 h-5" />
+                  Get 40% Better Insights - Free
                 </Link>
               </Button>
               <Button 
                 variant="outline" 
                 size="lg" 
-                className="w-full sm:w-auto px-8 py-5 font-semibold text-lg rounded-xl hover-lift gap-2"
+                className="w-full sm:w-auto px-8 py-6 font-semibold text-lg rounded-xl hover-lift gap-2 hover:bg-muted/50 transition-all duration-300"
                 asChild
               >
                 <Link href="#demo">
-                  <BarChart3 className="w-5 h-5" />
-                  View Live Demo
+                  <Play className="w-5 h-5" />
+                  Watch 2-min Demo
                 </Link>
               </Button>
             </div>
             
-            <div className="text-center text-sm text-muted-foreground">
-              ✓ No credit card required &nbsp;•&nbsp; ✓ Setup in 5 minutes &nbsp;•&nbsp; ✓ GDPR compliant
+            <div className="text-center text-sm text-muted-foreground animate-fade-in-up animation-delay-600">
+              ✓ No credit card required &nbsp;•&nbsp; ✓ 5-minute setup &nbsp;•&nbsp; ✓ Cancel anytime &nbsp;•&nbsp; ✓ ROI guarantee
             </div>
 
             <div className="flex justify-center items-center space-x-8 pt-12">
@@ -109,67 +109,136 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center space-y-6 mb-20">
             <div className="inline-block px-4 py-2 bg-primary/10 border border-primary/20 rounded-full mb-4">
-              <span className="text-primary text-sm font-semibold">POWERFUL FEATURES</span>
+              <span className="text-primary text-sm font-semibold">FEATURES THAT DRIVE RESULTS</span>
             </div>
             <h2 className="font-display text-4xl md:text-5xl font-bold text-foreground">
-              Everything you need for 
-              <span className="bg-gradient-to-r from-primary to-chart-1 bg-clip-text text-transparent"> data-driven decisions</span>
+              Analytics that turn 
+              <span className="bg-gradient-to-r from-primary to-chart-1 bg-clip-text text-transparent"> visitors into revenue</span>
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Our enterprise-grade analytics platform provides the insights your team needs to optimize performance and drive growth.
+              Stop drowning in data. Get the exact insights you need to optimize conversions, reduce churn, and accelerate growth.
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="group relative p-8 rounded-2xl bg-background border border-border shadow-lg hover:shadow-xl transition-all duration-300 hover:border-primary/40">
+            <div className="group relative p-8 rounded-2xl bg-background border border-border shadow-lg hover:shadow-xl transition-all duration-300 hover:border-primary/40 hover:-translate-y-1">
               <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               <div className="relative">
-                <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mb-6">
-                  <Zap className="w-7 h-7 text-primary" />
+                <div className="w-16 h-16 bg-gradient-to-br from-primary/20 to-primary/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <Clock className="w-8 h-8 text-primary" />
                 </div>
-                <h3 className="font-display text-xl font-bold text-foreground mb-4">Quick Integration</h3>
-                <p className="text-muted-foreground leading-relaxed text-sm">
-                  Deploy in minutes with our lightweight tracking script. One line of code gets you comprehensive analytics without impacting site performance.
+                <h3 className="font-display text-xl font-bold text-foreground mb-4">5-Minute Setup</h3>
+                <p className="text-muted-foreground leading-relaxed mb-6">
+                  From signup to first insights in 5 minutes. One lightweight script, zero configuration headaches. Start tracking immediately.
                 </p>
-                <div className="mt-4 flex items-center text-xs text-primary font-medium">
-                  <CheckCircle className="w-4 h-4 mr-2" />
-                  Sub-10kb script size
+                <div className="space-y-3">
+                  <div className="flex items-center text-sm text-primary font-medium">
+                    <CheckCircle className="w-4 h-4 mr-3 flex-shrink-0" />
+                    &lt;9kb tracking script
+                  </div>
+                  <div className="flex items-center text-sm text-primary font-medium">
+                    <CheckCircle className="w-4 h-4 mr-3 flex-shrink-0" />
+                    Zero page speed impact
+                  </div>
+                  <div className="flex items-center text-sm text-primary font-medium">
+                    <CheckCircle className="w-4 h-4 mr-3 flex-shrink-0" />
+                    Works with any platform
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div className="group relative p-8 rounded-2xl bg-background border border-border shadow-lg hover:shadow-xl transition-all duration-300 hover:border-chart-1/40">
+            <div className="group relative p-8 rounded-2xl bg-background border border-border shadow-lg hover:shadow-xl transition-all duration-300 hover:border-chart-1/40 hover:-translate-y-1">
               <div className="absolute inset-0 bg-gradient-to-br from-chart-1/5 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               <div className="relative">
-                <div className="w-14 h-14 bg-chart-1/10 rounded-2xl flex items-center justify-center mb-6">
-                  <TrendingUp className="w-7 h-7 text-chart-1" />
+                <div className="w-16 h-16 bg-gradient-to-br from-chart-1/20 to-chart-1/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <Target className="w-8 h-8 text-chart-1" />
                 </div>
-                <h3 className="font-display text-xl font-bold text-foreground mb-4">Real-Time Analytics</h3>
-                <p className="text-muted-foreground leading-relaxed text-sm">
-                  Monitor user behavior as it happens with live dashboards and instant alerts. Make data-driven decisions with confidence.
+                <h3 className="font-display text-xl font-bold text-foreground mb-4">Conversion Optimization</h3>
+                <p className="text-muted-foreground leading-relaxed mb-6">
+                  Identify exactly where visitors drop off and why. Get actionable recommendations to boost conversion rates by 40%+.
                 </p>
-                <div className="mt-4 flex items-center text-xs text-chart-1 font-medium">
-                  <CheckCircle className="w-4 h-4 mr-2" />
-                  &lt;1s data latency
+                <div className="space-y-3">
+                  <div className="flex items-center text-sm text-chart-1 font-medium">
+                    <CheckCircle className="w-4 h-4 mr-3 flex-shrink-0" />
+                    Conversion funnel analysis
+                  </div>
+                  <div className="flex items-center text-sm text-chart-1 font-medium">
+                    <CheckCircle className="w-4 h-4 mr-3 flex-shrink-0" />
+                    A/B testing insights
+                  </div>
+                  <div className="flex items-center text-sm text-chart-1 font-medium">
+                    <CheckCircle className="w-4 h-4 mr-3 flex-shrink-0" />
+                    Automated alerts
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div className="group relative p-8 rounded-2xl bg-background border border-border shadow-lg hover:shadow-xl transition-all duration-300 hover:border-chart-3/40">
+            <div className="group relative p-8 rounded-2xl bg-background border border-border shadow-lg hover:shadow-xl transition-all duration-300 hover:border-chart-3/40 hover:-translate-y-1">
               <div className="absolute inset-0 bg-gradient-to-br from-chart-3/5 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               <div className="relative">
-                <div className="w-14 h-14 bg-chart-3/10 rounded-2xl flex items-center justify-center mb-6">
-                  <Shield className="w-7 h-7 text-chart-3" />
+                <div className="w-16 h-16 bg-gradient-to-br from-chart-3/20 to-chart-3/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <Shield className="w-8 h-8 text-chart-3" />
                 </div>
-                <h3 className="font-display text-xl font-bold text-foreground mb-4">Enterprise Security</h3>
-                <p className="text-muted-foreground leading-relaxed text-sm">
-                  GDPR, CCPA, and SOC 2 compliant. End-to-end encryption with granular access controls for enterprise peace of mind.
+                <h3 className="font-display text-xl font-bold text-foreground mb-4">Privacy-First Approach</h3>
+                <p className="text-muted-foreground leading-relaxed mb-6">
+                  Get powerful insights without compromising user privacy. GDPR, CCPA compliant with enterprise-grade security.
                 </p>
-                <div className="mt-4 flex items-center text-xs text-chart-3 font-medium">
-                  <CheckCircle className="w-4 h-4 mr-2" />
-                  ISO 27001 certified
+                <div className="space-y-3">
+                  <div className="flex items-center text-sm text-chart-3 font-medium">
+                    <CheckCircle className="w-4 h-4 mr-3 flex-shrink-0" />
+                    No cookies required
+                  </div>
+                  <div className="flex items-center text-sm text-chart-3 font-medium">
+                    <CheckCircle className="w-4 h-4 mr-3 flex-shrink-0" />
+                    SOC 2 Type II certified
+                  </div>
+                  <div className="flex items-center text-sm text-chart-3 font-medium">
+                    <CheckCircle className="w-4 h-4 mr-3 flex-shrink-0" />
+                    EU data residency
+                  </div>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Additional Features Grid */}
+      <section className="relative py-16 px-4 bg-card">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="text-center p-6 rounded-xl bg-background/50 border border-border hover:border-primary/30 transition-colors duration-300">
+              <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <Eye className="w-6 h-6 text-primary" />
+              </div>
+              <h4 className="font-semibold text-foreground mb-2">Real-Time Monitoring</h4>
+              <p className="text-sm text-muted-foreground">Watch visitors navigate your site in real-time</p>
+            </div>
+            
+            <div className="text-center p-6 rounded-xl bg-background/50 border border-border hover:border-chart-1/30 transition-colors duration-300">
+              <div className="w-12 h-12 bg-chart-1/10 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <Users className="w-6 h-6 text-chart-1" />
+              </div>
+              <h4 className="font-semibold text-foreground mb-2">User Journey Maps</h4>
+              <p className="text-sm text-muted-foreground">Understand complete customer paths</p>
+            </div>
+            
+            <div className="text-center p-6 rounded-xl bg-background/50 border border-border hover:border-chart-2/30 transition-colors duration-300">
+              <div className="w-12 h-12 bg-chart-2/10 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <Building2 className="w-6 h-6 text-chart-2" />
+              </div>
+              <h4 className="font-semibold text-foreground mb-2">Team Collaboration</h4>
+              <p className="text-sm text-muted-foreground">Share insights across your organization</p>
+            </div>
+            
+            <div className="text-center p-6 rounded-xl bg-background/50 border border-border hover:border-chart-4/30 transition-colors duration-300">
+              <div className="w-12 h-12 bg-chart-4/10 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <DollarSign className="w-6 h-6 text-chart-4" />
+              </div>
+              <h4 className="font-semibold text-foreground mb-2">Revenue Attribution</h4>
+              <p className="text-sm text-muted-foreground">Track which sources drive the most value</p>
             </div>
           </div>
         </div>
@@ -281,38 +350,203 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Social Proof Section */}
-      <section id="customers" className="relative py-24 px-4 bg-muted/30">
+      {/* ROI Benefits Section */}
+      <section className="relative py-32 px-4 bg-gradient-to-br from-primary/5 via-background to-chart-1/5">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="font-display text-3xl font-bold text-foreground mb-4">
-              Trusted by teams at leading companies
+          <div className="text-center mb-20">
+            <div className="inline-block px-4 py-2 bg-gradient-to-r from-primary/10 to-chart-1/10 border border-primary/20 rounded-full mb-4">
+              <span className="text-primary text-sm font-semibold">MEASURABLE RESULTS</span>
+            </div>
+            <h2 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-6">
+              Stop guessing. Start 
+              <span className="bg-gradient-to-r from-primary to-chart-1 bg-clip-text text-transparent"> growing faster</span>
             </h2>
-            <p className="text-muted-foreground text-lg">
-              Join 10,000+ businesses using ClickChutney for actionable analytics
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              See exactly how ClickChutney drives measurable business results for companies just like yours.
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-3 gap-8 mb-16">
+            <div className="text-center p-8 rounded-2xl bg-background/80 backdrop-blur-sm border border-border shadow-lg">
+              <div className="w-16 h-16 bg-gradient-to-br from-primary/20 to-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <TrendingUp className="w-8 h-8 text-primary" />
+              </div>
+              <div className="text-4xl font-bold text-primary mb-2">40%</div>
+              <div className="text-lg font-semibold text-foreground mb-3">Average Conversion Increase</div>
+              <p className="text-muted-foreground text-sm">
+                Identify and fix conversion bottlenecks with precision analytics that show exactly where visitors drop off.
+              </p>
+            </div>
+
+            <div className="text-center p-8 rounded-2xl bg-background/80 backdrop-blur-sm border border-border shadow-lg">
+              <div className="w-16 h-16 bg-gradient-to-br from-chart-1/20 to-chart-1/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <Clock className="w-8 h-8 text-chart-1" />
+              </div>
+              <div className="text-4xl font-bold text-chart-1 mb-2">75%</div>
+              <div className="text-lg font-semibold text-foreground mb-3">Time Saved on Reporting</div>
+              <p className="text-muted-foreground text-sm">
+                Automated insights and reports free your team to focus on strategy instead of spreadsheets.
+              </p>
+            </div>
+
+            <div className="text-center p-8 rounded-2xl bg-background/80 backdrop-blur-sm border border-border shadow-lg">
+              <div className="w-16 h-16 bg-gradient-to-br from-chart-2/20 to-chart-2/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <DollarSign className="w-8 h-8 text-chart-2" />
+              </div>
+              <div className="text-4xl font-bold text-chart-2 mb-2">3.2x</div>
+              <div className="text-lg font-semibold text-foreground mb-3">ROI in First Quarter</div>
+              <p className="text-muted-foreground text-sm">
+                Pay for itself in weeks through improved conversion rates and reduced acquisition costs.
+              </p>
+            </div>
+          </div>
+
+          <div className="bg-background/80 backdrop-blur-sm border border-border rounded-2xl p-8 text-center">
+            <blockquote className="text-xl md:text-2xl text-foreground mb-6 font-medium">
+              &quot;ClickChutney helped us identify that our checkout process was losing 60% of users at step 2. 
+              After fixing it, our conversion rate jumped from 2.1% to 3.8% - that&apos;s an extra $180k in monthly revenue.&quot;
+            </blockquote>
+            <div className="flex items-center justify-center space-x-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-primary/20 to-chart-1/20 rounded-full flex items-center justify-center">
+                <Users className="w-6 h-6 text-primary" />
+              </div>
+              <div className="text-left">
+                <div className="font-semibold text-foreground">Mike Chen</div>
+                <div className="text-sm text-muted-foreground">VP of Growth, TechFlow Inc.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Social Proof Section */}
+      <section id="customers" className="relative py-32 px-4 bg-muted/30">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-20">
+            <div className="inline-block px-4 py-2 bg-primary/10 border border-primary/20 rounded-full mb-4">
+              <span className="text-primary text-sm font-semibold">TRUSTED WORLDWIDE</span>
+            </div>
+            <h2 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-6">
+              Join 10,000+ companies 
+              <span className="bg-gradient-to-r from-primary to-chart-1 bg-clip-text text-transparent"> growing with ClickChutney</span>
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              From startups to Fortune 500 companies, teams trust ClickChutney to make better data-driven decisions.
             </p>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-8 mb-16">
-            <div className="bg-background border border-border rounded-xl p-6 text-center">
+          {/* Testimonials Grid */}
+          <div className="grid lg:grid-cols-3 gap-8 mb-20">
+            <div className="bg-background/80 backdrop-blur-sm border border-border rounded-2xl p-8 shadow-lg">
+              <div className="flex items-center mb-6">
+                <div className="flex text-chart-4">
+                  <Star className="w-5 h-5 fill-current" />
+                  <Star className="w-5 h-5 fill-current" />
+                  <Star className="w-5 h-5 fill-current" />
+                  <Star className="w-5 h-5 fill-current" />
+                  <Star className="w-5 h-5 fill-current" />
+                </div>
+              </div>
+              <blockquote className="text-foreground mb-6 text-lg leading-relaxed">
+                &quot;ClickChutney helped us identify that our mobile checkout was broken. Fixing it increased our mobile conversions by 180% in just two weeks.&quot;
+              </blockquote>
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-primary/20 to-chart-1/20 rounded-full flex items-center justify-center">
+                  <Users className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <div className="font-semibold text-foreground">Alex Rivera</div>
+                  <div className="text-sm text-muted-foreground">CTO, EcomPlus</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-background/80 backdrop-blur-sm border border-border rounded-2xl p-8 shadow-lg">
+              <div className="flex items-center mb-6">
+                <div className="flex text-chart-4">
+                  <Star className="w-5 h-5 fill-current" />
+                  <Star className="w-5 h-5 fill-current" />
+                  <Star className="w-5 h-5 fill-current" />
+                  <Star className="w-5 h-5 fill-current" />
+                  <Star className="w-5 h-5 fill-current" />
+                </div>
+              </div>
+              <blockquote className="text-foreground mb-6 text-lg leading-relaxed">
+                &quot;The setup was incredibly easy. Within 5 minutes we had actionable insights. Our bounce rate dropped 35% after implementing their recommendations.&quot;
+              </blockquote>
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-chart-1/20 to-chart-2/20 rounded-full flex items-center justify-center">
+                  <TrendingUp className="w-5 h-5 text-chart-1" />
+                </div>
+                <div>
+                  <div className="font-semibold text-foreground">Sarah Kim</div>
+                  <div className="text-sm text-muted-foreground">Marketing Director, TechFlow</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-background/80 backdrop-blur-sm border border-border rounded-2xl p-8 shadow-lg">
+              <div className="flex items-center mb-6">
+                <div className="flex text-chart-4">
+                  <Star className="w-5 h-5 fill-current" />
+                  <Star className="w-5 h-5 fill-current" />
+                  <Star className="w-5 h-5 fill-current" />
+                  <Star className="w-5 h-5 fill-current" />
+                  <Star className="w-5 h-5 fill-current" />
+                </div>
+              </div>
+              <blockquote className="text-foreground mb-6 text-lg leading-relaxed">
+                &quot;Finally, analytics that actually help us make decisions. The privacy-first approach gave us peace of mind with GDPR compliance.&quot;
+              </blockquote>
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-chart-2/20 to-chart-3/20 rounded-full flex items-center justify-center">
+                  <Shield className="w-5 h-5 text-chart-3" />
+                </div>
+                <div>
+                  <div className="font-semibold text-foreground">Marcus Johnson</div>
+                  <div className="text-sm text-muted-foreground">Head of Product, DataCorp</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Stats Row */}
+          <div className="grid md:grid-cols-4 gap-6 mb-16">
+            <div className="bg-background/60 backdrop-blur-sm border border-border rounded-xl p-6 text-center">
               <div className="text-3xl font-bold text-primary mb-2">99.9%</div>
-              <div className="text-muted-foreground text-sm">Uptime SLA</div>
+              <div className="text-muted-foreground text-sm font-medium">Uptime SLA</div>
             </div>
-            <div className="bg-background border border-border rounded-xl p-6 text-center">
+            <div className="bg-background/60 backdrop-blur-sm border border-border rounded-xl p-6 text-center">
               <div className="text-3xl font-bold text-chart-1 mb-2">500M+</div>
-              <div className="text-muted-foreground text-sm">Events processed monthly</div>
+              <div className="text-muted-foreground text-sm font-medium">Events processed monthly</div>
             </div>
-            <div className="bg-background border border-border rounded-xl p-6 text-center">
+            <div className="bg-background/60 backdrop-blur-sm border border-border rounded-xl p-6 text-center">
               <div className="text-3xl font-bold text-chart-2 mb-2">10,000+</div>
-              <div className="text-muted-foreground text-sm">Active websites</div>
+              <div className="text-muted-foreground text-sm font-medium">Active websites</div>
+            </div>
+            <div className="bg-background/60 backdrop-blur-sm border border-border rounded-xl p-6 text-center">
+              <div className="text-3xl font-bold text-chart-4 mb-2">4.9/5</div>
+              <div className="text-muted-foreground text-sm font-medium">Customer satisfaction</div>
             </div>
           </div>
           
+          {/* Company Logos */}
           <div className="text-center">
-            <blockquote className="text-lg text-muted-foreground mb-4 max-w-3xl mx-auto">
-              &quot;ClickChutney transformed how we understand our users. The insights are actionable and the setup was incredibly straightforward.&quot;
-            </blockquote>
-            <cite className="text-sm font-medium text-foreground">Sarah Chen, Head of Growth at TechCorp</cite>
+            <p className="text-muted-foreground text-sm font-medium mb-8">Trusted by leading companies worldwide</p>
+            <div className="flex justify-center items-center space-x-12 opacity-60">
+              <div className="w-32 h-16 bg-muted/50 rounded-lg flex items-center justify-center">
+                <div className="w-20 h-8 bg-gradient-to-r from-primary/30 to-chart-1/30 rounded"></div>
+              </div>
+              <div className="w-32 h-16 bg-muted/50 rounded-lg flex items-center justify-center">
+                <div className="w-20 h-8 bg-gradient-to-r from-chart-2/30 to-chart-3/30 rounded"></div>
+              </div>
+              <div className="w-32 h-16 bg-muted/50 rounded-lg flex items-center justify-center">
+                <div className="w-20 h-8 bg-gradient-to-r from-chart-4/30 to-primary/30 rounded"></div>
+              </div>
+              <div className="w-32 h-16 bg-muted/50 rounded-lg flex items-center justify-center">
+                <div className="w-20 h-8 bg-gradient-to-r from-chart-1/30 to-chart-2/30 rounded"></div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -500,6 +734,115 @@ export default function Home() {
             <Button variant="ghost" asChild>
               <Link href="#faq" className="text-primary hover:text-primary/80">
                 View detailed feature comparison →
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section id="faq" className="relative py-32 px-4 bg-card">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-16">
+            <div className="inline-block px-4 py-2 bg-primary/10 border border-primary/20 rounded-full mb-4">
+              <span className="text-primary text-sm font-semibold">FREQUENTLY ASKED QUESTIONS</span>
+            </div>
+            <h2 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-6">
+              Everything you need to know
+            </h2>
+            <p className="text-xl text-muted-foreground">
+              Quick answers to the most common questions about ClickChutney.
+            </p>
+          </div>
+
+          <div className="space-y-6">
+            <div className="bg-background border border-border rounded-2xl p-8">
+              <h3 className="font-semibold text-lg text-foreground mb-4 flex items-center">
+                <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center mr-3">
+                  <span className="text-primary text-sm font-bold">Q</span>
+                </div>
+                How quickly can I see results after installing ClickChutney?
+              </h3>
+              <p className="text-muted-foreground leading-relaxed pl-11">
+                You&apos;ll see your first data within minutes of installation. Our dashboard provides real-time insights, 
+                so you can start making data-driven decisions immediately. Most customers see actionable insights within 24 hours.
+              </p>
+            </div>
+
+            <div className="bg-background border border-border rounded-2xl p-8">
+              <h3 className="font-semibold text-lg text-foreground mb-4 flex items-center">
+                <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center mr-3">
+                  <span className="text-primary text-sm font-bold">Q</span>
+                </div>
+                Is ClickChutney GDPR compliant?
+              </h3>
+              <p className="text-muted-foreground leading-relaxed pl-11">
+                Yes, absolutely. ClickChutney is built privacy-first from the ground up. We&apos;re fully GDPR, CCPA, and PECR compliant. 
+                We don&apos;t use cookies, don&apos;t collect personal data, and all data is processed in accordance with privacy regulations.
+              </p>
+            </div>
+
+            <div className="bg-background border border-border rounded-2xl p-8">
+              <h3 className="font-semibold text-lg text-foreground mb-4 flex items-center">
+                <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center mr-3">
+                  <span className="text-primary text-sm font-bold">Q</span>
+                </div>
+                How does ClickChutney compare to Google Analytics?
+              </h3>
+              <p className="text-muted-foreground leading-relaxed pl-11">
+                ClickChutney focuses on actionable insights rather than vanity metrics. While GA shows you what happened, 
+                we show you what to do next. Plus, we&apos;re privacy-compliant by default, lightweight (9kb vs 45kb), and designed for business results.
+              </p>
+            </div>
+
+            <div className="bg-background border border-border rounded-2xl p-8">
+              <h3 className="font-semibold text-lg text-foreground mb-4 flex items-center">
+                <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center mr-3">
+                  <span className="text-primary text-sm font-bold">Q</span>
+                </div>
+                Can I cancel my subscription anytime?
+              </h3>
+              <p className="text-muted-foreground leading-relaxed pl-11">
+                Yes, you can cancel your subscription at any time with no questions asked. Your data remains accessible for 90 days after cancellation, 
+                giving you time to export everything you need.
+              </p>
+            </div>
+
+            <div className="bg-background border border-border rounded-2xl p-8">
+              <h3 className="font-semibold text-lg text-foreground mb-4 flex items-center">
+                <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center mr-3">
+                  <span className="text-primary text-sm font-bold">Q</span>
+                </div>
+                Do you offer customer support?
+              </h3>
+              <p className="text-muted-foreground leading-relaxed pl-11">
+                Yes! All plans include email support with response within 24 hours. Professional and Enterprise plans get priority support, 
+                and Enterprise customers get a dedicated success manager.
+              </p>
+            </div>
+
+            <div className="bg-background border border-border rounded-2xl p-8">
+              <h3 className="font-semibold text-lg text-foreground mb-4 flex items-center">
+                <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center mr-3">
+                  <span className="text-primary text-sm font-bold">Q</span>
+                </div>
+                What happens to my data if I upgrade or downgrade plans?
+              </h3>
+              <p className="text-muted-foreground leading-relaxed pl-11">
+                Your historical data is always preserved. When upgrading, you immediately get access to advanced features. 
+                When downgrading, you keep all existing data but some advanced features become read-only until you upgrade again.
+              </p>
+            </div>
+          </div>
+
+          <div className="text-center mt-12">
+            <p className="text-muted-foreground mb-6">
+              Have more questions? We&apos;d love to help.
+            </p>
+            <Button asChild size="lg" variant="outline">
+              <Link href="#contact" className="gap-2">
+                <Users className="w-5 h-5" />
+                Contact Support
               </Link>
             </Button>
           </div>
