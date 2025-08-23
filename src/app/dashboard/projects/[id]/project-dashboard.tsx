@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { TrackingInstructions } from '@/components/tracking-instructions';
 import { AnalyticsChart } from '@/components/ui/analytics-chart';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
-import { ProjectAnalyticsSidebar } from '@/components/project-analytics-sidebar';
+import { DashboardLayout } from '@/components/dashboard-layout';
 
 interface Project {
   id: string;
@@ -66,7 +66,7 @@ interface ProjectDashboardProps {
 }
 
 
-export function ProjectDashboard({ projectId }: ProjectDashboardProps) {
+export function ProjectDashboard({ session, projectId }: ProjectDashboardProps) {
   const router = useRouter();
   const [project, setProject] = useState<Project | null>(null);
   const [stats, setStats] = useState<ProjectStats | null>(null);
@@ -74,8 +74,6 @@ export function ProjectDashboard({ projectId }: ProjectDashboardProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('realtime');
-  const [isAnalyticsSidebarCollapsed, setIsAnalyticsSidebarCollapsed] = useState(false);
-  const [isMobileAnalyticsSidebarOpen, setIsMobileAnalyticsSidebarOpen] = useState(false);
 
   useEffect(() => {
     const fetchProjectData = async () => {
@@ -769,112 +767,72 @@ export function ProjectDashboard({ projectId }: ProjectDashboardProps) {
     { label: project?.name || 'Project', isActive: true }
   ];
 
-  return (
-    <div className="flex h-screen">
-      {/* Project Analytics Sidebar */}
-      <ProjectAnalyticsSidebar
-        activeTab={activeTab}
-        onTabChange={(tab) => {
-          setActiveTab(tab);
-          setIsMobileAnalyticsSidebarOpen(false);
-        }}
-        projectName={project.name}
-        isCollapsed={isAnalyticsSidebarCollapsed}
-        onToggleCollapse={() => setIsAnalyticsSidebarCollapsed(!isAnalyticsSidebarCollapsed)}
-        isMobileOpen={isMobileAnalyticsSidebarOpen}
-        onMobileClose={() => setIsMobileAnalyticsSidebarOpen(false)}
-      />
+  const projectContext = {
+    projectName: project.name,
+    projectId: project.id,
+    activeTab,
+    onTabChange: setActiveTab
+  };
 
-      {/* Main Content Area */}
-      <main className={`flex-1 overflow-auto transition-all duration-300 ${
-        isAnalyticsSidebarCollapsed ? 'lg:ml-20' : 'lg:ml-72'
-      }`}>
-        {/* Mobile Analytics Header */}
-        <div className="lg:hidden flex items-center justify-between h-16 px-4 bg-background border-b border-border backdrop-blur-sm">
-          <button
-            onClick={() => setIsMobileAnalyticsSidebarOpen(true)}
-            className="p-2 rounded-md hover:bg-accent transition-colors"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
-          <div className="flex items-center gap-2">
-            <h2 className="text-lg font-bold text-foreground truncate">{project.name}</h2>
-            <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded-full">
-              {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
-            </span>
-          </div>
-          <div className="w-8" />
+  return (
+    <DashboardLayout session={session} projectContext={projectContext}>
+      <div className="p-4 lg:p-6 space-y-6">
+        {/* Breadcrumb Navigation - Hidden on mobile */}
+        <div className="hidden lg:block">
+          <Breadcrumb items={breadcrumbItems} className="animate-fade-in" />
         </div>
 
-        <div className="p-4 lg:p-6 space-y-6">
-          {/* Breadcrumb Navigation - Hidden on mobile */}
-          <div className="hidden lg:block">
-            <Breadcrumb items={breadcrumbItems} className="animate-fade-in" />
-          </div>
-
-          {/* Header with improved styling */}
-          <div className="bg-card border border-border rounded-lg p-4 lg:p-6 animate-fade-in">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex-1">
-                <div className="flex items-center gap-3 mb-3">
-                  <button
-                    onClick={() => router.push('/dashboard/projects')}
-                    className="p-2 text-muted-foreground hover:text-foreground hover:bg-accent rounded-lg transition-colors focus-ring"
-                    title="Back to Projects"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                    </svg>
-                  </button>
-                  <div className="min-w-0">
-                    <h1 className="text-xl lg:text-2xl font-bold text-foreground truncate">{project.name}</h1>
-                    <div className="flex items-center gap-3 mt-1 flex-wrap">
-                      <span className={`text-xs px-2 py-1 rounded-full font-medium ${
-                        project.status === 'ACTIVE' 
-                          ? 'bg-chart-4/20 text-chart-4 border border-chart-4/30' 
-                          : 'bg-chart-5/20 text-chart-5 border border-chart-5/30'
-                      }`}>
-                        {project.status === 'ACTIVE' ? 'Active' : 'Setup Required'}
-                      </span>
-                      <span className="text-xs text-muted-foreground font-mono truncate">
-                        ID: {project.trackingId}
-                      </span>
-                    </div>
+        {/* Header with improved styling */}
+        <div className="bg-card border border-border rounded-lg p-4 lg:p-6 animate-fade-in">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="min-w-0">
+                  <h1 className="text-xl lg:text-2xl font-bold text-foreground truncate">{project.name}</h1>
+                  <div className="flex items-center gap-3 mt-1 flex-wrap">
+                    <span className={`text-xs px-2 py-1 rounded-full font-medium ${
+                      project.status === 'ACTIVE' 
+                        ? 'bg-chart-4/20 text-chart-4 border border-chart-4/30' 
+                        : 'bg-chart-5/20 text-chart-5 border border-chart-5/30'
+                    }`}>
+                      {project.status === 'ACTIVE' ? 'Active' : 'Setup Required'}
+                    </span>
+                    <span className="text-xs text-muted-foreground font-mono truncate">
+                      ID: {project.trackingId}
+                    </span>
                   </div>
                 </div>
-                
-                <div className="space-y-2">
-                  <p className="text-muted-foreground text-sm lg:text-base">
-                    {project.description || `Analytics dashboard for ${project.name}`}
-                  </p>
-                  {project.website && (
-                    <div className="flex items-center gap-2">
-                      <svg className="w-4 h-4 text-muted-foreground flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                      </svg>
-                      <a 
-                        href={project.website} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-accent hover:text-accent/80 text-sm transition-colors hover:underline focus-ring truncate"
-                      >
-                        {project.website}
-                      </a>
-                    </div>
-                  )}
-                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <p className="text-muted-foreground text-sm lg:text-base">
+                  {project.description || `Analytics dashboard for ${project.name}`}
+                </p>
+                {project.website && (
+                  <div className="flex items-center gap-2">
+                    <svg className="w-4 h-4 text-muted-foreground flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                    </svg>
+                    <a 
+                      href={project.website} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-accent hover:text-accent/80 text-sm transition-colors hover:underline focus-ring truncate"
+                    >
+                      {project.website}
+                    </a>
+                  </div>
+                )}
               </div>
             </div>
           </div>
-
-          {/* Tab Content */}
-          <div className="animate-slide-up">
-            {renderTabContent()}
-          </div>
         </div>
-      </main>
-    </div>
+
+        {/* Tab Content */}
+        <div className="animate-slide-up">
+          {renderTabContent()}
+        </div>
+      </div>
+    </DashboardLayout>
   );
 }

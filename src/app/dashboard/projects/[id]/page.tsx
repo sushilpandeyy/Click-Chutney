@@ -1,7 +1,6 @@
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { DashboardLayout } from '@/components/dashboard-layout';
 import { ProjectDashboard } from './project-dashboard';
 
 export default async function ProjectDashboardPage({ 
@@ -20,8 +19,6 @@ export default async function ProjectDashboardPage({
   const resolvedParams = await params;
 
   return (
-    <DashboardLayout session={session}>
-      <ProjectDashboard session={session} projectId={resolvedParams.id} />
-    </DashboardLayout>
+    <ProjectDashboard session={session} projectId={resolvedParams.id} />
   );
 }
