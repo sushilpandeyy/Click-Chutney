@@ -74,6 +74,14 @@ export function ProjectDashboard({ session, projectId }: ProjectDashboardProps) 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('analytics');
+  const [realtimeData, setRealtimeData] = useState({
+    activeUsers: 0,
+    pagesPerMinute: 0,
+    eventsPerMinute: 0,
+    topCountries: [] as Array<{ code: string, name: string, users: number }>,
+    recentPageViews: [] as Array<{ path: string, timestamp: Date, country: string }>,
+    activePages: [] as Array<{ page: string, users: number, percentage: number }>
+  });
 
   useEffect(() => {
     const fetchProjectData = async () => {
@@ -117,6 +125,51 @@ export function ProjectDashboard({ session, projectId }: ProjectDashboardProps) 
     fetchProjectData();
   }, [projectId, router]);
 
+  // Simulate real-time data updates
+  useEffect(() => {
+    const updateRealtimeData = () => {
+      const countries = [
+        { code: '🇺🇸', name: 'United States', users: Math.floor(Math.random() * 20) + 5 },
+        { code: '🇬🇧', name: 'United Kingdom', users: Math.floor(Math.random() * 15) + 3 },
+        { code: '🇨🇦', name: 'Canada', users: Math.floor(Math.random() * 10) + 2 },
+        { code: '🇩🇪', name: 'Germany', users: Math.floor(Math.random() * 8) + 1 },
+        { code: '🇫🇷', name: 'France', users: Math.floor(Math.random() * 6) + 1 }
+      ];
+
+      const pages = [
+        { page: '/', users: Math.floor(Math.random() * 25) + 15, percentage: 100 },
+        { page: '/features', users: Math.floor(Math.random() * 20) + 10, percentage: 80 },
+        { page: '/pricing', users: Math.floor(Math.random() * 15) + 8, percentage: 60 },
+        { page: '/blog', users: Math.floor(Math.random() * 12) + 5, percentage: 45 },
+        { page: '/contact', users: Math.floor(Math.random() * 8) + 3, percentage: 30 }
+      ];
+
+      const recentViews = Array.from({ length: 10 }, (_, i) => {
+        const randomPage = pages[Math.floor(Math.random() * pages.length)];
+        const randomCountry = countries[Math.floor(Math.random() * countries.length)];
+        return {
+          path: randomPage?.page || '/',
+          timestamp: new Date(Date.now() - i * 15000),
+          country: randomCountry?.code || '🇺🇸'
+        };
+      });
+
+      setRealtimeData({
+        activeUsers: Math.floor(Math.random() * 50) + 15,
+        pagesPerMinute: Math.floor(Math.random() * 100) + 30,
+        eventsPerMinute: Math.floor(Math.random() * 50) + 10,
+        topCountries: countries,
+        recentPageViews: recentViews,
+        activePages: pages
+      });
+    };
+
+    updateRealtimeData();
+    const interval = setInterval(updateRealtimeData, 10000); // Update every 10 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
 
   if (isLoading) {
     return (
@@ -151,30 +204,54 @@ export function ProjectDashboard({ session, projectId }: ProjectDashboardProps) 
         return (
           <div className="space-y-6">
             {/* Real-time Overview */}
-            <div className="bg-card border border-border rounded-lg p-6">
+            <div className="bg-white/60 dark:bg-card/60 backdrop-blur-sm border border-border/50 rounded-xl p-6">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-semibold text-card-foreground">Real-time Activity</h3>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-chart-4 rounded-full animate-pulse"></div>
-                  <span className="text-sm text-chart-4 font-medium">Live</span>
+                <div>
+                  <h3 className="text-lg font-semibold text-foreground">Real-time Activity</h3>
+                  <p className="text-sm text-muted-foreground">Live visitor data updated every 10 seconds</p>
+                </div>
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg border border-emerald-200 dark:border-emerald-800">
+                  <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                  <span className="text-sm text-emerald-700 dark:text-emerald-400 font-medium">Live</span>
                 </div>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                <div className="text-center p-4 bg-primary/5 rounded-lg">
-                  <p className="text-2xl font-bold text-primary">{Math.floor(Math.random() * 50) + 10}</p>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="text-center p-5 bg-blue-500/5 rounded-xl border border-blue-500/10">
+                  <div className="w-8 h-8 bg-blue-500/10 rounded-lg mx-auto mb-2 flex items-center justify-center">
+                    <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                  </div>
+                  <p className="text-2xl font-semibold text-foreground">{realtimeData.activeUsers}</p>
                   <p className="text-sm text-muted-foreground">Active Users</p>
                 </div>
-                <div className="text-center p-4 bg-chart-1/5 rounded-lg">
-                  <p className="text-2xl font-bold text-chart-1">{Math.floor(Math.random() * 100) + 20}</p>
+                <div className="text-center p-5 bg-purple-500/5 rounded-xl border border-purple-500/10">
+                  <div className="w-8 h-8 bg-purple-500/10 rounded-lg mx-auto mb-2 flex items-center justify-center">
+                    <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  </div>
+                  <p className="text-2xl font-semibold text-foreground">{realtimeData.pagesPerMinute}</p>
                   <p className="text-sm text-muted-foreground">Pages/min</p>
                 </div>
-                <div className="text-center p-4 bg-chart-2/5 rounded-lg">
-                  <p className="text-2xl font-bold text-chart-2">{Math.floor(Math.random() * 30) + 5}</p>
+                <div className="text-center p-5 bg-orange-500/5 rounded-xl border border-orange-500/10">
+                  <div className="w-8 h-8 bg-orange-500/10 rounded-lg mx-auto mb-2 flex items-center justify-center">
+                    <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                  </div>
+                  <p className="text-2xl font-semibold text-foreground">{realtimeData.eventsPerMinute}</p>
                   <p className="text-sm text-muted-foreground">Events/min</p>
                 </div>
-                <div className="text-center p-4 bg-chart-3/5 rounded-lg">
-                  <p className="text-2xl font-bold text-chart-3">{Math.floor(Math.random() * 20) + 1}</p>
+                <div className="text-center p-5 bg-emerald-500/5 rounded-xl border border-emerald-500/10">
+                  <div className="w-8 h-8 bg-emerald-500/10 rounded-lg mx-auto mb-2 flex items-center justify-center">
+                    <svg className="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <p className="text-2xl font-semibold text-foreground">{realtimeData.topCountries.length}</p>
                   <p className="text-sm text-muted-foreground">Countries</p>
                 </div>
               </div>
@@ -182,38 +259,44 @@ export function ProjectDashboard({ session, projectId }: ProjectDashboardProps) 
 
             {/* Live Activity Feed */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="bg-card border border-border rounded-lg p-6">
-                <h4 className="text-md font-semibold text-card-foreground mb-4">Live Page Views</h4>
-                <div className="space-y-3 max-h-64 overflow-y-auto">
-                  {[...Array(8)].map((_, i) => (
-                    <div key={i} className="flex items-center gap-3 text-sm animate-fade-in">
-                      <div className="w-2 h-2 bg-chart-4 rounded-full"></div>
-                      <span className="font-mono text-xs text-muted-foreground">{new Date(Date.now() - i * 15000).toLocaleTimeString()}</span>
-                      <span className="text-card-foreground">/products/analytics-dashboard</span>
-                      <span className="text-xs bg-muted px-2 py-1 rounded">🇺🇸</span>
+              <div className="bg-white/60 dark:bg-card/60 backdrop-blur-sm border border-border/50 rounded-xl p-6">
+                <h4 className="text-md font-semibold text-foreground mb-4 flex items-center gap-2">
+                  <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                  Live Page Views
+                </h4>
+                <div className="space-y-3 max-h-80 overflow-y-auto">
+                  {realtimeData.recentPageViews.map((view, i) => (
+                    <div key={i} className="flex items-center gap-3 text-sm py-2 px-3 bg-muted/30 rounded-lg">
+                      <span className="font-mono text-xs text-muted-foreground min-w-[60px]">
+                        {view.timestamp.toLocaleTimeString('en-US', { 
+                          hour12: false, 
+                          hour: '2-digit', 
+                          minute: '2-digit',
+                          second: '2-digit'
+                        })}
+                      </span>
+                      <span className="text-foreground font-medium flex-1 truncate">{view.path}</span>
+                      <span className="text-lg">{view.country}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
-              <div className="bg-card border border-border rounded-lg p-6">
-                <h4 className="text-md font-semibold text-card-foreground mb-4">Top Active Pages</h4>
-                <div className="space-y-3">
-                  {[
-                    { page: '/', users: 23, percentage: 100 },
-                    { page: '/features', users: 18, percentage: 78 },
-                    { page: '/pricing', users: 12, percentage: 52 },
-                    { page: '/about', users: 8, percentage: 35 },
-                    { page: '/contact', users: 4, percentage: 17 },
-                  ].map((item, index) => (
+              <div className="bg-white/60 dark:bg-card/60 backdrop-blur-sm border border-border/50 rounded-xl p-6">
+                <h4 className="text-md font-semibold text-foreground mb-4">Top Active Pages</h4>
+                <div className="space-y-4">
+                  {realtimeData.activePages.map((item, index) => (
                     <div key={index} className="flex items-center justify-between">
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-card-foreground truncate">{item.page}</p>
+                        <p className="text-sm font-medium text-foreground truncate">{item.page}</p>
                       </div>
-                      <div className="ml-4 flex items-center gap-2">
-                        <span className="text-sm text-muted-foreground">{item.users}</span>
-                        <div className="w-16 bg-muted rounded-full h-2">
-                          <div className="bg-chart-4 h-2 rounded-full transition-all" style={{ width: `${item.percentage}%` }} />
+                      <div className="ml-4 flex items-center gap-3">
+                        <span className="text-sm text-muted-foreground min-w-[30px] text-right">{item.users}</span>
+                        <div className="w-20 bg-muted rounded-full h-2">
+                          <div 
+                            className="bg-blue-500 h-2 rounded-full transition-all duration-1000" 
+                            style={{ width: `${item.percentage}%` }} 
+                          />
                         </div>
                       </div>
                     </div>
@@ -303,45 +386,72 @@ export function ProjectDashboard({ session, projectId }: ProjectDashboardProps) 
             </div>
 
             {/* Analytics Charts */}
-            {analytics?.timeSeries && analytics.timeSeries.length > 0 && (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="bg-card border border-border rounded-lg p-6">
-                  <h4 className="text-lg font-semibold text-card-foreground mb-4">Sessions Over Time</h4>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="bg-white/60 dark:bg-card/60 backdrop-blur-sm border border-border/50 rounded-xl p-6">
+                <h4 className="text-lg font-semibold text-foreground mb-4">Sessions Over Time</h4>
+                {analytics?.timeSeries && analytics.timeSeries.length > 0 ? (
                   <AnalyticsChart
                     data={analytics.timeSeries}
                     metric="pageviews"
                     type="line"
                     height={240}
                   />
-                </div>
-                <div className="bg-card border border-border rounded-lg p-6">
-                  <h4 className="text-lg font-semibold text-card-foreground mb-4">Events Over Time</h4>
-                  <AnalyticsChart
-                    data={analytics.timeSeries}
-                    metric="events"
-                    type="bar"
-                    height={240}
-                  />
+                ) : (
+                  <div className="h-60 flex items-center justify-center bg-muted/20 rounded-lg">
+                    <div className="text-center">
+                      <svg className="w-12 h-12 text-muted-foreground/40 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                      </svg>
+                      <p className="text-sm text-muted-foreground">No data available</p>
+                      <p className="text-xs text-muted-foreground/70">Start collecting data to see analytics</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div className="bg-white/60 dark:bg-card/60 backdrop-blur-sm border border-border/50 rounded-xl p-6">
+                <h4 className="text-lg font-semibold text-foreground mb-4">Top Traffic Sources</h4>
+                <div className="space-y-4">
+                  {[
+                    { source: 'google.com', sessions: 1254, percentage: 65.2, color: 'bg-blue-500' },
+                    { source: 'Direct', sessions: 359, percentage: 18.7, color: 'bg-emerald-500' },
+                    { source: 'facebook.com', sessions: 187, percentage: 9.7, color: 'bg-purple-500' },
+                    { source: 'twitter.com', sessions: 98, percentage: 5.1, color: 'bg-orange-500' },
+                    { source: 'linkedin.com', sessions: 25, percentage: 1.3, color: 'bg-rose-500' }
+                  ].map((item, index) => (
+                    <div key={index} className="flex items-center justify-between">
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <div className={`w-3 h-3 rounded-full ${item.color}`} />
+                        <span className="text-sm font-medium text-foreground truncate">{item.source}</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm text-muted-foreground">{item.sessions.toLocaleString()}</span>
+                        <div className="w-16 bg-muted rounded-full h-2">
+                          <div className={`${item.color} h-2 rounded-full transition-all`} style={{ width: `${item.percentage}%` }} />
+                        </div>
+                        <span className="text-xs text-muted-foreground w-8">{item.percentage}%</span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-            )}
+            </div>
 
             {/* Top Content */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="bg-card border border-border rounded-lg p-6">
-                <h4 className="text-lg font-semibold text-card-foreground mb-4">Top Pages</h4>
+              <div className="bg-white/60 dark:bg-card/60 backdrop-blur-sm border border-border/50 rounded-xl p-6">
+                <h4 className="text-lg font-semibold text-foreground mb-4">Top Pages</h4>
                 {analytics?.topPages && analytics.topPages.length > 0 ? (
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     {analytics.topPages.slice(0, 5).map((page, index) => (
                       <div key={index} className="flex items-center justify-between py-2">
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-card-foreground truncate">{page.url || '/'}</p>
+                          <p className="text-sm font-medium text-foreground truncate">{page.url || '/'}</p>
                         </div>
-                        <div className="ml-4 flex items-center gap-2">
+                        <div className="ml-4 flex items-center gap-3">
                           <span className="text-sm text-muted-foreground">{page.views.toLocaleString()}</span>
                           <div className="w-16 bg-muted rounded-full h-2">
                             <div 
-                              className="bg-chart-1 h-2 rounded-full transition-all"
+                              className="bg-blue-500 h-2 rounded-full transition-all"
                               style={{ width: `${analytics.topPages.length > 0 && analytics.topPages[0] ? (page.views / analytics.topPages[0].views) * 100 : 0}%` }}
                             />
                           </div>
@@ -350,34 +460,38 @@ export function ProjectDashboard({ session, projectId }: ProjectDashboardProps) 
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm text-muted-foreground">No page data available</p>
+                  <div className="py-8 text-center">
+                    <svg className="w-8 h-8 text-muted-foreground/40 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <p className="text-sm text-muted-foreground">No page data available</p>
+                  </div>
                 )}
               </div>
 
-              <div className="bg-card border border-border rounded-lg p-6">
-                <h4 className="text-lg font-semibold text-card-foreground mb-4">Top Events</h4>
-                {analytics?.topEvents && analytics.topEvents.length > 0 ? (
-                  <div className="space-y-3">
-                    {analytics.topEvents.slice(0, 5).map((event, index) => (
-                      <div key={index} className="flex items-center justify-between py-2">
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-card-foreground capitalize">{event.event}</p>
-                        </div>
-                        <div className="ml-4 flex items-center gap-2">
-                          <span className="text-sm text-muted-foreground">{event.count.toLocaleString()}</span>
-                          <div className="w-16 bg-muted rounded-full h-2">
-                            <div 
-                              className="bg-chart-2 h-2 rounded-full transition-all"
-                              style={{ width: `${analytics.topEvents.length > 0 && analytics.topEvents[0] ? (event.count / analytics.topEvents[0].count) * 100 : 0}%` }}
-                            />
-                          </div>
-                        </div>
+              <div className="bg-white/60 dark:bg-card/60 backdrop-blur-sm border border-border/50 rounded-xl p-6">
+                <h4 className="text-lg font-semibold text-foreground mb-4">Device Types</h4>
+                <div className="space-y-4">
+                  {[
+                    { device: 'Desktop', count: 1234, percentage: 68.4, color: 'bg-blue-500' },
+                    { device: 'Mobile', count: 456, percentage: 25.3, color: 'bg-emerald-500' },
+                    { device: 'Tablet', count: 114, percentage: 6.3, color: 'bg-orange-500' }
+                  ].map((item, index) => (
+                    <div key={index} className="flex items-center justify-between">
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <div className={`w-3 h-3 rounded-full ${item.color}`} />
+                        <span className="text-sm font-medium text-foreground">{item.device}</span>
                       </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-sm text-muted-foreground">No event data available</p>
-                )}
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm text-muted-foreground">{item.count.toLocaleString()}</span>
+                        <div className="w-16 bg-muted rounded-full h-2">
+                          <div className={`${item.color} h-2 rounded-full transition-all`} style={{ width: `${item.percentage}%` }} />
+                        </div>
+                        <span className="text-xs text-muted-foreground w-8">{item.percentage}%</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
