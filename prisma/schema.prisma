@@ -26,6 +26,8 @@ model User {
   sessions      Session[]
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+
+  @@map("user")
 }
 
 model Account {
@@ -41,16 +43,19 @@ model Account {
   updatedAt         DateTime @updatedAt
 
   @@unique([providerId, providerAccountId])
+  @@map("account")
 }
 
 model Session {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   userId       String   @db.ObjectId
-  sessionToken String   @unique
+  sessionToken String?  @unique
   expiresAt    DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+
+  @@map("session")
 }
 
 model Project {

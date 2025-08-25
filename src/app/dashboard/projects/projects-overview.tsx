@@ -170,22 +170,19 @@ chutney('track', 'pageview');
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      {/* Breadcrumb */}
       <Breadcrumb 
         items={[
-          { label: "Dashboard", href: "/dashboard" },
-          { label: "Projects", isActive: true }
+          { label: "Dashboard", isActive: true }
         ]}
         className="mb-6"
       />
       
-      {/* Header */}
       <div className="mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-foreground mb-2 font-display">Projects</h1>
+            <h1 className="text-3xl font-bold text-foreground mb-2 font-display">Dashboard</h1>
             <p className="text-muted-foreground">
-              Manage your analytics projects and tracking configurations.
+              Monitor and manage your analytics projects
             </p>
           </div>
           <div className="mt-4 sm:mt-0">
@@ -208,10 +205,8 @@ chutney('track', 'pageview');
         </div>
       )}
 
-      {/* Filters and Search */}
       <div className="mb-6 bg-[#111111] border border-[#262626] rounded-lg p-4">
         <div className="flex flex-col lg:flex-row gap-4">
-          {/* Search */}
           <div className="flex-1">
             <div className="relative">
               <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -227,7 +222,6 @@ chutney('track', 'pageview');
             </div>
           </div>
 
-          {/* Status Filter */}
           <div className="flex items-center gap-2">
             <label className="text-sm text-gray-400">Status:</label>
             <select
@@ -241,7 +235,6 @@ chutney('track', 'pageview');
             </select>
           </div>
 
-          {/* Sort */}
           <div className="flex items-center gap-2">
             <label className="text-sm text-gray-400">Sort by:</label>
             <select
@@ -266,7 +259,6 @@ chutney('track', 'pageview');
         </div>
       </div>
 
-      {/* Projects Grid/List */}
       {filteredProjects.length === 0 ? (
         <EmptyState
           icon={
@@ -293,7 +285,6 @@ chutney('track', 'pageview');
           {filteredProjects.map((project) => (
             <div key={project.id} className="bg-[#111111] border border-[#262626] rounded-lg p-6 hover:border-[#404040] transition-colors">
               <div className="flex flex-col lg:flex-row lg:items-center gap-6">
-                {/* Project Info */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex-1 min-w-0">
@@ -324,7 +315,6 @@ chutney('track', 'pageview');
                     </span>
                   </div>
 
-                  {/* Tracking ID */}
                   <div className="flex items-center gap-2 mb-3">
                     <span className="text-xs text-gray-500">Tracking ID:</span>
                     <code className="text-xs bg-[#0a0a0a] border border-[#262626] px-2 py-1 rounded text-blue-400 font-mono">
@@ -341,7 +331,6 @@ chutney('track', 'pageview');
                     </button>
                   </div>
 
-                  {/* Stats */}
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
                     <div>
                       <p className="text-lg font-bold text-white">{project.stats?.totalEvents || 0}</p>
@@ -362,7 +351,6 @@ chutney('track', 'pageview');
                   </div>
                 </div>
 
-                {/* Actions */}
                 <div className="flex flex-col sm:flex-row gap-2 lg:flex-col lg:w-32">
                   <button 
                     onClick={() => router.push(`/dashboard/projects/${project.id}`)}
@@ -400,7 +388,6 @@ chutney('track', 'pageview');
                 </div>
               </div>
 
-              {/* Project metadata */}
               <div className="mt-4 pt-4 border-t border-[#262626] flex items-center justify-between text-xs text-gray-500">
                 <span>Created {new Date(project.createdAt).toLocaleDateString()}</span>
                 <span>Last updated {new Date(project.updatedAt).toLocaleDateString()}</span>
@@ -410,14 +397,12 @@ chutney('track', 'pageview');
         </div>
       )}
 
-      {/* Project Creation Modal */}
       <ProjectCreateModal
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         onProjectCreated={handleProjectCreated}
       />
 
-      {/* Delete Confirmation Modal */}
       {showDeleteModal && selectedProject && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-[#111111] border border-[#262626] rounded-lg w-full max-w-md">

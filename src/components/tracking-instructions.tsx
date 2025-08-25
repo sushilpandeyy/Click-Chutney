@@ -273,7 +273,6 @@ export default function RootLayout({
     <html lang="en">
       <body>
         {children}
-        {/* Add ClickChutney Analytics */}
         <ClickChutneyAnalytics trackingId="${trackingId}" />
       </body>
     </html>

@@ -115,7 +115,6 @@ export function ProjectsClient({ session }: ProjectsClientProps) {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white">
-      {/* Header */}
       <header className="border-b border-[#262626] bg-[#111111]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
@@ -155,9 +154,7 @@ export function ProjectsClient({ session }: ProjectsClientProps) {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header Section */}
         <div className="mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
             <div>
@@ -186,7 +183,6 @@ export function ProjectsClient({ session }: ProjectsClientProps) {
           </div>
         )}
 
-        {/* Projects Grid */}
         {projects.length > 0 ? (
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
             {projects.map((project) => (
@@ -305,14 +301,12 @@ export function ProjectsClient({ session }: ProjectsClientProps) {
         )}
       </main>
 
-      {/* Modals */}
       <ProjectCreateModal
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         onProjectCreated={handleProjectCreated}
       />
 
-      {/* Delete Confirmation Modal */}
       {showDeleteModal && selectedProject && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-[#111111] border border-[#262626] rounded-lg w-full max-w-md">

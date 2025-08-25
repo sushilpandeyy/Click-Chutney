@@ -235,7 +235,6 @@ export function SettingsOverview({ session }: SettingsOverviewProps) {
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white mb-2">Settings</h1>
         <p className="text-gray-400">
@@ -243,7 +242,6 @@ export function SettingsOverview({ session }: SettingsOverviewProps) {
         </p>
       </div>
 
-      {/* Status Messages */}
       {error && (
         <div className="mb-6 p-4 bg-red-900/20 border border-red-800/30 rounded-lg">
           <p className="text-red-400">{error}</p>
@@ -257,7 +255,6 @@ export function SettingsOverview({ session }: SettingsOverviewProps) {
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        {/* Sidebar Navigation */}
         <div className="lg:col-span-1">
           <nav className="space-y-2">
             {tabs.map((tab) => (
@@ -277,10 +274,8 @@ export function SettingsOverview({ session }: SettingsOverviewProps) {
           </nav>
         </div>
 
-        {/* Settings Content */}
         <div className="lg:col-span-3">
           <div className="bg-[#111111] border border-[#262626] rounded-lg p-6">
-            {/* Profile Settings */}
             {activeTab === 'profile' && (
               <div className="space-y-6">
                 <h2 className="text-xl font-semibold text-white">Profile Settings</h2>
@@ -344,7 +339,6 @@ export function SettingsOverview({ session }: SettingsOverviewProps) {
               </div>
             )}
 
-            {/* Notifications Settings */}
             {activeTab === 'notifications' && (
               <div className="space-y-6">
                 <h2 className="text-xl font-semibold text-white">Notification Preferences</h2>
@@ -433,7 +427,6 @@ export function SettingsOverview({ session }: SettingsOverviewProps) {
               </div>
             )}
 
-            {/* Privacy & Security Settings */}
             {activeTab === 'privacy' && (
               <div className="space-y-6">
                 <h2 className="text-xl font-semibold text-white">Privacy & Security</h2>
@@ -507,7 +500,6 @@ export function SettingsOverview({ session }: SettingsOverviewProps) {
               </div>
             )}
 
-            {/* Analytics Settings */}
             {activeTab === 'analytics' && (
               <div className="space-y-6">
                 <h2 className="text-xl font-semibold text-white">Analytics Preferences</h2>
@@ -565,13 +557,11 @@ export function SettingsOverview({ session }: SettingsOverviewProps) {
               </div>
             )}
 
-            {/* API & Integrations Settings */}
             {activeTab === 'api' && (
               <div className="space-y-6">
                 <h2 className="text-xl font-semibold text-white">API & Integrations</h2>
                 
                 <div className="space-y-6">
-                  {/* API Key */}
                   <div>
                     <h3 className="text-white font-medium mb-3">API Key</h3>
                     <div className="flex gap-3">
@@ -599,7 +589,6 @@ export function SettingsOverview({ session }: SettingsOverviewProps) {
                     <p className="text-gray-400 text-xs mt-1">Use this key to access the ClickChutney API</p>
                   </div>
                   
-                  {/* CORS Origins */}
                   <div>
                     <h3 className="text-white font-medium mb-3">CORS Origins</h3>
                     <div className="space-y-3">
@@ -634,7 +623,6 @@ export function SettingsOverview({ session }: SettingsOverviewProps) {
                     <p className="text-gray-400 text-xs mt-1">Domains allowed to make API requests from browsers</p>
                   </div>
                   
-                  {/* Webhooks */}
                   <div className="flex items-center justify-between pt-4 border-t border-[#262626]">
                     <div>
                       <h3 className="text-white font-medium">Webhooks</h3>
@@ -651,7 +639,6 @@ export function SettingsOverview({ session }: SettingsOverviewProps) {
               </div>
             )}
 
-            {/* Save Button */}
             <div className="pt-6 border-t border-[#262626] flex justify-end">
               <button
                 onClick={() => settings && saveSettings(settings)}

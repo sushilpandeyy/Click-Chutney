@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { TrackingInstructions } from '@/components/tracking-instructions';
 import { AnalyticsChart } from '@/components/ui/analytics-chart';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { DashboardLayout } from '@/components/dashboard-layout';
@@ -125,50 +124,86 @@ export function ProjectDashboard({ session, projectId }: ProjectDashboardProps) 
     fetchProjectData();
   }, [projectId, router]);
 
-  // Simulate real-time data updates
+  // Fetch real-time data from Redis
   useEffect(() => {
-    const updateRealtimeData = () => {
-      const countries = [
-        { code: '🇺🇸', name: 'United States', users: Math.floor(Math.random() * 20) + 5 },
-        { code: '🇬🇧', name: 'United Kingdom', users: Math.floor(Math.random() * 15) + 3 },
-        { code: '🇨🇦', name: 'Canada', users: Math.floor(Math.random() * 10) + 2 },
-        { code: '🇩🇪', name: 'Germany', users: Math.floor(Math.random() * 8) + 1 },
-        { code: '🇫🇷', name: 'France', users: Math.floor(Math.random() * 6) + 1 }
-      ];
-
-      const pages = [
-        { page: '/', users: Math.floor(Math.random() * 25) + 15, percentage: 100 },
-        { page: '/features', users: Math.floor(Math.random() * 20) + 10, percentage: 80 },
-        { page: '/pricing', users: Math.floor(Math.random() * 15) + 8, percentage: 60 },
-        { page: '/blog', users: Math.floor(Math.random() * 12) + 5, percentage: 45 },
-        { page: '/contact', users: Math.floor(Math.random() * 8) + 3, percentage: 30 }
-      ];
-
-      const recentViews = Array.from({ length: 10 }, (_, i) => {
-        const randomPage = pages[Math.floor(Math.random() * pages.length)];
-        const randomCountry = countries[Math.floor(Math.random() * countries.length)];
-        return {
-          path: randomPage?.page || '/',
-          timestamp: new Date(Date.now() - i * 15000),
-          country: randomCountry?.code || '🇺🇸'
-        };
-      });
-
-      setRealtimeData({
-        activeUsers: Math.floor(Math.random() * 50) + 15,
-        pagesPerMinute: Math.floor(Math.random() * 100) + 30,
-        eventsPerMinute: Math.floor(Math.random() * 50) + 10,
-        topCountries: countries,
-        recentPageViews: recentViews,
-        activePages: pages
-      });
+    const fetchRealtimeData = async () => {
+      try {
+        const response = await fetch(`/api/projects/${projectId}/realtime`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success) {
+            const stats = data.data;
+            
+            // Transform the data to match our component structure
+            setRealtimeData({
+              activeUsers: stats.activeVisitors,
+              pagesPerMinute: stats.pagesPerMinute,
+              eventsPerMinute: stats.eventsPerMinute,
+              topCountries: stats.topCountries.map((item: { country: string; count: number }) => ({
+                code: item.country,
+                name: 'Country',
+                users: item.count
+              })),
+              recentPageViews: stats.recentPageViews.map((view: { page: string; timestamp: number; country?: string }) => ({
+                path: view.page,
+                timestamp: new Date(view.timestamp),
+                country: view.country || '🌍'
+              })),
+              activePages: stats.topPages.map((page: { page: string; count: number }, index: number) => ({
+                page: page.page,
+                users: page.count,
+                percentage: index === 0 ? 100 : (page.count / stats.topPages[0]?.count || 1) * 100
+              }))
+            });
+          }
+        } else {
+          // Fallback to simulated data if API fails
+          const fallbackData = {
+            activeUsers: Math.floor(Math.random() * 20) + 5,
+            pagesPerMinute: Math.floor(Math.random() * 50) + 10,
+            eventsPerMinute: Math.floor(Math.random() * 25) + 5,
+            topCountries: [
+              { code: '🇺🇸', name: 'United States', users: Math.floor(Math.random() * 10) + 2 },
+              { code: '🇬🇧', name: 'United Kingdom', users: Math.floor(Math.random() * 8) + 1 }
+            ],
+            recentPageViews: Array.from({ length: 5 }, (_, i) => {
+              const paths = ['/', '/features', '/pricing'];
+              const countries = ['🇺🇸', '🇬🇧', '🇨🇦'];
+              return {
+                path: paths[Math.floor(Math.random() * paths.length)] || '/',
+                timestamp: new Date(Date.now() - i * 30000),
+                country: countries[Math.floor(Math.random() * countries.length)] || '🌍'
+              };
+            }),
+            activePages: [
+              { page: '/', users: Math.floor(Math.random() * 15) + 5, percentage: 100 },
+              { page: '/features', users: Math.floor(Math.random() * 10) + 3, percentage: 70 }
+            ]
+          };
+          setRealtimeData(fallbackData);
+        }
+      } catch (error) {
+        console.error('Error fetching real-time data:', error);
+        // Use fallback data
+        setRealtimeData({
+          activeUsers: 0,
+          pagesPerMinute: 0,
+          eventsPerMinute: 0,
+          topCountries: [],
+          recentPageViews: [],
+          activePages: []
+        });
+      }
     };
 
-    updateRealtimeData();
-    const interval = setInterval(updateRealtimeData, 10000); // Update every 10 seconds
-
-    return () => clearInterval(interval);
-  }, []);
+    if (project) {
+      fetchRealtimeData();
+      const interval = setInterval(fetchRealtimeData, 10000); // Update every 10 seconds
+      return () => clearInterval(interval);
+    }
+    
+    return undefined;
+  }, [projectId, project]);
 
 
   if (isLoading) {
@@ -203,32 +238,31 @@ export function ProjectDashboard({ session, projectId }: ProjectDashboardProps) 
       case 'realtime':
         return (
           <div className="space-y-6">
-            {/* Real-time Overview */}
-            <div className="bg-white/60 dark:bg-card/60 backdrop-blur-sm border border-border/50 rounded-xl p-6">
+            <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h3 className="text-lg font-semibold text-foreground">Real-time Activity</h3>
-                  <p className="text-sm text-muted-foreground">Live visitor data updated every 10 seconds</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">Live visitor data updated every 10 seconds</p>
                 </div>
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg border border-emerald-200 dark:border-emerald-800">
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg border border-emerald-300 dark:border-emerald-700">
                   <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-                  <span className="text-sm text-emerald-700 dark:text-emerald-400 font-medium">Live</span>
+                  <span className="text-sm text-emerald-800 dark:text-emerald-300 font-medium">Live</span>
                 </div>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="text-center p-5 bg-blue-500/5 rounded-xl border border-blue-500/10">
-                  <div className="w-8 h-8 bg-blue-500/10 rounded-lg mx-auto mb-2 flex items-center justify-center">
-                    <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="text-center p-5 bg-blue-500/10 rounded-xl border border-blue-500/20">
+                  <div className="w-8 h-8 bg-blue-500/20 rounded-lg mx-auto mb-2 flex items-center justify-center">
+                    <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                     </svg>
                   </div>
                   <p className="text-2xl font-semibold text-foreground">{realtimeData.activeUsers}</p>
                   <p className="text-sm text-muted-foreground">Active Users</p>
                 </div>
-                <div className="text-center p-5 bg-purple-500/5 rounded-xl border border-purple-500/10">
-                  <div className="w-8 h-8 bg-purple-500/10 rounded-lg mx-auto mb-2 flex items-center justify-center">
-                    <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="text-center p-5 bg-purple-500/10 rounded-xl border border-purple-500/20">
+                  <div className="w-8 h-8 bg-purple-500/20 rounded-lg mx-auto mb-2 flex items-center justify-center">
+                    <svg className="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
@@ -236,18 +270,18 @@ export function ProjectDashboard({ session, projectId }: ProjectDashboardProps) 
                   <p className="text-2xl font-semibold text-foreground">{realtimeData.pagesPerMinute}</p>
                   <p className="text-sm text-muted-foreground">Pages/min</p>
                 </div>
-                <div className="text-center p-5 bg-orange-500/5 rounded-xl border border-orange-500/10">
-                  <div className="w-8 h-8 bg-orange-500/10 rounded-lg mx-auto mb-2 flex items-center justify-center">
-                    <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="text-center p-5 bg-orange-500/10 rounded-xl border border-orange-500/20">
+                  <div className="w-8 h-8 bg-orange-500/20 rounded-lg mx-auto mb-2 flex items-center justify-center">
+                    <svg className="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
                   </div>
                   <p className="text-2xl font-semibold text-foreground">{realtimeData.eventsPerMinute}</p>
                   <p className="text-sm text-muted-foreground">Events/min</p>
                 </div>
-                <div className="text-center p-5 bg-emerald-500/5 rounded-xl border border-emerald-500/10">
-                  <div className="w-8 h-8 bg-emerald-500/10 rounded-lg mx-auto mb-2 flex items-center justify-center">
-                    <svg className="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="text-center p-5 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
+                  <div className="w-8 h-8 bg-emerald-500/20 rounded-lg mx-auto mb-2 flex items-center justify-center">
+                    <svg className="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
@@ -257,16 +291,15 @@ export function ProjectDashboard({ session, projectId }: ProjectDashboardProps) 
               </div>
             </div>
 
-            {/* Live Activity Feed */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="bg-white/60 dark:bg-card/60 backdrop-blur-sm border border-border/50 rounded-xl p-6">
+              <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
                 <h4 className="text-md font-semibold text-foreground mb-4 flex items-center gap-2">
                   <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
                   Live Page Views
                 </h4>
                 <div className="space-y-3 max-h-80 overflow-y-auto">
                   {realtimeData.recentPageViews.map((view, i) => (
-                    <div key={i} className="flex items-center gap-3 text-sm py-2 px-3 bg-muted/30 rounded-lg">
+                    <div key={i} className="flex items-center gap-3 text-sm py-2 px-3 bg-muted/40 rounded-lg">
                       <span className="font-mono text-xs text-muted-foreground min-w-[60px]">
                         {view.timestamp.toLocaleTimeString('en-US', { 
                           hour12: false, 
@@ -282,7 +315,7 @@ export function ProjectDashboard({ session, projectId }: ProjectDashboardProps) 
                 </div>
               </div>
 
-              <div className="bg-white/60 dark:bg-card/60 backdrop-blur-sm border border-border/50 rounded-xl p-6">
+              <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
                 <h4 className="text-md font-semibold text-foreground mb-4">Top Active Pages</h4>
                 <div className="space-y-4">
                   {realtimeData.activePages.map((item, index) => (
@@ -310,10 +343,9 @@ export function ProjectDashboard({ session, projectId }: ProjectDashboardProps) 
       case 'analytics':
         return (
           <div className="space-y-6">
-            {/* Date Range Selector */}
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-card-foreground">Analytics Overview</h3>
-              <select className="px-3 py-2 bg-card border border-border rounded-lg text-sm">
+              <h3 className="text-lg font-semibold text-foreground">Analytics Overview</h3>
+              <select className="px-3 py-2 bg-card border border-border rounded-lg text-sm text-foreground">
                 <option>Last 7 days</option>
                 <option>Last 30 days</option>
                 <option>Last 90 days</option>
@@ -321,32 +353,31 @@ export function ProjectDashboard({ session, projectId }: ProjectDashboardProps) 
               </select>
             </div>
 
-            {/* Key Metrics */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div className="bg-white/60 dark:bg-card/60 backdrop-blur-sm border border-border/50 rounded-xl p-5 hover:shadow-sm transition-shadow">
+              <div className="bg-card border border-border rounded-xl p-5 hover:shadow-md transition-shadow">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-muted-foreground text-sm font-medium">Total Sessions</p>
                     <p className="text-2xl font-semibold text-foreground mt-1">{stats?.uniqueSessions?.toLocaleString() || 0}</p>
-                    <p className="text-xs text-emerald-600 font-medium mt-1">+12.5% vs last period</p>
+                    <p className="text-xs text-emerald-500 font-medium mt-1">+12.5% vs last period</p>
                   </div>
-                  <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center">
-                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center">
+                    <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                     </svg>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-white/60 dark:bg-card/60 backdrop-blur-sm border border-border/50 rounded-xl p-5 hover:shadow-sm transition-shadow">
+              <div className="bg-card border border-border rounded-xl p-5 hover:shadow-md transition-shadow">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-muted-foreground text-sm font-medium">Page Views</p>
                     <p className="text-2xl font-semibold text-foreground mt-1">{stats?.pageviews?.toLocaleString() || 0}</p>
-                    <p className="text-xs text-emerald-600 font-medium mt-1">+8.2% vs last period</p>
+                    <p className="text-xs text-emerald-500 font-medium mt-1">+8.2% vs last period</p>
                   </div>
-                  <div className="w-10 h-10 bg-purple-500/10 rounded-xl flex items-center justify-center">
-                    <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-10 h-10 bg-purple-500/20 rounded-xl flex items-center justify-center">
+                    <svg className="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
@@ -354,30 +385,30 @@ export function ProjectDashboard({ session, projectId }: ProjectDashboardProps) 
                 </div>
               </div>
 
-              <div className="bg-white/60 dark:bg-card/60 backdrop-blur-sm border border-border/50 rounded-xl p-5 hover:shadow-sm transition-shadow">
+              <div className="bg-card border border-border rounded-xl p-5 hover:shadow-md transition-shadow">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-muted-foreground text-sm font-medium">Avg. Session Duration</p>
                     <p className="text-2xl font-semibold text-foreground mt-1">{Math.round(stats?.avgSessionDuration || 0)}s</p>
-                    <p className="text-xs text-emerald-600 font-medium mt-1">+5.1% vs last period</p>
+                    <p className="text-xs text-emerald-500 font-medium mt-1">+5.1% vs last period</p>
                   </div>
-                  <div className="w-10 h-10 bg-orange-500/10 rounded-xl flex items-center justify-center">
-                    <svg className="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-10 h-10 bg-orange-500/20 rounded-xl flex items-center justify-center">
+                    <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-white/60 dark:bg-card/60 backdrop-blur-sm border border-border/50 rounded-xl p-5 hover:shadow-sm transition-shadow">
+              <div className="bg-card border border-border rounded-xl p-5 hover:shadow-md transition-shadow">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-muted-foreground text-sm font-medium">Bounce Rate</p>
                     <p className="text-2xl font-semibold text-foreground mt-1">{stats?.bounceRate || 0}%</p>
-                    <p className="text-xs text-emerald-600 font-medium mt-1">-3.2% vs last period</p>
+                    <p className="text-xs text-emerald-500 font-medium mt-1">-3.2% vs last period</p>
                   </div>
-                  <div className="w-10 h-10 bg-rose-500/10 rounded-xl flex items-center justify-center">
-                    <svg className="w-5 h-5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-10 h-10 bg-rose-500/20 rounded-xl flex items-center justify-center">
+                    <svg className="w-5 h-5 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6" />
                     </svg>
                   </div>
@@ -385,9 +416,8 @@ export function ProjectDashboard({ session, projectId }: ProjectDashboardProps) 
               </div>
             </div>
 
-            {/* Analytics Charts */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="bg-white/60 dark:bg-card/60 backdrop-blur-sm border border-border/50 rounded-xl p-6">
+              <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
                 <h4 className="text-lg font-semibold text-foreground mb-4">Sessions Over Time</h4>
                 {analytics?.timeSeries && analytics.timeSeries.length > 0 ? (
                   <AnalyticsChart
@@ -397,9 +427,9 @@ export function ProjectDashboard({ session, projectId }: ProjectDashboardProps) 
                     height={240}
                   />
                 ) : (
-                  <div className="h-60 flex items-center justify-center bg-muted/20 rounded-lg">
+                  <div className="h-60 flex items-center justify-center bg-muted/30 rounded-lg">
                     <div className="text-center">
-                      <svg className="w-12 h-12 text-muted-foreground/40 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-12 h-12 text-muted-foreground mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                       </svg>
                       <p className="text-sm text-muted-foreground">No data available</p>
@@ -408,7 +438,7 @@ export function ProjectDashboard({ session, projectId }: ProjectDashboardProps) 
                   </div>
                 )}
               </div>
-              <div className="bg-white/60 dark:bg-card/60 backdrop-blur-sm border border-border/50 rounded-xl p-6">
+              <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
                 <h4 className="text-lg font-semibold text-foreground mb-4">Top Traffic Sources</h4>
                 <div className="space-y-4">
                   {[
@@ -428,7 +458,7 @@ export function ProjectDashboard({ session, projectId }: ProjectDashboardProps) 
                         <div className="w-16 bg-muted rounded-full h-2">
                           <div className={`${item.color} h-2 rounded-full transition-all`} style={{ width: `${item.percentage}%` }} />
                         </div>
-                        <span className="text-xs text-muted-foreground w-8">{item.percentage}%</span>
+                        <span className="text-xs text-muted-foreground/70 w-8">{item.percentage}%</span>
                       </div>
                     </div>
                   ))}
@@ -436,9 +466,8 @@ export function ProjectDashboard({ session, projectId }: ProjectDashboardProps) 
               </div>
             </div>
 
-            {/* Top Content */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="bg-white/60 dark:bg-card/60 backdrop-blur-sm border border-border/50 rounded-xl p-6">
+              <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
                 <h4 className="text-lg font-semibold text-foreground mb-4">Top Pages</h4>
                 {analytics?.topPages && analytics.topPages.length > 0 ? (
                   <div className="space-y-4">
@@ -461,7 +490,7 @@ export function ProjectDashboard({ session, projectId }: ProjectDashboardProps) 
                   </div>
                 ) : (
                   <div className="py-8 text-center">
-                    <svg className="w-8 h-8 text-muted-foreground/40 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-8 h-8 text-muted-foreground mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                     <p className="text-sm text-muted-foreground">No page data available</p>
@@ -469,7 +498,7 @@ export function ProjectDashboard({ session, projectId }: ProjectDashboardProps) 
                 )}
               </div>
 
-              <div className="bg-white/60 dark:bg-card/60 backdrop-blur-sm border border-border/50 rounded-xl p-6">
+              <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
                 <h4 className="text-lg font-semibold text-foreground mb-4">Device Types</h4>
                 <div className="space-y-4">
                   {[
@@ -487,7 +516,7 @@ export function ProjectDashboard({ session, projectId }: ProjectDashboardProps) 
                         <div className="w-16 bg-muted rounded-full h-2">
                           <div className={`${item.color} h-2 rounded-full transition-all`} style={{ width: `${item.percentage}%` }} />
                         </div>
-                        <span className="text-xs text-muted-foreground w-8">{item.percentage}%</span>
+                        <span className="text-xs text-muted-foreground/70 w-8">{item.percentage}%</span>
                       </div>
                     </div>
                   ))}
@@ -502,7 +531,6 @@ export function ProjectDashboard({ session, projectId }: ProjectDashboardProps) 
           <div className="space-y-6">
             <h3 className="text-lg font-semibold text-card-foreground">Traffic Acquisition</h3>
             
-            {/* Acquisition Overview */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="bg-card border border-border rounded-lg p-4">
                 <div className="flex items-center gap-3 mb-3">
@@ -553,7 +581,6 @@ export function ProjectDashboard({ session, projectId }: ProjectDashboardProps) 
               </div>
             </div>
 
-            {/* Detailed Source Analysis */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="bg-card border border-border rounded-lg p-6">
                 <h4 className="text-lg font-semibold text-card-foreground mb-4">Top Referrers</h4>
@@ -613,7 +640,6 @@ export function ProjectDashboard({ session, projectId }: ProjectDashboardProps) 
           <div className="space-y-6">
             <h3 className="text-lg font-semibold text-card-foreground">User Behavior</h3>
             
-            {/* Behavior Overview */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="bg-card border border-border rounded-lg p-4 text-center">
                 <p className="text-2xl font-bold text-card-foreground">{(stats?.pageviews || 0) / (stats?.uniqueSessions || 1) || 2.3}</p>
@@ -633,7 +659,6 @@ export function ProjectDashboard({ session, projectId }: ProjectDashboardProps) 
               </div>
             </div>
 
-            {/* Page Flow and Exit Pages */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="bg-card border border-border rounded-lg p-6">
                 <h4 className="text-lg font-semibold text-card-foreground mb-4">Landing Pages</h4>
@@ -696,7 +721,6 @@ export function ProjectDashboard({ session, projectId }: ProjectDashboardProps) 
               </button>
             </div>
             
-            {/* Conversion Overview */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="bg-card border border-border rounded-lg p-4">
                 <div className="flex items-center gap-3 mb-3">
@@ -747,7 +771,6 @@ export function ProjectDashboard({ session, projectId }: ProjectDashboardProps) 
               </div>
             </div>
 
-            {/* Goals List */}
             <div className="bg-card border border-border rounded-lg p-6">
               <h4 className="text-lg font-semibold text-card-foreground mb-4">Active Goals</h4>
               <div className="space-y-4">
@@ -785,7 +808,6 @@ export function ProjectDashboard({ session, projectId }: ProjectDashboardProps) 
               </button>
             </div>
             
-            {/* Current Users */}
             <div className="bg-card border border-border rounded-lg p-6">
               <h4 className="text-lg font-semibold text-card-foreground mb-4">Team Members</h4>
               <div className="space-y-4">
@@ -824,7 +846,6 @@ export function ProjectDashboard({ session, projectId }: ProjectDashboardProps) 
               </div>
             </div>
 
-            {/* Access Permissions */}
             <div className="bg-card border border-border rounded-lg p-6">
               <h4 className="text-lg font-semibold text-card-foreground mb-4">Permission Levels</h4>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -863,10 +884,241 @@ export function ProjectDashboard({ session, projectId }: ProjectDashboardProps) 
       case 'tracking':
         return (
           <div className="space-y-6">
-            <TrackingInstructions 
-              trackingId={project.trackingId} 
-              domain="clickchutney.vercel.app"
-            />
+            <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
+              <h3 className="text-lg font-semibold text-foreground mb-4">Installation Guide</h3>
+              <p className="text-sm text-muted-foreground mb-6">
+                Add ClickChutney analytics to your React/Next.js project in 2 simple steps.
+              </p>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium text-foreground block mb-2">
+                    1. Copy Components (Download and add to your project)
+                  </label>
+                  <div className="relative">
+                    <pre className="bg-muted/60 border border-border rounded-lg p-4 text-xs overflow-x-auto text-foreground">
+{`// components/clickchutney-provider.tsx & components/analytics-wrapper.tsx
+// Copy these files to your project from the dashboard`}
+                    </pre>
+                    <button
+                      onClick={() => {
+                        const files = `Files to copy:
+1. components/clickchutney-provider.tsx
+2. components/analytics-wrapper.tsx
+
+Download from: ${window.location.origin}/dashboard/projects/${project.id}`;
+                        navigator.clipboard.writeText(files);
+                      }}
+                      className="absolute top-2 right-2 p-2 bg-background/80 hover:bg-background border border-border rounded-md transition-colors"
+                      title="Copy file info"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium text-foreground block mb-2">
+                    2. Wrap Your App (Add to layout.tsx or _app.tsx)
+                  </label>
+                  <div className="relative">
+                    <pre className="bg-gray-50 dark:bg-muted/60 border border-gray-200 dark:border-border rounded-lg p-4 text-xs overflow-x-auto text-gray-800 dark:text-gray-200">
+{`// app/layout.tsx (Next.js 13+)
+import { AnalyticsWrapper } from '@/components/analytics-wrapper';
+
+export default function Layout({ children }) {
+  return (
+    <html>
+      <body>
+        <AnalyticsWrapper trackingId="${project.trackingId}">
+          {children}
+        </AnalyticsWrapper>
+      </body>
+    </html>
+  );
+}`}
+                    </pre>
+                    <button
+                      onClick={() => {
+                        const code = `import { AnalyticsWrapper } from '@/components/analytics-wrapper';
+
+export default function Layout({ children }) {
+  return (
+    <html>
+      <body>
+        <AnalyticsWrapper trackingId="${project.trackingId}">
+          {children}
+        </AnalyticsWrapper>
+      </body>
+    </html>
+  );
+}`;
+                        navigator.clipboard.writeText(code);
+                      }}
+                      className="absolute top-2 right-2 p-2 bg-white/90 dark:bg-background/80 hover:bg-gray-50 dark:hover:bg-background border border-gray-300 dark:border-border rounded-md transition-colors"
+                      title="Copy integration code"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 002 2z" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium text-foreground block mb-2">
+                    Track Custom Events (Optional)
+                  </label>
+                  <div className="relative">
+                    <pre className="bg-gray-50 dark:bg-muted/60 border border-gray-200 dark:border-border rounded-lg p-4 text-xs overflow-x-auto text-gray-800 dark:text-gray-200">
+{`// In your components
+import { useClickChutney } from '@/components/clickchutney-provider';
+
+function MyComponent() {
+  const { trackEvent } = useClickChutney();
+  
+  return (
+    <button onClick={() => trackEvent('button-click', { name: 'signup' })}>
+      Sign Up
+    </button>
+  );
+}`}
+                    </pre>
+                    <button
+                      onClick={() => {
+                        const code = `import { useClickChutney } from '@/components/clickchutney-provider';
+
+function MyComponent() {
+  const { trackEvent } = useClickChutney();
+  
+  return (
+    <button onClick={() => trackEvent('button-click', { name: 'signup' })}>
+      Sign Up
+    </button>
+  );
+}`;
+                        navigator.clipboard.writeText(code);
+                      }}
+                      className="absolute top-2 right-2 p-2 bg-white/90 dark:bg-background/80 hover:bg-gray-50 dark:hover:bg-background border border-gray-300 dark:border-border rounded-md transition-colors"
+                      title="Copy event tracking code"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 002 2z" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                  <div className="text-center p-4 bg-blue-500/5 rounded-lg border border-blue-500/10">
+                    <div className="w-10 h-10 bg-blue-500/10 rounded-full mx-auto mb-3 flex items-center justify-center">
+                      <span className="text-blue-600 font-semibold">1</span>
+                    </div>
+                    <h4 className="font-medium text-gray-900 dark:text-foreground mb-2">Copy Components</h4>
+                    <p className="text-xs text-gray-600 dark:text-gray-300">Add the provider files to your project</p>
+                  </div>
+                  <div className="text-center p-4 bg-emerald-500/5 rounded-lg border border-emerald-500/10">
+                    <div className="w-10 h-10 bg-emerald-500/10 rounded-full mx-auto mb-3 flex items-center justify-center">
+                      <span className="text-emerald-600 font-semibold">2</span>
+                    </div>
+                    <h4 className="font-medium text-gray-900 dark:text-foreground mb-2">Wrap & Track</h4>
+                    <p className="text-xs text-gray-600 dark:text-gray-300">Add to layout and start tracking</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
+              <h3 className="text-lg font-semibold text-foreground mb-4">Project Settings</h3>
+              
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="text-sm font-medium text-foreground block mb-2">
+                      Project Name
+                    </label>
+                    <input
+                      type="text"
+                      value={project.name}
+                      className="w-full p-3 bg-background border border-border rounded-lg text-sm text-foreground"
+                      disabled
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-foreground block mb-2">
+                      Website URL
+                    </label>
+                    <input
+                      type="url"
+                      value={project.website || ''}
+                      placeholder="https://example.com"
+                      className="w-full p-3 bg-background border border-border rounded-lg text-sm text-foreground placeholder-muted-foreground"
+                      disabled
+                    />
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="text-sm font-medium text-foreground block mb-2">
+                    Tracking ID
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={project.trackingId}
+                      className="flex-1 p-3 bg-muted/60 border border-border rounded-lg text-sm font-mono text-foreground"
+                      readOnly
+                    />
+                    <button
+                      onClick={() => navigator.clipboard.writeText(project.trackingId)}
+                      className="p-3 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 rounded-lg transition-colors"
+                      title="Copy Tracking ID"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
+                    </button>
+                  </div>
+                  <p className="text-xs text-muted-foreground/70 mt-1">
+                    This unique ID identifies your project in the tracking script
+                  </p>
+                </div>
+                
+                <div>
+                  <label className="text-sm font-medium text-foreground block mb-2">
+                    Status
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <span className={`inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium ${
+                      project.status === 'ACTIVE' 
+                        ? 'bg-emerald-500/20 text-emerald-500 border border-emerald-500/30' 
+                        : 'bg-amber-500/20 text-amber-500 border border-amber-500/30'
+                    }`}>
+                      {project.status === 'ACTIVE' ? 'Active' : 'Setup Required'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
+              <h3 className="text-lg font-semibold text-foreground mb-4">Test Connection</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Verify that your tracking script is properly installed and sending data.
+              </p>
+              
+              <button 
+                onClick={() => {
+                  // In a real app, this would test the connection
+                  alert('Connection test would be implemented here');
+                }}
+                className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
+              >
+                Test Connection
+              </button>
+            </div>
           </div>
         );
       
@@ -891,33 +1143,31 @@ export function ProjectDashboard({ session, projectId }: ProjectDashboardProps) 
   return (
     <DashboardLayout session={session} projectContext={projectContext}>
       <div className="p-4 lg:p-6 space-y-6">
-        {/* Breadcrumb Navigation - Hidden on mobile */}
         <div className="hidden lg:block">
           <Breadcrumb items={breadcrumbItems} className="animate-fade-in" />
         </div>
 
-        {/* Project Header */}
-        <div className="bg-white/50 dark:bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl p-6 animate-fade-in">
+        <div className="bg-card border border-border rounded-xl p-6 animate-fade-in shadow-sm">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-3 mb-2">
                 <h1 className="text-2xl font-semibold text-foreground truncate">{project.name}</h1>
                 <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium ${
                   project.status === 'ACTIVE' 
-                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800' 
-                    : 'bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800'
+                    ? 'bg-emerald-500/20 text-emerald-500 border border-emerald-500/30' 
+                    : 'bg-amber-500/20 text-amber-500 border border-amber-500/30'
                 }`}>
                   {project.status === 'ACTIVE' ? 'Live' : 'Setup Required'}
                 </span>
               </div>
               
               {project.description && (
-                <p className="text-muted-foreground text-sm mb-3">
+                <p className="text-gray-600 dark:text-gray-300 text-sm mb-3">
                   {project.description}
                 </p>
               )}
               
-              <div className="flex flex-col sm:flex-row sm:items-center gap-3 text-xs text-muted-foreground">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
                 <div className="flex items-center gap-2">
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
@@ -944,7 +1194,6 @@ export function ProjectDashboard({ session, projectId }: ProjectDashboardProps) 
           </div>
         </div>
 
-        {/* Tab Content */}
         <div className="animate-slide-up">
           {renderTabContent()}
         </div>

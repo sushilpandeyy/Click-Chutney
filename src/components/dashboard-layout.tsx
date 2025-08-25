@@ -28,22 +28,11 @@ const genericNavigation = [
     title: "Main",
     items: [
       {
-        name: 'Overview',
+        name: 'Dashboard',
         href: '/dashboard',
         icon: (
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-          </svg>
-        ),
-        badge: null,
-        isImportant: true,
-      },
-      {
-        name: 'Projects',
-        href: '/dashboard/projects',
-        icon: (
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
           </svg>
         ),
         badge: 'Primary',
@@ -229,7 +218,7 @@ export function DashboardLayout({ children, session, projectContext }: Dashboard
   };
 
   const handleBackToProjects = () => {
-    router.push('/dashboard/projects');
+    router.push('/dashboard');
     setIsMobileMenuOpen(false);
   };
 
@@ -237,7 +226,6 @@ export function DashboardLayout({ children, session, projectContext }: Dashboard
 
   return (
     <div className="min-h-screen bg-background text-foreground flex">
-      {/* Mobile overlay */}
       {isMobileMenuOpen && (
         <div 
           className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
@@ -245,7 +233,6 @@ export function DashboardLayout({ children, session, projectContext }: Dashboard
         />
       )}
 
-      {/* Sidebar */}
       <aside 
         className={`
           fixed inset-y-0 left-0 z-50 w-64 bg-sidebar-background border-r border-sidebar-border transform transition-all duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 focus-within:ring-2 focus-within:ring-primary/20
@@ -256,7 +243,6 @@ export function DashboardLayout({ children, session, projectContext }: Dashboard
         aria-label="Main navigation"
       >
         <div className="flex flex-col h-full">
-          {/* Header */}
           <div className="flex items-center justify-between h-16 px-4 border-b border-sidebar-border bg-sidebar-background/50">
             {!isSidebarCollapsed && (
               <div className="flex-1 min-w-0">
@@ -304,7 +290,6 @@ export function DashboardLayout({ children, session, projectContext }: Dashboard
             </button>
           </div>
 
-          {/* Navigation */}
           <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-6">
             {navigationData.map((section) => (
               <div key={section.title} className="space-y-1">
@@ -368,7 +353,6 @@ export function DashboardLayout({ children, session, projectContext }: Dashboard
             ))}
           </nav>
 
-          {/* Quick Actions / Stats */}
           {!isSidebarCollapsed && (
             <div className="border-t border-sidebar-border/50 p-4">
               {isInProjectView ? (
@@ -387,7 +371,7 @@ export function DashboardLayout({ children, session, projectContext }: Dashboard
                 </div>
               ) : (
                 <button
-                  onClick={() => router.push('/dashboard/projects')}
+                  onClick={() => router.push('/dashboard')}
                   className="w-full bg-primary/8 hover:bg-primary/12 text-primary rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150 flex items-center gap-2 justify-center group"
                 >
                   <svg className="w-4 h-4 group-hover:scale-105 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -399,7 +383,6 @@ export function DashboardLayout({ children, session, projectContext }: Dashboard
             </div>
           )}
 
-          {/* User section */}
           <div className="border-t border-sidebar-border p-4 bg-sidebar-background/50">
             <div className={`flex items-center gap-3 ${isSidebarCollapsed ? 'justify-center' : ''}`}>
               <div className="relative">
@@ -462,9 +445,7 @@ export function DashboardLayout({ children, session, projectContext }: Dashboard
         </div>
       </aside>
 
-      {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Mobile header */}
         <div className="lg:hidden flex items-center justify-between h-16 px-4 bg-sidebar-background border-b border-sidebar-border backdrop-blur-sm">
           <button
             onClick={() => setIsMobileMenuOpen(true)}
@@ -486,10 +467,9 @@ export function DashboardLayout({ children, session, projectContext }: Dashboard
               <span className="text-lg font-bold bg-gradient-to-r from-primary via-chart-1 to-chart-2 bg-clip-text text-transparent">ClickChutney</span>
             )}
           </div>
-          <div className="w-8" /> {/* Spacer */}
+          <div className="w-8" />
         </div>
 
-        {/* Page content */}
         <main className={`flex-1 overflow-auto transition-all duration-300 ${
           isInProjectView && !isSidebarCollapsed ? 'lg:ml-0' : ''
         }`}>

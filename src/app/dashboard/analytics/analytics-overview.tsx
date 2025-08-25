@@ -272,7 +272,6 @@ export function AnalyticsOverview({ }: AnalyticsOverviewProps) {
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      {/* Header */}
       <div className="mb-8">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
           <div>
@@ -282,9 +281,7 @@ export function AnalyticsOverview({ }: AnalyticsOverviewProps) {
             </p>
           </div>
           
-          {/* Controls */}
           <div className="mt-4 lg:mt-0 flex flex-col sm:flex-row gap-3">
-            {/* Project Selector */}
             <div className="flex items-center gap-2">
               <label className="text-sm text-gray-400">Project:</label>
               <select
@@ -301,7 +298,6 @@ export function AnalyticsOverview({ }: AnalyticsOverviewProps) {
               </select>
             </div>
             
-            {/* Time Range Selector */}
             <div className="flex items-center gap-2">
               <label className="text-sm text-gray-400">Time:</label>
               <select
@@ -320,7 +316,6 @@ export function AnalyticsOverview({ }: AnalyticsOverviewProps) {
         </div>
       </div>
 
-      {/* Tab Navigation */}
       <div className="mb-8">
         <div className="border-b border-[#262626]">
           <nav className="flex space-x-8 overflow-x-auto">
@@ -342,10 +337,8 @@ export function AnalyticsOverview({ }: AnalyticsOverviewProps) {
         </div>
       </div>
 
-      {/* Overview Tab */}
       {activeTab === 'overview' && (
         <div className="space-y-8">
-          {/* Key Metrics Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {METRICS_CARDS.map((metric) => (
               <div key={metric.key} className="bg-[#111111] border border-[#262626] rounded-lg p-6">
@@ -367,9 +360,7 @@ export function AnalyticsOverview({ }: AnalyticsOverviewProps) {
             ))}
           </div>
 
-          {/* Charts Row */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Traffic Chart */}
             <div className="bg-[#111111] border border-[#262626] rounded-lg p-6">
               <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                 <span>📈</span>
@@ -380,7 +371,6 @@ export function AnalyticsOverview({ }: AnalyticsOverviewProps) {
               </div>
             </div>
 
-            {/* Device Breakdown */}
             <div className="bg-[#111111] border border-[#262626] rounded-lg p-6">
               <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                 <span>📱</span>
@@ -433,9 +423,7 @@ export function AnalyticsOverview({ }: AnalyticsOverviewProps) {
             </div>
           </div>
 
-          {/* Top Pages and Sources */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Top Pages */}
             <div className="bg-[#111111] border border-[#262626] rounded-lg p-6">
               <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                 <span>📄</span>
@@ -456,7 +444,6 @@ export function AnalyticsOverview({ }: AnalyticsOverviewProps) {
               </div>
             </div>
 
-            {/* Top Sources */}
             <div className="bg-[#111111] border border-[#262626] rounded-lg p-6">
               <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                 <span>🔗</span>
@@ -480,7 +467,6 @@ export function AnalyticsOverview({ }: AnalyticsOverviewProps) {
         </div>
       )}
 
-      {/* Real-time Tab */}
       {activeTab === 'realtime' && (
         <div className="space-y-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -526,7 +512,6 @@ export function AnalyticsOverview({ }: AnalyticsOverviewProps) {
         </div>
       )}
 
-      {/* Other tabs content */}
       {activeTab !== 'overview' && activeTab !== 'realtime' && (
         <div className="bg-[#111111] border border-[#262626] rounded-lg p-12 text-center">
           <h3 className="text-xl font-semibold text-white mb-2">{tabs.find(t => t.id === activeTab)?.name}</h3>

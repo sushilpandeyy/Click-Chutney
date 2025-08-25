@@ -91,7 +91,6 @@ export function AnalyticsChart({
 
       <div className="relative" style={{ height }}>
         <svg width="100%" height="100%" className="overflow-visible">
-          {/* Grid lines */}
           <defs>
             <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
               <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgb(var(--border))" strokeWidth="0.5" opacity="0.3"/>
@@ -99,10 +98,8 @@ export function AnalyticsChart({
           </defs>
           <rect width="100%" height="100%" fill="url(#grid)" />
 
-          {/* Chart content */}
           {type === 'line' ? (
             <>
-              {/* Area fill */}
               <defs>
                 <linearGradient id="areaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
                   <stop offset="0%" stopColor="rgb(var(--chart-1))" stopOpacity="0.3" />
@@ -127,7 +124,6 @@ export function AnalyticsChart({
                 </>
               )}
               
-              {/* Data points */}
               {normalizedData.map((point, index) => (
                 <g key={index}>
                   <circle
@@ -143,7 +139,6 @@ export function AnalyticsChart({
               ))}
             </>
           ) : (
-            /* Bar chart */
             normalizedData.map((point, index) => (
               <g key={index}>
                 <rect
@@ -162,7 +157,6 @@ export function AnalyticsChart({
           )}
         </svg>
 
-        {/* X-axis labels */}
         <div className="absolute bottom-0 left-0 right-0 flex justify-between text-xs text-muted-foreground mt-2">
           {normalizedData.length > 0 && normalizedData[0] && normalizedData[normalizedData.length - 1] && (
             <>

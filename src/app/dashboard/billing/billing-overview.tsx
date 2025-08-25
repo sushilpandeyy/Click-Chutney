@@ -227,7 +227,6 @@ export function BillingOverview({ session }: BillingOverviewProps) {
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white mb-2">Billing & Usage</h1>
         <p className="text-gray-400">
@@ -235,7 +234,6 @@ export function BillingOverview({ session }: BillingOverviewProps) {
         </p>
       </div>
 
-      {/* Current Plan */}
       <div className="mb-8 bg-[#111111] border border-[#262626] rounded-lg p-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between">
           <div>
@@ -266,11 +264,9 @@ export function BillingOverview({ session }: BillingOverviewProps) {
         </div>
       </div>
 
-      {/* Usage Statistics */}
       <div className="mb-8">
         <h2 className="text-xl font-semibold text-white mb-4">Current Usage</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {/* Events */}
           <div className="bg-[#111111] border border-[#262626] rounded-lg p-6">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-medium text-gray-400">Events</h3>
@@ -297,7 +293,6 @@ export function BillingOverview({ session }: BillingOverviewProps) {
             </p>
           </div>
 
-          {/* Projects */}
           <div className="bg-[#111111] border border-[#262626] rounded-lg p-6">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-medium text-gray-400">Projects</h3>
@@ -331,7 +326,6 @@ export function BillingOverview({ session }: BillingOverviewProps) {
             )}
           </div>
 
-          {/* Storage */}
           <div className="bg-[#111111] border border-[#262626] rounded-lg p-6">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-medium text-gray-400">Storage</h3>
@@ -358,7 +352,6 @@ export function BillingOverview({ session }: BillingOverviewProps) {
             </p>
           </div>
 
-          {/* API Calls */}
           <div className="bg-[#111111] border border-[#262626] rounded-lg p-6">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-medium text-gray-400">API Calls (Today)</h3>
@@ -387,7 +380,6 @@ export function BillingOverview({ session }: BillingOverviewProps) {
         </div>
       </div>
 
-      {/* Plans Comparison */}
       <div className="mb-8">
         <h2 className="text-xl font-semibold text-white mb-4">Available Plans</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -443,9 +435,7 @@ export function BillingOverview({ session }: BillingOverviewProps) {
         </div>
       </div>
 
-      {/* Payment Method & Billing History */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Payment Method */}
         <div className="bg-[#111111] border border-[#262626] rounded-lg p-6">
           <h2 className="text-xl font-semibold text-white mb-4">Payment Method</h2>
           
@@ -483,7 +473,6 @@ export function BillingOverview({ session }: BillingOverviewProps) {
           )}
         </div>
 
-        {/* Billing History */}
         <div className="bg-[#111111] border border-[#262626] rounded-lg p-6">
           <h2 className="text-xl font-semibold text-white mb-4">Billing History</h2>
           

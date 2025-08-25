@@ -166,7 +166,6 @@ export function SettingsClient({ session }: SettingsClientProps) {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white">
-      {/* Header */}
       <header className="border-b border-[#262626] bg-[#111111]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
@@ -212,7 +211,6 @@ export function SettingsClient({ session }: SettingsClientProps) {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">Settings</h1>
@@ -232,7 +230,6 @@ export function SettingsClient({ session }: SettingsClientProps) {
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Sidebar */}
           <div className="lg:col-span-1">
             <nav className="bg-[#111111] border border-[#262626] rounded-lg p-2">
               <button
@@ -268,7 +265,6 @@ export function SettingsClient({ session }: SettingsClientProps) {
             </nav>
           </div>
 
-          {/* Content */}
           <div className="lg:col-span-3">
             {activeTab === 'profile' && profile && (
               <div className="bg-[#111111] border border-[#262626] rounded-lg p-6">

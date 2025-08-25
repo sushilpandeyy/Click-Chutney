@@ -193,7 +193,6 @@ export function DashboardClient({ session }: DashboardClientProps) {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
@@ -205,7 +204,6 @@ export function DashboardClient({ session }: DashboardClientProps) {
                 ClickChutney
               </button>
               
-              {/* Navigation */}
               <nav className="hidden md:flex items-center space-x-6">
                 <button className="text-white border-b-2 border-blue-500 pb-1 text-sm font-medium">
                   Dashboard
@@ -274,9 +272,7 @@ export function DashboardClient({ session }: DashboardClientProps) {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header Section */}
         <div className="mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
             <div>
@@ -299,7 +295,6 @@ export function DashboardClient({ session }: DashboardClientProps) {
           </div>
         </div>
 
-        {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatCard
             title="Total Projects"
@@ -349,9 +344,7 @@ export function DashboardClient({ session }: DashboardClientProps) {
           />
         </div>
 
-        {/* Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Recent Activity */}
           <div className="lg:col-span-2">
             <div className="bg-[#111111] border border-[#262626] rounded-lg p-6">
               <div className="flex items-center justify-between mb-6">
@@ -411,7 +404,6 @@ export function DashboardClient({ session }: DashboardClientProps) {
             </div>
           </div>
 
-          {/* Quick Actions */}
           <div className="space-y-6">
             <div className="bg-[#111111] border border-[#262626] rounded-lg p-6">
               <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
@@ -469,7 +461,6 @@ export function DashboardClient({ session }: DashboardClientProps) {
               </div>
             </div>
 
-            {/* Integration Status */}
             <div className="bg-[#111111] border border-[#262626] rounded-lg p-6">
               <h3 className="text-lg font-semibold text-white mb-4">Integration Status</h3>
               
@@ -491,7 +482,6 @@ export function DashboardClient({ session }: DashboardClientProps) {
           </div>
         </div>
 
-        {/* Projects Overview */}
         <div className="mt-12">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-xl font-semibold flex items-center gap-2">
@@ -581,7 +571,6 @@ export function DashboardClient({ session }: DashboardClientProps) {
         </div>
       </main>
 
-      {/* Project Creation Modal */}
       <ProjectCreateModal
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}

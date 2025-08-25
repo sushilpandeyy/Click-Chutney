@@ -129,7 +129,6 @@ export function AnalyticsClient({ session, projectId }: AnalyticsClientProps) {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white">
-      {/* Header */}
       <header className="border-b border-[#262626] bg-[#111111]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
@@ -175,9 +174,7 @@ export function AnalyticsClient({ session, projectId }: AnalyticsClientProps) {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header Section */}
         <div className="mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
             <div>
@@ -252,7 +249,6 @@ export function AnalyticsClient({ session, projectId }: AnalyticsClientProps) {
           </div>
         ) : analytics ? (
           <>
-            {/* Summary Stats */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
               <div className="bg-[#111111] border border-[#262626] rounded-lg p-6">
                 <p className="text-gray-400 text-sm font-medium">Total Events</p>
@@ -280,9 +276,7 @@ export function AnalyticsClient({ session, projectId }: AnalyticsClientProps) {
               </div>
             </div>
 
-            {/* Charts and Tables */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-              {/* Top Pages */}
               <div className="bg-[#111111] border border-[#262626] rounded-lg p-6">
                 <h3 className="text-lg font-semibold text-white mb-4">Top Pages</h3>
                 {analytics.topPages.length > 0 ? (
@@ -299,7 +293,6 @@ export function AnalyticsClient({ session, projectId }: AnalyticsClientProps) {
                 )}
               </div>
 
-              {/* Top Events */}
               <div className="bg-[#111111] border border-[#262626] rounded-lg p-6">
                 <h3 className="text-lg font-semibold text-white mb-4">Top Events</h3>
                 {analytics.topEvents.length > 0 ? (
@@ -317,7 +310,6 @@ export function AnalyticsClient({ session, projectId }: AnalyticsClientProps) {
               </div>
             </div>
 
-            {/* Recent Events */}
             <div className="bg-[#111111] border border-[#262626] rounded-lg p-6">
               <h3 className="text-lg font-semibold text-white mb-4">Recent Events</h3>
               {analytics.recentEvents.length > 0 ? (

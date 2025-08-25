@@ -109,7 +109,6 @@ export function DashboardOverview({ }: DashboardOverviewProps) {
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      {/* Breadcrumb Navigation */}
       <Breadcrumb 
         items={[
           { label: "Dashboard", href: "/dashboard" },
@@ -118,7 +117,6 @@ export function DashboardOverview({ }: DashboardOverviewProps) {
         className="mb-6"
       />
       
-      {/* Header Section */}
       <div className="mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -144,7 +142,6 @@ export function DashboardOverview({ }: DashboardOverviewProps) {
         </div>
       </div>
 
-      {/* Projects List */}
       {projects.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {projects.map((project) => (
@@ -213,7 +210,6 @@ export function DashboardOverview({ }: DashboardOverviewProps) {
         />
       )}
 
-      {/* Project Creation Modal */}
       <ProjectCreateModal
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}

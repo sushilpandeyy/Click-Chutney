@@ -1,15 +1,13 @@
 import { betterAuth } from "better-auth"
 import { nextCookies } from "better-auth/next-js"
-import { MongoClient } from "mongodb"
 import { mongodbAdapter } from "better-auth/adapters/mongodb"
+import { MongoClient } from "mongodb"
+
 
 const getDatabaseConfig = () => {
   const baseUrl = process.env.DATABASE_URL
-  
-  // Use hardcoded DEV database name
   const dbName = 'DEV'
   
-  // Handle different URL formats
   if (!baseUrl) {
     return {
       url: `mongodb://localhost:27017/${dbName}`,
@@ -17,9 +15,8 @@ const getDatabaseConfig = () => {
     }
   }
   
-  // If URL already contains database name, use it as is
+  // Handle different URL formats
   if (baseUrl.includes('mongodb://') || baseUrl.includes('mongodb+srv://')) {
-    // Check if database name is already in URL
     const urlParts = baseUrl.split('/')
     if (urlParts.length > 3 && urlParts[3] && !urlParts[3].startsWith('?')) {
       return {
@@ -27,7 +24,6 @@ const getDatabaseConfig = () => {
         dbName: urlParts[3].split('?')[0]
       }
     } else {
-      // Add database name to URL
       const hasQuery = baseUrl.includes('?')
       return {
         url: hasQuery ? baseUrl.replace('?', `/${dbName}?`) : `${baseUrl}/${dbName}`,
@@ -54,14 +50,6 @@ const getGitHubConfig = () => {
   const clientId = process.env.GITHUB_CLIENT_ID
   const clientSecret = process.env.GITHUB_CLIENT_SECRET
   
-  // Debug logging only in development runtime
-  if (process.env.NODE_ENV === 'development') {
-    console.log('🍛 GitHub OAuth Config:', {
-      clientId: clientId ? `${clientId.slice(0, 8)}...` : 'missing',
-      clientSecret: clientSecret ? 'present' : 'missing'
-    })
-  }
-  
   if (!clientId || !clientSecret) {
     console.warn('⚠️ GitHub OAuth credentials not found, using dummy values')
     return {
@@ -78,41 +66,39 @@ const getBaseURL = () => {
   return url.endsWith('/') ? url.slice(0, -1) : url
 }
 
-let client: MongoClient
-let db: ReturnType<MongoClient['db']>
+// Initialize MongoDB client for Better Auth (separate from Prisma)
+let authClient: MongoClient | null = null
+let authDb: ReturnType<MongoClient['db']> | null = null
 
 // Skip database initialization during build time
-if (process.env.NEXT_PHASE === 'phase-production-build') {
-  client = {} as MongoClient
-  db = {} as ReturnType<MongoClient['db']>
-} else {
+if (process.env.NEXT_PHASE !== 'phase-production-build') {
   try {
     const dbConfig = getDatabaseConfig()
-    client = new MongoClient(dbConfig.url, {
+    authClient = new MongoClient(dbConfig.url, {
       serverSelectionTimeoutMS: 5000,
       connectTimeoutMS: 5000,
       socketTimeoutMS: 5000,
-      maxPoolSize: 10,
+      maxPoolSize: 5,
       retryWrites: true,
       retryReads: true
     })
-    db = client.db(dbConfig.dbName)
+    authDb = authClient.db(dbConfig.dbName)
     
-    // Log which database is being used (helpful for debugging)
+    // Log successful connection in development
     if (process.env.NODE_ENV === 'development') {
-      console.log(`🍛 ClickChutney connecting to database: ${dbConfig.dbName}`)
+      console.log(`✅ Better Auth connected to database: ${dbConfig.dbName}`)
     }
   } catch (error) {
-    console.warn("MongoDB client initialization failed during build:", error)
-    client = {} as MongoClient
-    db = {} as ReturnType<MongoClient['db']>
+    console.warn("Better Auth MongoDB client initialization failed:", error)
+    authClient = null
+    authDb = null
   }
 }
 
 const githubConfig = getGitHubConfig()
 
 const createAuthConfig = () => {
-  const config = {
+  const baseConfig = {
     emailAndPassword: {
       enabled: true,
     },
@@ -123,7 +109,7 @@ const createAuthConfig = () => {
     baseURL: getBaseURL(),
     secret: process.env.BETTER_AUTH_SECRET || process.env.AUTH_SECRET || "default-secret-change-in-production",
     logger: {
-      level: (process.env.NODE_ENV === 'development' && process.env.NEXT_PHASE !== 'phase-production-build' ? 'debug' : 'error') as 'debug' | 'error'
+      level: 'error' as const  // Reduce logging noise
     },
     user: {
       additionalFields: {
@@ -139,15 +125,15 @@ const createAuthConfig = () => {
     }
   }
 
-  // Only add database during runtime, not build time
-  if (process.env.NEXT_PHASE !== 'phase-production-build' && db && typeof db.collection === 'function') {
+  // Add database configuration if available
+  if (process.env.NEXT_PHASE !== 'phase-production-build' && authDb && typeof authDb.collection === 'function') {
     return {
-      ...config,
-      database: mongodbAdapter(db)
+      ...baseConfig,
+      database: mongodbAdapter(authDb)
     }
   }
 
-  return config
+  return baseConfig
 }
 
 export const auth = betterAuth(createAuthConfig())

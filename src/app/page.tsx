@@ -5,11 +5,9 @@ import { ArrowRight, BarChart3, Shield, CheckCircle, Users, TrendingUp, Globe, A
 export default function Home() {
   return (
     <main className="relative min-h-screen bg-background overflow-hidden">
-      {/* Background Elements */}
       <div className="absolute inset-0 bg-gradient-to-br from-background via-card/50 to-background"></div>
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-accent/10"></div>
       
-      {/* Fixed Header */}
       <header className="fixed top-0 w-full z-50 backdrop-blur-xl bg-background/80 border-b border-border">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <div className="font-display text-2xl font-bold bg-gradient-to-r from-primary via-chart-1 to-chart-2 bg-clip-text text-transparent">
@@ -35,7 +33,6 @@ export default function Home() {
         </div>
       </header>
       
-      {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center px-4 pt-20">
         <div className="max-w-7xl mx-auto text-center space-y-12">
           <div className="space-y-8">
@@ -104,7 +101,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Features Section */}
       <section id="features" className="relative py-32 px-4 bg-card">
         <div className="max-w-7xl mx-auto">
           <div className="text-center space-y-6 mb-20">
@@ -205,7 +201,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Additional Features Grid */}
       <section className="relative py-16 px-4 bg-card">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -244,7 +239,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Advanced Analytics Section */}
       <section className="relative py-32 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
@@ -319,7 +313,6 @@ export default function Home() {
                   </div>
                   
                   <div className="space-y-4">
-                    {/* Metrics Row */}
                     <div className="grid grid-cols-3 gap-4">
                       <div className="bg-card border border-border rounded-lg p-4">
                         <div className="text-xs text-muted-foreground mb-1">Page Views</div>
@@ -338,7 +331,6 @@ export default function Home() {
                       </div>
                     </div>
                     
-                    {/* Chart Area */}
                     <div className="bg-card border border-border rounded-lg p-4 h-32">
                       <div className="w-full h-full bg-gradient-to-r from-primary/20 via-chart-1/20 to-chart-2/20 rounded opacity-50"></div>
                     </div>
@@ -350,7 +342,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ROI Benefits Section */}
       <section className="relative py-32 px-4 bg-gradient-to-br from-primary/5 via-background to-chart-1/5">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-20">
@@ -419,7 +410,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Social Proof Section */}
       <section id="customers" className="relative py-32 px-4 bg-muted/30">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-20">
@@ -435,7 +425,6 @@ export default function Home() {
             </p>
           </div>
           
-          {/* Testimonials Grid */}
           <div className="grid lg:grid-cols-3 gap-8 mb-20">
             <div className="bg-background/80 backdrop-blur-sm border border-border rounded-2xl p-8 shadow-lg">
               <div className="flex items-center mb-6">
@@ -510,7 +499,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Stats Row */}
           <div className="grid md:grid-cols-4 gap-6 mb-16">
             <div className="bg-background/60 backdrop-blur-sm border border-border rounded-xl p-6 text-center">
               <div className="text-3xl font-bold text-primary mb-2">99.9%</div>
@@ -530,7 +518,6 @@ export default function Home() {
             </div>
           </div>
           
-          {/* Company Logos */}
           <div className="text-center">
             <p className="text-muted-foreground text-sm font-medium mb-8">Trusted by leading companies worldwide</p>
             <div className="flex justify-center items-center space-x-12 opacity-60">
@@ -551,7 +538,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CTA Section */}
       <section className="relative py-32 px-4 bg-gradient-to-br from-primary/10 via-background to-chart-1/10">
         <div className="max-w-4xl mx-auto text-center space-y-12">
           <div className="space-y-6">
@@ -595,7 +581,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Pricing Section */}
       <section id="pricing" className="relative py-32 px-4 bg-card">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
@@ -611,7 +596,6 @@ export default function Home() {
           </div>
           
           <div className="grid md:grid-cols-3 gap-8">
-            {/* Starter Plan */}
             <div className="bg-background border border-border rounded-2xl p-8 relative">
               <div className="mb-6">
                 <h3 className="text-xl font-bold text-foreground mb-2">Starter</h3>
@@ -645,7 +629,6 @@ export default function Home() {
               </Button>
             </div>
             
-            {/* Professional Plan */}
             <div className="bg-background border-2 border-primary rounded-2xl p-8 relative">
               <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                 <span className="bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold">Most Popular</span>
@@ -688,7 +671,6 @@ export default function Home() {
               </Button>
             </div>
             
-            {/* Enterprise Plan */}
             <div className="bg-background border border-border rounded-2xl p-8 relative">
               <div className="mb-6">
                 <h3 className="text-xl font-bold text-foreground mb-2">Enterprise</h3>
@@ -740,7 +722,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* FAQ Section */}
       <section id="faq" className="relative py-32 px-4 bg-card">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
@@ -849,7 +830,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="relative py-20 px-4 bg-background border-t border-border">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-5 gap-8 mb-12">
